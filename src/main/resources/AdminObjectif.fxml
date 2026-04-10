@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controllers.ObjectifAdminController"
+            fitToWidth="true"
+            hbarPolicy="NEVER"
+            style="-fx-background-color: transparent; -fx-background: transparent;">
+
+    <content>
+        <VBox spacing="20"
+              style="-fx-padding: 24; -fx-background-color: #F4F8FF;">
+
+            <!-- Titre -->
+            <VBox spacing="8"
+                  style="-fx-background-color: white;
+                         -fx-background-radius: 18;
+                         -fx-padding: 18;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
+                <Label text="Objectifs des utilisateurs"
+                       style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #223A5E;"/>
+                <Label text="L’administrateur peut consulter, modifier et supprimer tous les objectifs."
+                       style="-fx-font-size: 13px; -fx-text-fill: #6B7280;"/>
+            </VBox>
+
+            <!-- Statistiques -->
+            <FlowPane hgap="14" vgap="14" prefWrapLength="1100">
+                <VBox prefWidth="220"
+                      style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 18;">
+                    <Label text="Total"
+                           style="-fx-text-fill: #6B7280; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                    <Label fx:id="lblTotal" text="0"
+                           style="-fx-text-fill: #1F2937; -fx-font-size: 28px; -fx-font-weight: bold;"/>
+                </VBox>
+
+                <VBox prefWidth="220"
+                      style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 18;">
+                    <Label text="En cours"
+                           style="-fx-text-fill: #6B7280; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                    <Label fx:id="lblEnCours" text="0"
+                           style="-fx-text-fill: #F59E0B; -fx-font-size: 28px; -fx-font-weight: bold;"/>
+                </VBox>
+
+                <VBox prefWidth="220"
+                      style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 18;">
+                    <Label text="Atteints"
+                           style="-fx-text-fill: #6B7280; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                    <Label fx:id="lblAtteints" text="0"
+                           style="-fx-text-fill: #10B981; -fx-font-size: 28px; -fx-font-weight: bold;"/>
+                </VBox>
+
+                <VBox prefWidth="220"
+                      style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 18;">
+                    <Label text="Annulés"
+                           style="-fx-text-fill: #6B7280; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                    <Label fx:id="lblAnnules" text="0"
+                           style="-fx-text-fill: #EF4444; -fx-font-size: 28px; -fx-font-weight: bold;"/>
+                </VBox>
+            </FlowPane>
+
+            <!-- Filtres -->
+            <VBox spacing="14"
+                  style="-fx-background-color: white;
+                         -fx-background-radius: 18;
+                         -fx-padding: 18;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
+
+                <HBox spacing="12">
+                    <TextField fx:id="txtRechercheTitre"
+                               promptText="Titre objectif"
+                               HBox.hgrow="ALWAYS"
+                               style="-fx-background-radius: 12; -fx-padding: 12;"/>
+
+                    <ComboBox fx:id="comboStatut"
+                              promptText="Statut"
+                              HBox.hgrow="ALWAYS"
+                              style="-fx-background-radius: 12;"/>
+
+                    <Button text="Filtrer"
+                            onAction="#filtrerObjectifs"
+                            style="-fx-background-color: linear-gradient(to right, #6D5EF6, #4338CA);
+                                   -fx-text-fill: white;
+                                   -fx-font-size: 14px;
+                                   -fx-font-weight: bold;
+                                   -fx-background-radius: 22;
+                                   -fx-padding: 10 24;
+                                   -fx-cursor: hand;"/>
+
+                    <Button text="Réinitialiser"
+                            onAction="#reinitialiserFiltres"
+                            style="-fx-background-color: #E5E7EB;
+                                   -fx-text-fill: #374151;
+                                   -fx-font-size: 14px;
+                                   -fx-font-weight: bold;
+                                   -fx-background-radius: 22;
+                                   -fx-padding: 10 24;
+                                   -fx-cursor: hand;"/>
+                </HBox>
+            </VBox>
+
+            <!-- Liste -->
+            <VBox spacing="10"
+                  style="-fx-background-color: white;
+                         -fx-background-radius: 18;
+                         -fx-padding: 18;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
+
+                <HBox spacing="20" style="-fx-padding: 0 0 8 0; -fx-border-color: transparent transparent #E5E7EB transparent; -fx-border-width: 0 0 1 0;">
+                    <Label text="Utilisateur" HBox.hgrow="ALWAYS"
+                           style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                    <Label text="Titre" HBox.hgrow="ALWAYS"
+                           style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                    <Label text="Statut" HBox.hgrow="ALWAYS"
+                           style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                    <Label text="Progression" HBox.hgrow="ALWAYS"
+                           style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                    <Label text="Actions"
+                           style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                </HBox>
+
+                <VBox fx:id="containerObjectifs" spacing="10"/>
+            </VBox>
+
+        </VBox>
+    </content>
+</ScrollPane>

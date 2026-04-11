@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="Controllors.ControllerEditSujet"
+      spacing="15"
+      prefWidth="500" prefHeight="450"
+      style="-fx-background-color: white; -fx-background-radius: 10;">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <Label text="✏️ Modifier la discussion"
+           style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;">
+        <font>
+            <Font size="18"/>
+        </font>
+    </Label>
+
+    <Separator/>
+
+    <VBox spacing="8">
+        <Label text="Titre" style="-fx-font-weight: bold; -fx-text-fill: #2C3E50;"/>
+        <TextField fx:id="titreField"
+                   style="-fx-padding: 10; -fx-background-radius: 8; -fx-border-color: #E8EEF4; -fx-border-radius: 8;"/>
+    </VBox>
+
+    <VBox spacing="8">
+        <Label text="Contenu" style="-fx-font-weight: bold; -fx-text-fill: #2C3E50;"/>
+        <TextArea fx:id="contenuArea" prefHeight="200" wrapText="true"
+                  style="-fx-padding: 10; -fx-background-radius: 8; -fx-border-color: #E8EEF4; -fx-border-radius: 8;"/>
+    </VBox>
+
+    <HBox spacing="15" alignment="CENTER_LEFT">
+        <CheckBox fx:id="anonymeCheckBox" text="📝 Poster anonymement"
+                  style="-fx-text-fill: #7F8C8D;"/>
+    </HBox>
+
+    <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
+        <Button fx:id="cancelButton" text="Annuler"
+                style="-fx-background-color: transparent; -fx-text-fill: #7F8C8D; -fx-cursor: hand; -fx-padding: 8 20;"/>
+        <Button fx:id="submitButton" text="Enregistrer"
+                style="-fx-background-color: #2C5F8A; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand; -fx-padding: 8 25;"/>
+    </HBox>
+
+</VBox>

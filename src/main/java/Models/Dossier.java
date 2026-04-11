@@ -1,0 +1,98 @@
+package Models;
+
+import javafx.beans.property.*;
+import java.sql.Date;
+
+public class Dossier {
+
+    private final IntegerProperty id = new SimpleIntegerProperty();
+    private final ObjectProperty<Date> dateCreation = new SimpleObjectProperty<>();
+    private final StringProperty notesGenerales = new SimpleStringProperty();
+    private final StringProperty niveauRisque = new SimpleStringProperty();
+    private final IntegerProperty patientId = new SimpleIntegerProperty();
+    private final IntegerProperty psychologueId = new SimpleIntegerProperty();
+    private final StringProperty aiSummary = new SimpleStringProperty();
+    private final StringProperty aiKeyPoints = new SimpleStringProperty();
+    private String patientNom;
+    // Empty constructor
+    public Dossier() {}
+
+    // Constructor used in controller (add)
+    public Dossier(Date dateCreation, String notesGenerales, String niveauRisque,
+                   int patientId, int psychologueId, String aiSummary, String aiKeyPoints) {
+        this.dateCreation.set(dateCreation);
+        this.notesGenerales.set(notesGenerales);
+        this.niveauRisque.set(niveauRisque);
+        this.patientId.set(patientId);
+        this.psychologueId.set(psychologueId);
+        this.aiSummary.set(aiSummary);
+        this.aiKeyPoints.set(aiKeyPoints);
+    }
+
+    // Constructor with ID (used in getAll / find)
+    public Dossier(int id, Date dateCreation, String notesGenerales, String niveauRisque,
+                   int patientId, int psychologueId, String aiSummary, String aiKeyPoints) {
+        this.id.set(id);
+        this.dateCreation.set(dateCreation);
+        this.notesGenerales.set(notesGenerales);
+        this.niveauRisque.set(niveauRisque);
+        this.patientId.set(patientId);
+        this.psychologueId.set(psychologueId);
+        this.aiSummary.set(aiSummary);
+        this.aiKeyPoints.set(aiKeyPoints);
+    }
+
+    // ===== Properties for TableView binding =====
+    public IntegerProperty idProperty() { return id; }
+    public ObjectProperty<Date> dateCreationProperty() { return dateCreation; }
+    public StringProperty notesGeneralesProperty() { return notesGenerales; }
+    public StringProperty niveauRisqueProperty() { return niveauRisque; }
+    public IntegerProperty patientIdProperty() { return patientId; }
+    public IntegerProperty psychologueIdProperty() { return psychologueId; }
+    public StringProperty aiSummaryProperty() { return aiSummary; }
+    public StringProperty aiKeyPointsProperty() { return aiKeyPoints; }
+
+    // ===== Standard getters & setters =====
+    public int getId() { return id.get(); }
+    public void setId(int value) { id.set(value); }
+
+    public Date getDateCreation() { return dateCreation.get(); }
+    public void setDateCreation(Date value) { dateCreation.set(value); }
+
+    public String getNotesGenerales() { return notesGenerales.get(); }
+    public void setNotesGenerales(String value) { notesGenerales.set(value); }
+
+    public String getNiveauRisque() { return niveauRisque.get(); }
+    public void setNiveauRisque(String value) { niveauRisque.set(value); }
+
+    public int getPatientId() { return patientId.get(); }
+    public void setPatientId(int value) { patientId.set(value); }
+
+    public int getPsychologueId() { return psychologueId.get(); }
+    public void setPsychologueId(int value) { psychologueId.set(value); }
+
+    public String getAiSummary() { return aiSummary.get(); }
+    public void setAiSummary(String value) { aiSummary.set(value); }
+
+    public String getAiKeyPoints() { return aiKeyPoints.get(); }
+    public void setAiKeyPoints(String value) { aiKeyPoints.set(value); }
+
+
+    public String getPatientNom() {
+        return patientNom;
+    }
+
+    public void setPatientNom(String patientNom) {
+        this.patientNom = patientNom;
+    }
+    @Override
+    public String toString() {
+        return "Dossier{" +
+                "id=" + getId() +
+                ", dateCreation=" + getDateCreation() +
+                ", patientId=" + getPatientId() +
+                ", psychologueId=" + getPsychologueId() +
+                ", niveauRisque='" + getNiveauRisque() + '\'' +
+                '}';
+    }
+}

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controllers.ConsulterDossiersController">
+
+    <!-- LEFT : LISTE -->
+    <left>
+        <VBox spacing="10" style="-fx-padding:10;">
+
+            <TextField fx:id="searchField"
+                       promptText="Rechercher..."
+                       onKeyReleased="#handleSearch"/>
+
+            <ListView fx:id="dossierList"
+                      prefWidth="250"/>
+
+        </VBox>
+    </left>
+
+    <!-- CENTER : DETAILS -->
+    <center>
+        <VBox spacing="10" style="-fx-padding:20;">
+
+            <Label text="Détails dossier"
+                   style="-fx-font-size:18px; -fx-font-weight:bold"/>
+
+            <Label fx:id="patientLabel"/>
+            <Label fx:id="dateLabel"/>
+
+            <TextArea fx:id="notesArea"
+                      promptText="Notes générales"/>
+
+            <ComboBox fx:id="niveauRisqueBox"/>
+
+            <HBox spacing="10">
+                <Button text="Modifier" onAction="#handleUpdate"/>
+                <Button text="Supprimer" onAction="#handleDelete"/>
+                <Button text="Actualiser" onAction="#loadData"/>
+            </HBox>
+
+        </VBox>
+    </center>
+
+</BorderPane>

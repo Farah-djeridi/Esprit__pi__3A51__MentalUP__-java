@@ -2,9 +2,9 @@
 
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.text.*?>
+
 <?import javafx.scene.shape.*?>
-<?import javafx.geometry.Insets?>
+
 <?import javafx.scene.image.ImageView?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
@@ -12,7 +12,6 @@
             fx:controller="controllers.DashboardPsyController"
             prefWidth="1100" prefHeight="700">
 
-    <!-- ================= SIDEBAR ================= -->
     <left>
         <VBox prefWidth="280" style="-fx-background-color: #1a4a5f;">
 
@@ -37,7 +36,7 @@
 
             <Separator style="-fx-background-color: #2a5a6f;"/>
 
-            <!-- MENU NAVIGATION AVEC SOUS-MENUS -->
+
             <VBox spacing="6" style="-fx-padding: 20 16 0 16;" VBox.vgrow="ALWAYS">
 
                 <Label text="MENU PRINCIPAL" textFill="#6a8a9a" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 8 12;"/>

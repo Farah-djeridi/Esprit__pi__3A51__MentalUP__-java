@@ -2,15 +2,10 @@
 
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.text.*?>
-<?import javafx.scene.shape.*?>
-<?import javafx.geometry.*?>
 
-<!--
-    MentalUp — HomeAdmin.fxml
-    Sidebar : #2C3E50 avec sous-menus masqués au départ
-    Fenêtre : 1024×700
--->
+<?import javafx.scene.shape.*?>
+
+
 <?import javafx.scene.image.ImageView?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
@@ -18,9 +13,6 @@
             prefWidth="1024" prefHeight="700"
             style="-fx-background-color: #F4F8FF;">
 
-    <!-- ═══════════════════════════════════════════
-         SIDEBAR ADMIN (#2C3E50) - Couleur unie
-    ═══════════════════════════════════════════ -->
     <left>
         <VBox prefWidth="260" prefHeight="700"
               style="-fx-background-color: #2C3E50;">
@@ -42,7 +34,7 @@
                 </VBox>
             </HBox>
 
-            <!-- Navigation avec sous-menus -->
+
             <VBox spacing="2" style="-fx-padding: 16 12 0 12;" VBox.vgrow="ALWAYS">
 
                 <!-- Accueil -->

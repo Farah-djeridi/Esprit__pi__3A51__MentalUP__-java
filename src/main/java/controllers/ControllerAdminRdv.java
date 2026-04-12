@@ -1,5 +1,6 @@
 package controllers;
 
+
 import Models.RendezVous;
 import Services.ServiceRendezVous;
 import javafx.animation.FadeTransition;
@@ -17,7 +18,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -27,10 +27,10 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import validators.RendezVousValidator;
 
 public class ControllerAdminRdv {
 
-    // ── FXML ──
     @FXML private VBox      rdvListContainer;
     @FXML private Label     statTotal, statLibres, statReserves, statConfirmes, statAujourdhui;
     @FXML private TextField searchField;
@@ -40,7 +40,6 @@ public class ControllerAdminRdv {
     private final ServiceRendezVous service = new ServiceRendezVous();
     private List<RendezVous> tousLesRdv;
 
-    // ══════════════════════════════════════════════════════
     @FXML
     public void initialize() {
         logoImage.setImage(new Image(getClass().getResourceAsStream("/Images/logo.png")));
@@ -61,9 +60,7 @@ public class ControllerAdminRdv {
         chargerEtAfficher();
     }
 
-    // ══════════════════════════════════════════════════════
-    //  CHARGEMENT + AFFICHAGE
-    // ══════════════════════════════════════════════════════
+
     private void chargerEtAfficher() {
         tousLesRdv = service.getAll();
         mettreAJourStats(tousLesRdv);
@@ -127,9 +124,7 @@ public class ControllerAdminRdv {
         afficherCartes(filtres);
     }
 
-    // ══════════════════════════════════════════════════════
-    //  AFFICHAGE DES CARTES
-    // ══════════════════════════════════════════════════════
+
     private void afficherCartes(List<RendezVous> list) {
         rdvListContainer.getChildren().clear();
 
@@ -160,21 +155,20 @@ public class ControllerAdminRdv {
         barre.setPrefWidth(6);
         barre.setStyle("-fx-background-color: " + couleur + "; -fx-background-radius: 14 0 0 14;");
 
-        // Contenu
+
         HBox contenu = new HBox(16);
         contenu.setAlignment(Pos.CENTER_LEFT);
         contenu.setPadding(new Insets(16, 20, 16, 18));
         HBox.setHgrow(contenu, Priority.ALWAYS);
 
-        // Icône type
         Label icone = new Label(getIconeType(r.getTypeRdv()));
         icone.setStyle("-fx-font-size: 26px;");
 
-        // Infos principales
+
         VBox infos = new VBox(4);
         HBox.setHgrow(infos, Priority.ALWAYS);
 
-        // Ligne 1 : date + heure
+
         HBox ligne1 = new HBox(10);
         ligne1.setAlignment(Pos.CENTER_LEFT);
         Label lblDate = new Label(formatDate(r.getDate()));
@@ -183,7 +177,7 @@ public class ControllerAdminRdv {
         lblHeure.setStyle("-fx-font-size: 13px; -fx-text-fill: #5A6C7D; -fx-font-weight: 500;");
         ligne1.getChildren().addAll(lblDate, lblHeure);
 
-        // Ligne 2 : type + psycho id
+
         HBox ligne2 = new HBox(12);
         ligne2.setAlignment(Pos.CENTER_LEFT);
         Label lblType = new Label(r.getTypeRdv() != null ? capitalize(r.getTypeRdv()) : "—");
@@ -261,9 +255,7 @@ public class ControllerAdminRdv {
         return card;
     }
 
-    // ══════════════════════════════════════════════════════
-    //  ACTIONS CRUD
-    // ══════════════════════════════════════════════════════
+
     @FXML
     private void onAjouterRdv(ActionEvent event) {
         ouvrirDialogAjout();
@@ -374,28 +366,45 @@ public class ControllerAdminRdv {
     }
 
     @SuppressWarnings("unchecked")
-    private RendezVous buildRdvFromForm(DatePicker dp, TextField tfS, TextField tfE,
-                                        ComboBox<String> cbStat, ComboBox<String> cbType,
-                                        TextField tfPsy, int id) {
-        try {
-            RendezVous r = new RendezVous();
-            r.setId(id);
-            r.setDate(Date.valueOf(dp.getValue()));
-            r.setHeureDebut(Time.valueOf(tfS.getText().trim() + ":00"));
-            r.setHeureFin(Time.valueOf(tfE.getText().trim() + ":00"));
-            r.setStatut(cbStat.getValue());
-            r.setTypeRdv(cbType.getValue());
-            r.setPsychologueId(Integer.parseInt(tfPsy.getText().trim()));
-            return r;
-        } catch (Exception ex) {
-            new Alert(Alert.AlertType.ERROR, "Données invalides. Vérifiez le format heure (HH:mm) et l'ID.").showAndWait();
+    private RendezVous buildRdvFromForm(DatePicker dp,
+                                        TextField tfS,
+                                        TextField tfE,
+                                        ComboBox<String> cbStat,
+                                        ComboBox<String> cbType,
+                                        TextField tfPsy,
+                                        int id) {
+
+        RendezVousValidator.ValidationResult result =
+                new RendezVousValidator.ValidationResult();
+
+        Time tDebut = RendezVousValidator.parseHeure(tfS.getText(), "Heure début", result);
+        Time tFin   = RendezVousValidator.parseHeure(tfE.getText(), "Heure fin", result);
+        int psyId   = RendezVousValidator.parseId(tfPsy.getText(), "Psy ID", result);
+
+        RendezVous r = new RendezVous();
+        r.setId(id);
+        r.setDate(dp.getValue() != null ? Date.valueOf(dp.getValue()) : null);
+        r.setHeureDebut(tDebut);
+        r.setHeureFin(tFin);
+        r.setStatut(cbStat.getValue());
+        r.setTypeRdv(cbType.getValue());
+        r.setPsychologueId(psyId);
+
+        // Validation complète
+        RendezVousValidator.ValidationResult full = RendezVousValidator.valider(r);
+        full.getErreurs().addAll(result.getErreurs());
+
+        if (!full.isValide()) {
+            new Alert(Alert.AlertType.WARNING,
+                    "⚠ Erreurs de saisie :\n\n" + full.getMessageComplet()
+            ).showAndWait();
             return null;
         }
+
+        return r;
     }
 
-    // ══════════════════════════════════════════════════════
-    //  RECHERCHE + FILTRES + TRI
-    // ══════════════════════════════════════════════════════
+
     @FXML private void onSearch(KeyEvent e)        { appliquerFiltresEtTri(); }
     @FXML private void onFiltreChange(ActionEvent e){ appliquerFiltresEtTri(); }
     @FXML private void onTriChange(ActionEvent e)  { appliquerFiltresEtTri(); }
@@ -409,9 +418,7 @@ public class ControllerAdminRdv {
         appliquerFiltresEtTri();
     }
 
-    // ══════════════════════════════════════════════════════
-    //  NAVIGATION
-    // ══════════════════════════════════════════════════════
+
     private void loadPage(String fxml, Object event) {
         try {
             Parent root = FXMLLoader.load(getClass().getResource(fxml));
@@ -443,9 +450,7 @@ public class ControllerAdminRdv {
         );
     }
 
-    // ══════════════════════════════════════════════════════
-    //  HELPERS
-    // ══════════════════════════════════════════════════════
+
     private String getCouleurStatut(String s) {
         if (s == null) return "#95A5A6";
         return switch (s.toLowerCase()) {

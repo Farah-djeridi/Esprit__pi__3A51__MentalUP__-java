@@ -4,9 +4,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.text.*?>
+
 <?import javafx.scene.shape.*?>
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.StackPane?>
 
@@ -16,7 +15,7 @@
             fx:controller="controllers.ConsulterDossiersController"
             prefWidth="1100" prefHeight="700">
 
-    <!-- ================= SIDEBAR ================= -->
+
     <left>
         <VBox prefWidth="280" style="-fx-background-color: #1a4a5f;">
 
@@ -55,7 +54,7 @@
                     <Region HBox.hgrow="ALWAYS"/>
                 </HBox>
 
-                <!-- ===== GESTION RENDEZ-VOUS ===== -->
+
                 <VBox spacing="2">
                     <HBox fx:id="navRdv" onMouseClicked="#toggleRdvMenu"
                           alignment="CENTER_LEFT" spacing="12"
@@ -65,7 +64,7 @@
                         <Label fx:id="arrowRdv" text="▶" textFill="#6a8a9a" style="-fx-font-size: 10px;"/>
                     </HBox>
 
-                    <!-- Sous-menu Rendez-vous -->
+
                     <VBox fx:id="submenuRdv" spacing="2" style="-fx-padding: 4 0 4 20;">
                         <HBox fx:id="navVoirRdv" onMouseClicked="#goVoirRendezVous"
                               alignment="CENTER_LEFT" spacing="10"
@@ -80,7 +79,7 @@
                     </VBox>
                 </VBox>
 
-                <!-- ===== GESTION DOSSIERS ===== -->
+
                 <VBox spacing="2">
                     <HBox fx:id="navDossiers" onMouseClicked="#toggleDossiersMenu"
                           alignment="CENTER_LEFT" spacing="12"

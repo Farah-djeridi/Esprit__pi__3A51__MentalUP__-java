@@ -56,9 +56,7 @@ public class CalendrierController {
         updateSidebarStats();
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    //  BUILD CALENDAR GRID
-    // ══════════════════════════════════════════════════════════════════════════
+
     private void buildCalendar() {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd MMM", Locale.FRENCH);
         labelSemaine.setText(
@@ -70,7 +68,7 @@ public class CalendrierController {
         calendarGrid.getColumnConstraints().clear();
         calendarGrid.getRowConstraints().clear();
 
-        // Col 0 = heures
+
         ColumnConstraints colH = new ColumnConstraints(58);
         colH.setHgrow(Priority.NEVER);
         calendarGrid.getColumnConstraints().add(colH);
@@ -175,7 +173,6 @@ public class CalendrierController {
             }
         }
 
-        // Cellule vide
         cell.setOnMouseEntered(e ->
                 cell.setStyle("-fx-background-color:#dff0fa; -fx-border-color:#b0d8ef;" +
                         "-fx-border-width:0 1 1 0; -fx-cursor:hand;"));
@@ -237,16 +234,10 @@ public class CalendrierController {
         return s.substring(0,1).toUpperCase() + s.substring(1);
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    //  NAV SEMAINE
-    // ══════════════════════════════════════════════════════════════════════════
+
     @FXML public void semainePrec()      { currentWeekStart = currentWeekStart.minusWeeks(1); buildCalendar(); }
     @FXML public void semaineSuiv()      { currentWeekStart = currentWeekStart.plusWeeks(1);  buildCalendar(); }
     @FXML public void semaineAujourd()   { currentWeekStart = LocalDate.now().with(java.time.DayOfWeek.MONDAY); buildCalendar(); }
-
-    // ══════════════════════════════════════════════════════════════════════════
-    //  DIALOGS
-    // ══════════════════════════════════════════════════════════════════════════
     @FXML public void ouvrirDialogAjout(ActionEvent e) { ouvrirDialogAjout(LocalDate.now(), 9); }
 
     private void ouvrirDialogAjout(LocalDate day, int hour) {
@@ -400,16 +391,18 @@ public class CalendrierController {
         sidebarRdvToday.setText(String.valueOf(count));
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    //  NAVIGATION PAGES
-    // ══════════════════════════════════════════════════════════════════════════
+
     private void loadPage(MouseEvent event, String path) {
         try {
             java.net.URL url = getClass().getClassLoader().getResource(path.substring(1));
             if (url == null) return;
             Parent root = FXMLLoader.load(url);
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.setResizable(true);
+            stage.setMinWidth(900);
+            stage.setMinHeight(600);
         } catch (Exception e) { e.printStackTrace(); }
     }
 

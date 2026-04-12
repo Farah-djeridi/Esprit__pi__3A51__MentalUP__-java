@@ -13,31 +13,29 @@ import javafx.util.Duration;
 
 public class ControllerRdvConfirmation {
 
-    // ── FXML ──────────────────────────────────────────────
+
     @FXML private Label  labelPsyNom;
     @FXML private Label  labelDate;
     @FXML private Label  labelHeure;
     @FXML private Label  labelType;
     @FXML private Button btnConfirmer;
 
-    // ── Données ──────────────────────────────────────────
+
     private final ServiceRendezVous serviceRdv = new ServiceRendezVous();
     private RendezVous rdv;
     private int        etudiantId;
-    private Runnable   onSuccess; // callback vers ControllerRdvCalendrier
+    private Runnable   onSuccess;
 
-    // ══════════════════════════════════════════════════════
-    //  INIT (appelé depuis ControllerRdvCalendrier)
-    // ══════════════════════════════════════════════════════
+
     public void initData(RendezVous rdv, String psyNom, int etudiantId, Runnable onSuccess) {
         this.rdv        = rdv;
         this.etudiantId = etudiantId;
         this.onSuccess  = onSuccess;
 
-        // Remplir les labels
+
         labelPsyNom.setText(psyNom);
 
-        // Date
+
         if (rdv.getDate() != null) {
             java.time.LocalDate ld = rdv.getDate().toLocalDate();
             String[] joursFr = {"Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"};
@@ -57,13 +55,11 @@ public class ControllerRdvConfirmation {
             ? rdv.getHeureFin().toString().substring(0, 5) : "--:--";
         labelHeure.setText(heureDebut + " – " + heureFin);
 
-        // Type
+
         labelType.setText(rdv.getTypeRdv() != null ? rdv.getTypeRdv() : "Consultation individuelle");
     }
 
-    // ══════════════════════════════════════════════════════
-    //  ACTIONS
-    // ══════════════════════════════════════════════════════
+
     @FXML
     private void onConfirmer(ActionEvent event) {
         // Animation bouton
@@ -73,19 +69,19 @@ public class ControllerRdvConfirmation {
         st.setCycleCount(2);
         st.play();
 
-        // Réserver en base
+
         boolean ok = serviceRdv.reserverCreneau(rdv.getId(), etudiantId);
 
         if (ok) {
-            // Feedback visuel succès
-            btnConfirmer.setText("✅  Réservé !");
+
+            btnConfirmer.setText("Réservé !");
             btnConfirmer.setStyle(
                 "-fx-background-color: linear-gradient(to right, #1E8449, #145A32);" +
                 "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;" +
                 "-fx-background-radius: 10; -fx-padding: 10 28;"
             );
 
-            // Fermer après un court délai
+
             javafx.animation.PauseTransition pause =
                 new javafx.animation.PauseTransition(Duration.millis(800));
             pause.setOnFinished(e -> {
@@ -95,8 +91,8 @@ public class ControllerRdvConfirmation {
             pause.play();
 
         } else {
-            // Créneau déjà pris
-            btnConfirmer.setText("❌  Créneau indisponible");
+
+            btnConfirmer.setText(" Créneau indisponible");
             btnConfirmer.setStyle(
                 "-fx-background-color: linear-gradient(to right, #C0392B, #922B21);" +
                 "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;" +
@@ -114,9 +110,7 @@ public class ControllerRdvConfirmation {
         fermerFenetre();
     }
 
-    // ══════════════════════════════════════════════════════
-    //  HELPER
-    // ══════════════════════════════════════════════════════
+
     private void fermerFenetre() {
         Stage stage = (Stage) btnConfirmer.getScene().getWindow();
         FadeTransition ft = new FadeTransition(Duration.millis(150), stage.getScene().getRoot());

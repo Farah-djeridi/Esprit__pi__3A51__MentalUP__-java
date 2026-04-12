@@ -6,6 +6,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.image.Image;
@@ -13,6 +14,9 @@ import javafx.scene.image.ImageView;
 import javafx.event.ActionEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import javafx.stage.Screen;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -42,6 +46,11 @@ public class DashboardPsyController {
     // ===== ÉTATS =====
     private boolean rdvOpen = false;
     private boolean dossiersOpen = false;
+
+    // ===== COMPOSANTS PRINCIPAUX =====
+    @FXML private BorderPane rootPane;
+    @FXML private VBox sidebarVBox;
+    @FXML private ScrollPane mainScrollPane;
 
     // ===== INITIALIZE =====
     @FXML
@@ -81,6 +90,61 @@ public class DashboardPsyController {
 
         // Actif par défaut
         setActive(navHome);
+
+        // Ajouter un listener pour le redimensionnement de la scène
+        setupResponsiveBehavior();
+    }
+
+    // ===== GESTION RESPONSIVE =====
+    private void setupResponsiveBehavior() {
+        // Attendre que la scène soit disponible
+        if (navHome != null && navHome.getScene() != null) {
+            navHome.getScene().widthProperty().addListener((obs, oldVal, newVal) -> {
+                adjustLayoutForWidth(newVal.doubleValue());
+            });
+        } else {
+            // Si la scène n'est pas encore disponible, utiliser un listener sur la fenêtre
+            javafx.application.Platform.runLater(() -> {
+                if (navHome != null && navHome.getScene() != null) {
+                    navHome.getScene().widthProperty().addListener((obs, oldVal, newVal) -> {
+                        adjustLayoutForWidth(newVal.doubleValue());
+                    });
+                    // Appliquer immédiatement
+                    adjustLayoutForWidth(navHome.getScene().getWidth());
+                }
+            });
+        }
+    }
+
+    private void adjustLayoutForWidth(double width) {
+        if (sidebarVBox != null) {
+            // Ajuster la largeur de la sidebar selon la taille de l'écran
+            if (width < 900) {
+                sidebarVBox.setPrefWidth(240);
+                sidebarVBox.setMinWidth(200);
+                sidebarVBox.setMaxWidth(280);
+            } else if (width < 1200) {
+                sidebarVBox.setPrefWidth(260);
+                sidebarVBox.setMinWidth(240);
+                sidebarVBox.setMaxWidth(300);
+            } else {
+                sidebarVBox.setPrefWidth(280);
+                sidebarVBox.setMinWidth(260);
+                sidebarVBox.setMaxWidth(320);
+            }
+        }
+
+        // Ajuster le padding du contenu principal
+        if (mainScrollPane != null && mainScrollPane.getContent() != null) {
+            VBox content = (VBox) mainScrollPane.getContent();
+            if (width < 1000) {
+                content.setStyle("-fx-padding: 20 24 24 24;");
+            } else if (width < 1300) {
+                content.setStyle("-fx-padding: 24 28 28 28;");
+            } else {
+                content.setStyle("-fx-padding: 28 32 32 32;");
+            }
+        }
     }
 
     // ===== TOGGLE MENUS =====

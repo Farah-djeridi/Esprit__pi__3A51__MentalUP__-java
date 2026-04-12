@@ -2,14 +2,8 @@
 
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.shape.*?>
-<?import javafx.geometry.*?>
 
-<!--
-    RendezVous_Confirmation.fxml
-    Fenêtre modale de confirmation de réservation (Stage séparé)
-    Taille : 420 x 380
--->
+
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="controllers.ControllerRdvConfirmation"
@@ -17,7 +11,7 @@
       prefWidth="420"
       style="-fx-background-color: #F4F8FF; -fx-background-radius: 18;">
 
-    <!-- ── En-tête coloré ── -->
+
     <VBox alignment="CENTER" spacing="8"
           style="-fx-background-color: linear-gradient(to right, #4A7FA5, #2C5F8A);
                  -fx-background-radius: 18 18 0 0;
@@ -29,7 +23,7 @@
                style="-fx-text-fill: rgba(255,255,255,0.8); -fx-font-size: 12px;"/>
     </VBox>
 
-    <!-- ── Détails du créneau ── -->
+
     <VBox spacing="12"
           style="-fx-background-color: white; -fx-padding: 24 28;">
 
@@ -77,7 +71,7 @@
 
     </VBox>
 
-    <!-- ── Boutons d'action ── -->
+
     <HBox spacing="12" alignment="CENTER"
           style="-fx-background-color: #F4F8FF; -fx-background-radius: 0 0 18 18;
                  -fx-padding: 16 28 24 28;

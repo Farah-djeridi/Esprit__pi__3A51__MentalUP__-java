@@ -19,6 +19,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import validators.DossierValidator;
 
 import java.sql.Date;
 import java.time.LocalDate;
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
 
 public class ControllerAdminDossiers {
 
-    // ── FXML ──
+
     @FXML private VBox      dossierListContainer;
     @FXML private Label     statTotalDossiers, statRisqueEleve, statRisqueMoyen, statRisqueFaible;
     @FXML private TextField searchField;
@@ -38,7 +39,7 @@ public class ControllerAdminDossiers {
     private final ServiceDossier service = new ServiceDossier();
     private List<Dossier> tousLesDossiers;
 
-    // ══════════════════════════════════════════════════════
+
     @FXML
     public void initialize() {
         logoImage.setImage(new Image(getClass().getResourceAsStream("/Images/logo.png")));
@@ -55,9 +56,7 @@ public class ControllerAdminDossiers {
         chargerEtAfficher();
     }
 
-    // ══════════════════════════════════════════════════════
-    //  CHARGEMENT
-    // ══════════════════════════════════════════════════════
+
     private void chargerEtAfficher() {
         tousLesDossiers = service.getAll();
         mettreAJourStats(tousLesDossiers);
@@ -108,9 +107,7 @@ public class ControllerAdminDossiers {
         afficherCartes(filtres);
     }
 
-    // ══════════════════════════════════════════════════════
-    //  AFFICHAGE CARTES
-    // ══════════════════════════════════════════════════════
+
     private void afficherCartes(List<Dossier> list) {
         dossierListContainer.getChildren().clear();
 
@@ -142,17 +139,15 @@ public class ControllerAdminDossiers {
         barre.setPrefWidth(6);
         barre.setStyle("-fx-background-color: " + couleur + "; -fx-background-radius: 14 0 0 14;");
 
-        // Contenu
+
         HBox contenu = new HBox(16);
         contenu.setAlignment(Pos.CENTER_LEFT);
         contenu.setPadding(new Insets(16, 20, 16, 18));
         HBox.setHgrow(contenu, Priority.ALWAYS);
 
-        // Icône
+
         Label icone = new Label(getIconeRisque(d.getNiveauRisque()));
         icone.setStyle("-fx-font-size: 26px;");
-
-        // Infos — SANS notes générales (confidentielles)
         VBox infos = new VBox(4);
         HBox.setHgrow(infos, Priority.ALWAYS);
 
@@ -171,7 +166,7 @@ public class ControllerAdminDossiers {
         Label lblPsy = new Label("Psy #" + d.getPsychologueId());
         lblPsy.setStyle("-fx-font-size: 12px; -fx-text-fill: #94A3B8;");
 
-        // Badge IA si disponible
+
         if (d.getAiSummary() != null && !d.getAiSummary().isEmpty()) {
             Label lblAi = new Label("🤖 IA");
             lblAi.setStyle(
@@ -236,9 +231,7 @@ public class ControllerAdminDossiers {
         return card;
     }
 
-    // ══════════════════════════════════════════════════════
-    //  CRUD DOSSIERS
-    // ══════════════════════════════════════════════════════
+
     @FXML
     private void onAjouterDossier(ActionEvent event) {
         ouvrirDialogAjout();
@@ -338,26 +331,33 @@ public class ControllerAdminDossiers {
 
         dialog.setResultConverter(btn -> {
             if (btn.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
-                try {
-                    Dossier d = new Dossier();
-                    d.setId(existingId);
-                    d.setDateCreation(Date.valueOf(dp.getValue()));
-                    d.setNiveauRisque(cbRisque.getValue());
-                    d.setPatientId(Integer.parseInt(tfPatient.getText().trim()));
-                    d.setPsychologueId(Integer.parseInt(tfPsy.getText().trim()));
-                    // Préserver les données confidentielles existantes
-                    d.setNotesGenerales(existingNotes);
-                    d.setAiSummary(existingAiSum);
-                    d.setAiKeyPoints(existingAiKeys);
-                    return d;
-                } catch (Exception ex) {
-                    new Alert(Alert.AlertType.ERROR, "Données invalides. Vérifiez les IDs.").showAndWait();
+                DossierValidator.ValidationResult result =
+                        new DossierValidator.ValidationResult();
+
+                int patientId = DossierValidator.parseId(tfPatient.getText(), "Patient ID", result);
+                int psyId     = DossierValidator.parseId(tfPsy.getText(), "Psy ID", result);
+
+                Dossier d = new Dossier();
+                d.setId(existingId);
+                d.setDateCreation(dp.getValue() != null ? Date.valueOf(dp.getValue()) : null);
+                d.setNiveauRisque(cbRisque.getValue());
+                d.setPatientId(patientId);
+                d.setPsychologueId(psyId);
+                d.setNotesGenerales(existingNotes);
+                d.setAiSummary(existingAiSum);
+                d.setAiKeyPoints(existingAiKeys);
+
+                DossierValidator.ValidationResult full = DossierValidator.valider(d);
+                if (!full.isValide()) {
+                    new Alert(Alert.AlertType.WARNING,
+                            "⚠ Erreurs de saisie :\n\n" + full.getMessageComplet()
+                    ).showAndWait();
                     return null;
                 }
+                return d;
             }
             return null;
         });
-
         return dialog;
     }
 
@@ -376,9 +376,6 @@ public class ControllerAdminDossiers {
         appliquerFiltresEtTri();
     }
 
-    // ══════════════════════════════════════════════════════
-    //  NAVIGATION
-    // ══════════════════════════════════════════════════════
     private void loadPage(String fxml, Object event) {
         try {
             Parent root = FXMLLoader.load(getClass().getResource(fxml));
@@ -409,9 +406,7 @@ public class ControllerAdminDossiers {
         );
     }
 
-    // ══════════════════════════════════════════════════════
-    //  HELPERS
-    // ══════════════════════════════════════════════════════
+
     private String getCouleurRisque(String r) {
         if (r == null) return "#95A5A6";
         return switch (r.toLowerCase()) {

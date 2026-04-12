@@ -44,7 +44,7 @@ public class ConsulterDossiersController {
                 .addListener((obs, oldVal, newVal) -> showDetails(newVal));
     }
 
-    // 🔄 LOAD LIST
+
     @FXML
     public void loadData() {
 
@@ -53,7 +53,7 @@ public class ConsulterDossiersController {
 
         dossierList.setItems(list);
 
-        // affichage custom dans ListView
+
         dossierList.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(Dossier d, boolean empty) {
@@ -71,7 +71,7 @@ public class ConsulterDossiersController {
         });
     }
 
-    // 👁 DETAILS
+
     private void showDetails(Dossier d) {
 
         if (d == null) return;
@@ -85,7 +85,7 @@ public class ConsulterDossiersController {
         niveauRisqueBox.setValue(d.getNiveauRisque());
     }
 
-    // ✏️ UPDATE (notes + risque only)
+
     @FXML
     public void handleUpdate() {
 
@@ -103,7 +103,7 @@ public class ConsulterDossiersController {
         loadData();
     }
 
-    // 🗑 DELETE
+
     @FXML
     public void handleDelete() {
 
@@ -123,7 +123,7 @@ public class ConsulterDossiersController {
         loadData();
     }
 
-    // 🔍 SEARCH
+
     @FXML
     public void handleSearch() {
 
@@ -143,8 +143,6 @@ public class ConsulterDossiersController {
     }
 
 
-    // ================= NAVIGATION =================
-    // ================= NAVIGATION =================
     private void loadPage(MouseEvent event, String path) {
         try {
             java.net.URL url = getClass().getClassLoader().getResource(path.substring(1));

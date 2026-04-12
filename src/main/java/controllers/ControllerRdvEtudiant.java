@@ -36,11 +36,11 @@ public class ControllerRdvEtudiant {
 
     private final ServiceRendezVous serviceRdv = new ServiceRendezVous();
 
-    // ── IDs hardcodés pour les tests ──
-    private final int etudiantId  = 1; // TODO: session
-    private final int psyIdDefaut = 2; // TODO: session
 
-    // ══════════════════════════════════════════════════════
+    private final int etudiantId  = 1;
+    private final int psyIdDefaut = 2;
+
+
     @FXML
     public void initialize() {
         logoImage.setImage(new Image(getClass().getResourceAsStream("/Images/logo.png")));

@@ -20,7 +20,7 @@ import javafx.util.Duration;
 
 public class ControllerHome {
 
-    // Éléments FXML pour les animations
+
     @FXML private VBox card1, card2, card3;
     @FXML private VBox adv1, adv2, adv3, adv4;
     @FXML private HBox bannerBox;

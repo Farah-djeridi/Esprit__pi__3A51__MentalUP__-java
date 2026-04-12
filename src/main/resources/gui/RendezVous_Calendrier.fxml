@@ -2,9 +2,9 @@
 
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.text.*?>
+
 <?import javafx.scene.shape.*?>
-<?import javafx.geometry.*?>
+
 <?import javafx.scene.image.ImageView?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
@@ -13,7 +13,7 @@
             prefWidth="1024" prefHeight="700"
             style="-fx-background-color: linear-gradient(to bottom right, #F4F8FF, #E8F0FE);">
 
-    <!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+
     <left>
         <VBox prefWidth="240" prefHeight="700"
               style="-fx-background-color: linear-gradient(to bottom, #D6E8F7, #2C5F8A);">
@@ -195,12 +195,11 @@
 
             </HBox>
 
-            <!-- Grille du calendrier -->
+
             <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
                         style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
                 <VBox style="-fx-padding: 0 16 16 16; -fx-background-color: #F4F8FF;">
 
-                    <!-- Entêtes des jours -->
                     <HBox fx:id="headerJours" spacing="0"
                           style="-fx-background-color: white;
                                  -fx-background-radius: 12 12 0 0;
@@ -213,10 +212,10 @@
                               style="-fx-padding: 12 8; -fx-border-color: transparent rgba(151,187,228,0.2) transparent transparent; -fx-border-width: 0 1 0 0;">
                             <Label text="" style="-fx-font-size: 11px;"/>
                         </VBox>
-                        <!-- Jours dynamiques ajoutés par contrôleur -->
+
                     </HBox>
 
-                    <!-- Corps de la grille -->
+
                     <HBox fx:id="grilleCalendrier" spacing="0"
                           style="-fx-background-color: white;
                                  -fx-background-radius: 0 0 12 12;
@@ -227,9 +226,9 @@
                         <VBox fx:id="colonneHeures" minWidth="60" prefWidth="60"
                               style="-fx-border-color: transparent rgba(151,187,228,0.2) transparent transparent;
                                      -fx-border-width: 0 1 0 0;">
-                            <!-- Heures ajoutées dynamiquement -->
+
                         </VBox>
-                        <!-- Colonnes des jours ajoutées dynamiquement -->
+
                     </HBox>
 
                 </VBox>

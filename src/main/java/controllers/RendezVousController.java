@@ -34,7 +34,7 @@ public class RendezVousController {
 
     private List<RendezVous> allRdv;
 
-    // ================= INIT =================
+
     @FXML
     public void initialize() {
 
@@ -44,14 +44,12 @@ public class RendezVousController {
         loadData();
     }
 
-    // ================= LOAD =================
     private void loadData() {
         allRdv = service.getAll();
         afficherCards(allRdv);
         updateStats();
     }
 
-    // ================= CARDS =================
     private void afficherCards(List<RendezVous> list) {
 
         cardsContainer.getChildren().clear();
@@ -117,7 +115,7 @@ public class RendezVousController {
     }
 
 
-    // ================= FILTERS =================
+
     @FXML
     public void rechercherRendezVous() {
         appliquerFiltres();
@@ -163,7 +161,6 @@ public class RendezVousController {
         afficherCards(filtered);
     }
 
-    // ================= STATS =================
     private void updateStats() {
 
         totalRdv.setText(String.valueOf(allRdv.size()));
@@ -181,7 +178,7 @@ public class RendezVousController {
         rdvCeMois.setText(String.valueOf(mois));
     }
 
-    // ================= NAVIGATION =================
+
     private void loadPage(MouseEvent event, String path) {
         try {
             java.net.URL url = getClass().getResource(path);

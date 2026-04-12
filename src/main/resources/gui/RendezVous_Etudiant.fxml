@@ -2,9 +2,9 @@
 
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.text.*?>
+
 <?import javafx.scene.shape.*?>
-<?import javafx.geometry.*?>
+
 <?import javafx.scene.image.ImageView?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
@@ -13,7 +13,7 @@
             prefWidth="1024" prefHeight="700"
             style="-fx-background-color: linear-gradient(to bottom right, #F4F8FF, #E8F0FE);">
 
-    <!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+
     <left>
         <VBox prefWidth="240" prefHeight="700"
               style="-fx-background-color: linear-gradient(to bottom, #D6E8F7, #2C5F8A);">

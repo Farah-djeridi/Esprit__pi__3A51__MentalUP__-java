@@ -48,9 +48,7 @@ public class ControllerRdvCalendrier {
     private static final int HEURE_FIN     = 20;
     private static final int HAUTEUR_HEURE = 52;
 
-    // ══════════════════════════════════════════════════════
-    //  INIT appelé depuis ControllerRdvEtudiant
-    // ══════════════════════════════════════════════════════
+
     public void initData(int psyId, String psyNom, int etudiantId) {
         this.psyId       = psyId;
         this.psyNom      = psyNom;
@@ -65,18 +63,13 @@ public class ControllerRdvCalendrier {
         logoImage.setImage(new Image(getClass().getResourceAsStream("/Images/logo.png")));
     }
 
-    // ══════════════════════════════════════════════════════
-    //  NAVIGATION SEMAINE
-    // ══════════════════════════════════════════════════════
     @FXML private void onPrevWeek(ActionEvent e)  { debutSemaine = debutSemaine.minusWeeks(1); chargerEtAfficher(); }
     @FXML private void onNextWeek(ActionEvent e)  { debutSemaine = debutSemaine.plusWeeks(1);  chargerEtAfficher(); }
     @FXML private void onToday(ActionEvent e)     { debutSemaine = lundiDeLaSemaine(LocalDate.now()); chargerEtAfficher(); }
     @FXML private void onVueSemaine(ActionEvent e){ /* déjà en vue semaine */ }
     @FXML private void onVueJour(ActionEvent e)   { debutSemaine = LocalDate.now(); chargerEtAfficher(); }
 
-    // ══════════════════════════════════════════════════════
-    //  CHARGEMENT + RENDU
-    // ══════════════════════════════════════════════════════
+
     private void chargerEtAfficher() {
         creneaux = serviceRdv.getByPsychologueId(psyId);
 
@@ -128,7 +121,7 @@ public class ControllerRdvCalendrier {
             headerJours.getChildren().add(header);
         }
 
-        // ── Colonne heures ──
+
         colonneHeures.getChildren().clear();
         for (int h = HEURE_DEBUT; h <= HEURE_FIN; h++) {
             Label lh = new Label(String.format("%02dh", h));
@@ -139,7 +132,6 @@ public class ControllerRdvCalendrier {
             colonneHeures.getChildren().add(lh);
         }
 
-        // ── Colonnes jours ──
         while (grilleCalendrier.getChildren().size() > 1)
             grilleCalendrier.getChildren().remove(1);
 
@@ -187,9 +179,6 @@ public class ControllerRdvCalendrier {
         ft.setFromValue(0.7); ft.setToValue(1); ft.play();
     }
 
-    // ══════════════════════════════════════════════════════
-    //  BLOC CRÉNEAU — "libre" est cliquable (= statut du psy)
-    // ══════════════════════════════════════════════════════
     private VBox createCreneauBlock(RendezVous rdv) {
         String statut  = rdv.getStatut() != null ? rdv.getStatut().toLowerCase() : "";
         // "libre" = le psy a créé le créneau, il est disponible pour l'étudiant
@@ -250,9 +239,6 @@ public class ControllerRdvCalendrier {
         return bloc;
     }
 
-    // ══════════════════════════════════════════════════════
-    //  POPUP CONFIRMATION
-    // ══════════════════════════════════════════════════════
     private void ouvrirConfirmation(RendezVous rdv) {
         try {
             FXMLLoader loader = new FXMLLoader(
@@ -283,9 +269,7 @@ public class ControllerRdvCalendrier {
         }
     }
 
-    // ══════════════════════════════════════════════════════
-    //  NAVIGATION
-    // ══════════════════════════════════════════════════════
+
     @FXML
     private void onRetour(ActionEvent event) {
         try {

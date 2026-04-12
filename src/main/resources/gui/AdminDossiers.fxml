@@ -9,12 +9,13 @@
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="controllers.ControllerAdminDossiers"
-            prefWidth="1024" prefHeight="700"
+            maxWidth="Infinity" maxHeight="Infinity"
             style="-fx-background-color: #F0F4F8;">
 
     <!-- ═══════════════ SIDEBAR ADMIN ═══════════════ -->
     <left>
-        <VBox prefWidth="260" prefHeight="700"
+        <VBox prefWidth="260" maxWidth="260"
+              VBox.vgrow="ALWAYS"
               style="-fx-background-color: #2C3E50;">
 
             <HBox alignment="CENTER_LEFT" spacing="10"
@@ -114,7 +115,8 @@
 
     <!-- ═══════════════ CONTENU PRINCIPAL ═══════════════ -->
     <center>
-        <VBox spacing="0" style="-fx-background-color: #F0F4F8;">
+        <VBox spacing="0" VBox.vgrow="ALWAYS"
+              style="-fx-background-color: #F0F4F8;">
 
             <!-- Top bar -->
             <HBox alignment="CENTER_LEFT" spacing="16"
@@ -134,7 +136,8 @@
                                -fx-effect: dropshadow(gaussian, rgba(44,62,80,0.3), 8, 0, 0, 2);"/>
             </HBox>
 
-            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+            <ScrollPane fitToWidth="true" fitToHeight="true"
+                        VBox.vgrow="ALWAYS"
                         style="-fx-background: transparent; -fx-background-color: transparent; -fx-border-color: transparent;">
                 <VBox spacing="20" style="-fx-padding: 22 24 24 24;">
 
@@ -240,5 +243,6 @@
 
         </VBox>
     </center>
+
 
 </BorderPane>

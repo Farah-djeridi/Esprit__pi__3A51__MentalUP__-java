@@ -16,29 +16,29 @@ import javafx.stage.Stage;
 
 public class ControllerHomeAdmin {
 
-    // Éléments FXML - Sidebar
+
     @FXML private HBox navAccueil, navSuivi, navForum, navRdv, navActivites, navContenus, navDossiers, navUtilisateurs;
     @FXML private HBox navSuiviStats, navObjectifs, navSujets, navCommentaires;
     @FXML private VBox submenuSuivi, submenuForum;
     @FXML private Label arrowSuivi, arrowForum;
 
-    // Éléments FXML - Statistiques
+
     @FXML private Label statUsers, statRdvs, statTopics, statMood;
     @FXML private Label labelDate, labelUserName, avatarInitials;
     @FXML private Button notifButton, logoutButton;
 
     @FXML private ImageView logoImage;
 
-    // État des sous-menus
+
     private boolean suiviOpen = false;
     private boolean forumOpen = false;
 
     @FXML
     public void initialize() {
-        // Mettre à jour la date
+
         labelDate.setText(new java.text.SimpleDateFormat("EEEE d MMMM yyyy").format(new java.util.Date()));
 
-        // Masquer les sous-menus au départ
+
         submenuSuivi.setVisible(false);
         submenuSuivi.setManaged(false);
         submenuForum.setVisible(false);
@@ -50,7 +50,7 @@ public class ControllerHomeAdmin {
         logoImage.setImage(new Image(getClass().getResourceAsStream("/Images/logo.png")));
     }
 
-    // ========== TOGGLE SOUS-MENUS ==========
+
 
     @FXML
     void toggleSuiviMenu(MouseEvent event) {
@@ -162,7 +162,6 @@ public class ControllerHomeAdmin {
         }
     }
 
-    // ========== ACTIONS ==========
 
     @FXML
     private void onNotifications(ActionEvent event) { System.out.println("Notifications"); }
@@ -182,7 +181,7 @@ public class ControllerHomeAdmin {
     @FXML
     private void onExportData(ActionEvent event) { System.out.println("Exporter les données"); }
 
-    // ========== UTILS ==========
+
 
     private void setActiveNav(HBox activeNav) {
         HBox[] allNavs = {navAccueil, navSuivi, navForum, navRdv, navActivites, navContenus, navDossiers, navUtilisateurs};
@@ -193,7 +192,6 @@ public class ControllerHomeAdmin {
     }
 
 
-    // ── Helper navigation ──
     private void loadPage(MouseEvent event, String path) {
         try {
             Parent root = FXMLLoader.load(getClass().getResource(path));

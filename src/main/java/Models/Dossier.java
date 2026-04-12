@@ -14,10 +14,10 @@ public class Dossier {
     private final StringProperty aiSummary = new SimpleStringProperty();
     private final StringProperty aiKeyPoints = new SimpleStringProperty();
     private String patientNom;
-    // Empty constructor
+
     public Dossier() {}
 
-    // Constructor used in controller (add)
+
     public Dossier(Date dateCreation, String notesGenerales, String niveauRisque,
                    int patientId, int psychologueId, String aiSummary, String aiKeyPoints) {
         this.dateCreation.set(dateCreation);
@@ -29,7 +29,7 @@ public class Dossier {
         this.aiKeyPoints.set(aiKeyPoints);
     }
 
-    // Constructor with ID (used in getAll / find)
+
     public Dossier(int id, Date dateCreation, String notesGenerales, String niveauRisque,
                    int patientId, int psychologueId, String aiSummary, String aiKeyPoints) {
         this.id.set(id);
@@ -42,7 +42,6 @@ public class Dossier {
         this.aiKeyPoints.set(aiKeyPoints);
     }
 
-    // ===== Properties for TableView binding =====
     public IntegerProperty idProperty() { return id; }
     public ObjectProperty<Date> dateCreationProperty() { return dateCreation; }
     public StringProperty notesGeneralesProperty() { return notesGenerales; }
@@ -52,7 +51,7 @@ public class Dossier {
     public StringProperty aiSummaryProperty() { return aiSummary; }
     public StringProperty aiKeyPointsProperty() { return aiKeyPoints; }
 
-    // ===== Standard getters & setters =====
+
     public int getId() { return id.get(); }
     public void setId(int value) { id.set(value); }
 

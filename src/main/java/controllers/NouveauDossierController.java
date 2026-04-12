@@ -141,9 +141,7 @@ public class NouveauDossierController {
         alert.showAndWait();
     }
 
-    // navigations
 
-    // ================= NAVIGATION =================
     private void loadPage(MouseEvent event, String path) {
         try {
             java.net.URL url = getClass().getResource(path);

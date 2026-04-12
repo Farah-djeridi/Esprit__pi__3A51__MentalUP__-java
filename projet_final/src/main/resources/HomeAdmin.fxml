@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.ImageView?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="Controllor.ControllerHomeAdmin"
+            prefWidth="1024" prefHeight="700"
+            style="-fx-background-color: #F4F8FF;">
+
+    <!-- ═══ SIDEBAR ADMIN ═══ -->
+    <left>
+        <VBox prefWidth="260" prefHeight="700"
+              style="-fx-background-color: #2C3E50;">
+
+            <!-- Logo -->
+            <HBox alignment="CENTER_LEFT" spacing="10"
+                  style="-fx-padding: 24 18 20 18;
+                         -fx-border-color: transparent transparent rgba(255,255,255,0.1) transparent;
+                         -fx-border-width: 0 0 1 0;">
+                <ImageView fx:id="logoImage" fitWidth="45" fitHeight="45" preserveRatio="true"/>
+                <VBox spacing="2">
+                    <Label text="MentalUp Admin"
+                           style="-fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;"/>
+                    <Label text="Espace d'administration"
+                           style="-fx-text-fill: rgba(255,255,255,0.55); -fx-font-size: 11px;"/>
+                </VBox>
+            </HBox>
+
+            <!-- Navigation -->
+            <VBox spacing="2" style="-fx-padding: 16 12 0 12;" VBox.vgrow="ALWAYS">
+
+                <!-- Accueil -->
+                <HBox alignment="CENTER_LEFT" spacing="12" fx:id="navAccueil"
+                      onMouseClicked="#onNavHomeClicked"
+                      style="-fx-background-color: #34495E; -fx-background-radius: 8;
+                             -fx-padding: 10 14; -fx-cursor: hand;">
+                    <Label text="🏠" style="-fx-font-size: 16px; -fx-text-fill: white;"/>
+                    <Label text="Accueil" style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                </HBox>
+
+                <!-- Suivi Mental avec sous-menu -->
+                <VBox spacing="0">
+                    <HBox alignment="CENTER_LEFT" spacing="12" fx:id="navSuivi"
+                          onMouseClicked="#toggleSuiviMenu"
+                          onMouseEntered="#onNavHoverEnter" onMouseExited="#onNavHoverExit"
+                          style="-fx-background-color: transparent; -fx-background-radius: 8;
+                                 -fx-padding: 10 14; -fx-cursor: hand;">
+                        <Label text="📈" style="-fx-font-size: 16px; -fx-text-fill: rgba(255,255,255,0.85);"/>
+                        <Label text="Suivi Mental" style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="arrowSuivi" text="▶" style="-fx-text-fill: rgba(255,255,255,0.5); -fx-font-size: 11px;"/>
+                    </HBox>
+                    <VBox fx:id="submenuSuivi" spacing="2" style="-fx-padding: 4 0 6 28;">
+                        <HBox alignment="CENTER_LEFT" spacing="10" fx:id="navSuiviStats"
+                              onMouseClicked="#onNavSuiviStatsClicked"
+                              onMouseEntered="#onSubmenuHoverEnter" onMouseExited="#onSubmenuHoverExit"
+                              style="-fx-background-radius: 6; -fx-padding: 8 12; -fx-cursor: hand;">
+                            <Label text="📊" style="-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.55);"/>
+                            <Label text="Statistiques" style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 13px;"/>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="10" fx:id="navObjectifs"
+                              onMouseClicked="#onNavObjectifsClicked"
+                              onMouseEntered="#onSubmenuHoverEnter" onMouseExited="#onSubmenuHoverExit"
+                              style="-fx-background-radius: 6; -fx-padding: 8 12; -fx-cursor: hand;">
+                            <Label text="🎯" style="-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.55);"/>
+                            <Label text="Objectifs" style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 13px;"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+
+                <!-- Forum avec sous-menu -->
+                <VBox spacing="0">
+                    <HBox alignment="CENTER_LEFT" spacing="12" fx:id="navForum"
+                          onMouseClicked="#toggleForumMenu"
+                          onMouseEntered="#onNavHoverEnter" onMouseExited="#onNavHoverExit"
+                          style="-fx-background-color: transparent; -fx-background-radius: 8;
+                                 -fx-padding: 10 14; -fx-cursor: hand;">
+                        <Label text="💬" style="-fx-font-size: 16px; -fx-text-fill: rgba(255,255,255,0.85);"/>
+                        <Label text="Forum" style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="arrowForum" text="▶" style="-fx-text-fill: rgba(255,255,255,0.5); -fx-font-size: 11px;"/>
+                    </HBox>
+                    <VBox fx:id="submenuForum" spacing="2" style="-fx-padding: 4 0 6 28;">
+                        <HBox alignment="CENTER_LEFT" spacing="10" fx:id="navSujets"
+                              onMouseClicked="#onNavSujetsClicked"
+                              onMouseEntered="#onSubmenuHoverEnter" onMouseExited="#onSubmenuHoverExit"
+                              style="-fx-background-radius: 6; -fx-padding: 8 12; -fx-cursor: hand;">
+                            <Label text="📝" style="-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.55);"/>
+                            <Label text="Sujets" style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 13px;"/>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="10" fx:id="navCommentaires"
+                              onMouseClicked="#onNavCommentairesClicked"
+                              onMouseEntered="#onSubmenuHoverEnter" onMouseExited="#onSubmenuHoverExit"
+                              style="-fx-background-radius: 6; -fx-padding: 8 12; -fx-cursor: hand;">
+                            <Label text="💬" style="-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.55);"/>
+                            <Label text="Commentaires" style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 13px;"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+
+                <!-- Rendez-vous -->
+                <HBox alignment="CENTER_LEFT" spacing="12" fx:id="navRdv"
+                      onMouseClicked="#onNavRdvClicked"
+                      onMouseEntered="#onNavHoverEnter" onMouseExited="#onNavHoverExit"
+                      style="-fx-background-color: transparent; -fx-background-radius: 8;
+                             -fx-padding: 10 14; -fx-cursor: hand;">
+                    <Label text="📅" style="-fx-font-size: 16px; -fx-text-fill: rgba(255,255,255,0.85);"/>
+                    <Label text="Rendez-vous" style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px;"/>
+                </HBox>
+
+                <!-- Utilisateurs -->
+                <HBox alignment="CENTER_LEFT" spacing="12" fx:id="navUtilisateurs"
+                      onMouseClicked="#onNavUtilisateursClicked"
+                      onMouseEntered="#onNavHoverEnter" onMouseExited="#onNavHoverExit"
+                      style="-fx-background-color: transparent; -fx-background-radius: 8;
+                             -fx-padding: 10 14; -fx-cursor: hand;">
+                    <Label text="👥" style="-fx-font-size: 16px; -fx-text-fill: rgba(255,255,255,0.85);"/>
+                    <Label text="Utilisateurs" style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px;"/>
+                </HBox>
+
+                <!-- Dossiers médicaux -->
+                <HBox alignment="CENTER_LEFT" spacing="12" fx:id="navDossiers"
+                      onMouseClicked="#onNavDossiersClicked"
+                      onMouseEntered="#onNavHoverEnter" onMouseExited="#onNavHoverExit"
+                      style="-fx-background-color: transparent; -fx-background-radius: 8;
+                             -fx-padding: 10 14; -fx-cursor: hand;">
+                    <Label text="📋" style="-fx-font-size: 16px; -fx-text-fill: rgba(255,255,255,0.85);"/>
+                    <Label text="Dossiers médicaux" style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px;"/>
+                </HBox>
+
+                <!-- Contenus -->
+                <HBox alignment="CENTER_LEFT" spacing="12" fx:id="navContenus"
+                      onMouseClicked="#onNavContenusClicked"
+                      onMouseEntered="#onNavHoverEnter" onMouseExited="#onNavHoverExit"
+                      style="-fx-background-color: transparent; -fx-background-radius: 8;
+                             -fx-padding: 10 14; -fx-cursor: hand;">
+                    <Label text="📝" style="-fx-font-size: 16px; -fx-text-fill: rgba(255,255,255,0.85);"/>
+                    <Label text="Contenus" style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px;"/>
+                </HBox>
+
+                <!-- Activités -->
+                <HBox alignment="CENTER_LEFT" spacing="12" fx:id="navActivites"
+                      onMouseClicked="#onNavActivitesClicked"
+                      onMouseEntered="#onNavHoverEnter" onMouseExited="#onNavHoverExit"
+                      style="-fx-background-color: transparent; -fx-background-radius: 8;
+                             -fx-padding: 10 14; -fx-cursor: hand;">
+                    <Label text="⚡" style="-fx-font-size: 16px; -fx-text-fill: rgba(255,255,255,0.85);"/>
+                    <Label text="Activités" style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px;"/>
+                </HBox>
+
+            </VBox>
+
+            <!-- Profil admin + bouton ⋮ -->
+            <VBox spacing="6" style="-fx-padding: 16 14 20 14;
+                                     -fx-border-color: rgba(255,255,255,0.08);
+                                     -fx-border-width: 1 0 0 0;">
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <StackPane>
+                        <Circle radius="18" style="-fx-fill: rgba(255,255,255,0.15);"/>
+                        <Label fx:id="avatarInitials" text="AD"
+                               style="-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                    </StackPane>
+                    <VBox spacing="1" HBox.hgrow="ALWAYS">
+                        <Label fx:id="labelUserName" text="Admin MentalUp"
+                               style="-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                        <Label text="Super Administrateur"
+                               style="-fx-text-fill: rgba(255,255,255,0.55); -fx-font-size: 11px;"/>
+                    </VBox>
+                    <!-- ✅ Bouton déconnexion -->
+                    <Button fx:id="logoutButton" text="⏻" onAction="#onLogout"
+                            style="-fx-background-color: rgba(255,255,255,0.1);
+                                   -fx-text-fill: white; -fx-background-radius: 6;
+                                   -fx-padding: 5 10; -fx-cursor: hand;
+                                   -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                </HBox>
+            </VBox>
+
+        </VBox>
+    </left>
+
+    <!-- ═══ CONTENU PRINCIPAL ═══ -->
+    <center>
+        <VBox spacing="0" prefWidth="764"
+              style="-fx-background-color: #F4F8FF;">
+
+            <!-- Barre supérieure -->
+            <HBox alignment="CENTER_LEFT" spacing="12"
+                  style="-fx-background-color: white; -fx-padding: 14 24;
+                         -fx-border-color: transparent transparent #E8EEF4 transparent;
+                         -fx-border-width: 0 0 1 0;">
+                <VBox spacing="2">
+                    <Label text="Tableau de bord Administrateur 👑"
+                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;"/>
+                    <Label fx:id="labelDate" text=""
+                           style="-fx-font-size: 12px; -fx-text-fill: #5A6C7D;"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="notifButton" text="🔔" onAction="#onNotifications"
+                        style="-fx-background-color: transparent; -fx-text-fill: #5A6E7A;
+                               -fx-padding: 6; -fx-cursor: hand; -fx-font-size: 16px;
+                               -fx-border-color: #E8EEF4; -fx-border-radius: 50; -fx-border-width: 1;
+                               -fx-min-width: 32; -fx-min-height: 32;"/>
+            </HBox>
+
+            <!-- Contenu -->
+            <VBox spacing="20" style="-fx-padding: 24 28 28 28;" VBox.vgrow="ALWAYS">
+
+                <!-- Bannière Admin -->
+                <HBox style="-fx-background-color: linear-gradient(to right, #2C3E50, #34495E);
+                             -fx-background-radius: 20; -fx-padding: 35 40;
+                             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5);"
+                      alignment="CENTER_LEFT">
+                    <VBox spacing="12" HBox.hgrow="ALWAYS">
+                        <Label text="🔐 Espace Administration"
+                               style="-fx-text-fill: rgba(255,255,255,0.8); -fx-font-size: 15px; -fx-font-weight: bold;"/>
+                        <Label text="Gérez MentalUp depuis un seul tableau de bord"
+                               style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;"/>
+                        <Label text="Utilisateurs, rendez-vous, forums, contenus et bien plus encore."
+                               style="-fx-text-fill: rgba(255,255,255,0.75); -fx-font-size: 14px;"/>
+                    </VBox>
+                    <Label text="⚙️" style="-fx-font-size: 70px; -fx-opacity: 0.12;"/>
+                </HBox>
+
+                <!-- 4 cartes statistiques -->
+                <HBox spacing="16">
+
+                    <VBox spacing="8" HBox.hgrow="ALWAYS"
+                          style="-fx-background-color: white; -fx-background-radius: 14;
+                                 -fx-padding: 18; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
+                        <Label text="👥" style="-fx-font-size: 32px;"/>
+                        <Label text="Utilisateurs" style="-fx-font-size: 14px; -fx-text-fill: #5A6C7D; -fx-font-weight: 600;"/>
+                        <Label fx:id="statUsers" text="0"
+                               style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;"/>
+                        <Label text="+12 cette semaine" style="-fx-font-size: 12px; -fx-text-fill: #50C878;"/>
+                    </VBox>
+
+                    <VBox spacing="8" HBox.hgrow="ALWAYS"
+                          style="-fx-background-color: white; -fx-background-radius: 14;
+                                 -fx-padding: 18; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
+                        <Label text="📅" style="-fx-font-size: 32px;"/>
+                        <Label text="Rendez-vous" style="-fx-font-size: 14px; -fx-text-fill: #5A6C7D; -fx-font-weight: 600;"/>
+                        <Label fx:id="statRdvs" text="48"
+                               style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;"/>
+                        <Label text="8 cette semaine" style="-fx-font-size: 12px; -fx-text-fill: #97BBE4;"/>
+                    </VBox>
+
+                    <VBox spacing="8" HBox.hgrow="ALWAYS"
+                          style="-fx-background-color: white; -fx-background-radius: 14;
+                                 -fx-padding: 18; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
+                        <Label text="💬" style="-fx-font-size: 32px;"/>
+                        <Label text="Sujets forum" style="-fx-font-size: 14px; -fx-text-fill: #5A6C7D; -fx-font-weight: 600;"/>
+                        <Label fx:id="statTopics" text="156"
+                               style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;"/>
+                        <Label text="+23 ce mois" style="-fx-font-size: 12px; -fx-text-fill: #97BBE4;"/>
+                    </VBox>
+
+                    <VBox spacing="8" HBox.hgrow="ALWAYS"
+                          style="-fx-background-color: white; -fx-background-radius: 14;
+                                 -fx-padding: 18; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
+                        <Label text="📊" style="-fx-font-size: 32px;"/>
+                        <Label text="Moyenne humeur" style="-fx-font-size: 14px; -fx-text-fill: #5A6C7D; -fx-font-weight: 600;"/>
+                        <Label fx:id="statMood" text="7.2/10"
+                               style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;"/>
+                        <Label text="+0.3 vs mois dernier" style="-fx-font-size: 12px; -fx-text-fill: #50C878;"/>
+                    </VBox>
+
+                </HBox>
+
+                <!-- Actions rapides -->
+                <VBox spacing="12"
+                      style="-fx-background-color: white; -fx-background-radius: 16;
+                             -fx-padding: 22 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
+                    <Label text="⚡ Actions rapides"
+                           style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;"/>
+                    <HBox spacing="16">
+                        <Button text="➕ Nouvel utilisateur" onAction="#onAddUser"
+                                style="-fx-background-color: #2C3E50; -fx-text-fill: white;
+                                       -fx-background-radius: 25; -fx-padding: 8 18;
+                                       -fx-cursor: hand; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                        <Button text="📅 Créer un rendez-vous" onAction="#onCreateRdv"
+                                style="-fx-background-color: #97BBE4; -fx-text-fill: #2C3E50;
+                                       -fx-background-radius: 25; -fx-padding: 8 18;
+                                       -fx-cursor: hand; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                        <Button text="📝 Modérer le forum" onAction="#onModerateForum"
+                                style="-fx-background-color: #F39C12; -fx-text-fill: white;
+                                       -fx-background-radius: 25; -fx-padding: 8 18;
+                                       -fx-cursor: hand; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                        <Button text="📊 Exporter les données" onAction="#onExportData"
+                                style="-fx-background-color: #34495E; -fx-text-fill: white;
+                                       -fx-background-radius: 25; -fx-padding: 8 18;
+                                       -fx-cursor: hand; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                    </HBox>
+                </VBox>
+
+            </VBox>
+        </VBox>
+    </center>
+
+</BorderPane>

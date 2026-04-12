@@ -14,6 +14,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -106,11 +107,19 @@ public class DashboardPsyController {
 
     // ===== NAVIGATION =====
 
+
     @FXML
     void goHome(MouseEvent event) {
-        setActive(navHome);
-        pageTitle.setText("Tableau de bord");
-        System.out.println("Accueil");
+
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/gui/DashboardPsyVue.fxml"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -138,14 +147,28 @@ public class DashboardPsyController {
 
     @FXML
     void goVoirRendezVous(MouseEvent event) {
-        pageTitle.setText("Liste des rendez-vous");
-        System.out.println("Voir RDV");
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/gui/VoirRendezVous.fxml"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
     void goCalendrier(MouseEvent event) {
-        pageTitle.setText("Calendrier");
-        System.out.println("Calendrier");
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/gui/Calendrier.fxml"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -179,6 +202,9 @@ public class DashboardPsyController {
             e.printStackTrace();
         }
     }
+
+
+
 
     // ===== ACTIONS =====
 

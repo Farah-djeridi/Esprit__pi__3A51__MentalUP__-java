@@ -1,6 +1,5 @@
 package Services;
 
-import interfaces.IService;
 import Models.RendezVous;
 import utils.MyDataBase;
 
@@ -8,131 +7,89 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class ServiceRendezVous implements IService<RendezVous> {
+public class ServiceRendezVous {
 
-    private Connection cnx;
+    private final Connection conn;
 
     public ServiceRendezVous() {
-        cnx = MyDataBase.getInstance().getCnx();
+        this.conn = MyDataBase.getInstance().getCnx();
     }
 
-    // ✅ CREATE
-    @Override
+    // CREATE
     public void add(RendezVous r) {
-
-        String req = "INSERT INTO rendez_vous " +
-                "(date, heure_debut, heure_fin, type_rdv, statut, lien_meet, lieu, telephone, psychologue_id, etudiant_id) " +
-                "VALUES (?,?,?,?,?,?,?,?,?,?)";
-
-        try {
-            PreparedStatement ps = cnx.prepareStatement(req);
-
+        String sql = "INSERT INTO rendez_vous " +
+                "(date, heure_debut, heure_fin, type_rdv, statut, psychologue_id) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setDate(1, r.getDate());
             ps.setTime(2, r.getHeureDebut());
             ps.setTime(3, r.getHeureFin());
             ps.setString(4, r.getTypeRdv());
             ps.setString(5, r.getStatut());
-            ps.setString(6, r.getLienMeet());
-            ps.setString(7, r.getLieu());
-            ps.setString(8, r.getTelephone());
-            ps.setInt(9, r.getPsychologueId());
-
-            if (r.getEtudiantId() != null)
-                ps.setInt(10, r.getEtudiantId());
-            else
-                ps.setNull(10, Types.INTEGER);
-
+            ps.setInt(6, r.getPsychologueId());
             ps.executeUpdate();
-
+            System.out.println("Créneau ajouté : " + r);
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.err.println("[add] " + e.getMessage());
         }
     }
 
-    // ✅ READ
-    @Override
+    // READ ALL
     public List<RendezVous> getAll() {
-
         List<RendezVous> list = new ArrayList<>();
-        String req = "SELECT * FROM rendez_vous";
-
-        try {
-            Statement st = cnx.createStatement();
-            ResultSet rs = st.executeQuery(req);
-
+        String sql = "SELECT * FROM rendez_vous ORDER BY date, heure_debut";
+        try (Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) {
                 RendezVous r = new RendezVous();
-
                 r.setId(rs.getInt("id"));
                 r.setDate(rs.getDate("date"));
                 r.setHeureDebut(rs.getTime("heure_debut"));
                 r.setHeureFin(rs.getTime("heure_fin"));
                 r.setTypeRdv(rs.getString("type_rdv"));
                 r.setStatut(rs.getString("statut"));
+                r.setPsychologueId(rs.getInt("psychologue_id"));
                 r.setLienMeet(rs.getString("lien_meet"));
                 r.setLieu(rs.getString("lieu"));
                 r.setTelephone(rs.getString("telephone"));
-                r.setPsychologueId(rs.getInt("psychologue_id"));
-                r.setEtudiantId((Integer) rs.getObject("etudiant_id"));
-
+                int etudiantId = rs.getInt("etudiant_id");
+                r.setEtudiantId(rs.wasNull() ? null : etudiantId);
                 list.add(r);
             }
-
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.err.println("[getAll] " + e.getMessage());
         }
-
         return list;
     }
 
-    // ✅ UPDATE
-    @Override
+    // UPDATE
     public void update(RendezVous r) {
-
-        String req = "UPDATE rendez_vous SET " +
-                "date=?, heure_debut=?, heure_fin=?, type_rdv=?, statut=?, lien_meet=?, lieu=?, telephone=?, psychologue_id=?, etudiant_id=? " +
+        String sql = "UPDATE rendez_vous SET " +
+                "date=?, heure_debut=?, heure_fin=?, type_rdv=?, statut=? " +
                 "WHERE id=?";
-
-        try {
-            PreparedStatement ps = cnx.prepareStatement(req);
-
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setDate(1, r.getDate());
             ps.setTime(2, r.getHeureDebut());
             ps.setTime(3, r.getHeureFin());
             ps.setString(4, r.getTypeRdv());
             ps.setString(5, r.getStatut());
-            ps.setString(6, r.getLienMeet());
-            ps.setString(7, r.getLieu());
-            ps.setString(8, r.getTelephone());
-            ps.setInt(9, r.getPsychologueId());
-
-            if (r.getEtudiantId() != null)
-                ps.setInt(10, r.getEtudiantId());
-            else
-                ps.setNull(10, Types.INTEGER);
-
-            ps.setInt(11, r.getId());
-
+            ps.setInt(6, r.getId());
             ps.executeUpdate();
-
+            System.out.println("Créneau mis à jour : id=" + r.getId());
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.err.println("[update] " + e.getMessage());
         }
     }
 
-    // ✅ DELETE
-    @Override
-    public void delete(RendezVous r) {
-
-        String req = "DELETE FROM rendez_vous WHERE id=?";
-
-        try {
-            PreparedStatement ps = cnx.prepareStatement(req);
-            ps.setInt(1, r.getId());
+    // DELETE
+    public void delete(int id) {
+        String sql = "DELETE FROM rendez_vous WHERE id=?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
             ps.executeUpdate();
-
+            System.out.println("Créneau supprimé : id=" + id);
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.err.println("[delete] " + e.getMessage());
         }
     }
 }

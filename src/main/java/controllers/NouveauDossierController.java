@@ -4,10 +4,14 @@ import Models.Dossier;
 import Services.ServiceDossier;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.event.ActionEvent;
+import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 import utils.MyDataBase;
 
 
@@ -27,7 +31,8 @@ public class NouveauDossierController {
     @FXML private DatePicker datePicker;
     @FXML private TextArea notesField;
     @FXML private Label pageTitle;
-
+    @FXML
+    private HBox navHome;
 
     private Map<String, Integer> patientMap = new HashMap<>();
     private int psychologueId = 2; // connecté
@@ -135,15 +140,50 @@ public class NouveauDossierController {
         alert.setContentText(msg);
         alert.showAndWait();
     }
-    @FXML
-    void goHome(javafx.scene.input.MouseEvent event) {
+
+    // navigations
+
+    // ================= NAVIGATION =================
+    private void loadPage(MouseEvent event, String path) {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/gui/DashboardPsyVue.fxml"));
+            java.net.URL url = getClass().getResource(path);
+
+            if (url == null) {
+                System.out.println("FXML introuvable: " + path);
+                return;
+            }
+
+            Parent root = FXMLLoader.load(url);
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    @FXML
+    public void goHome(MouseEvent event) {
+        loadPage(event, "/gui/DashboardPsyVue.fxml");
+    }
+
+    @FXML
+    public void goVoirRendezVous(MouseEvent event) {
+        loadPage(event, "/gui/VoirRendezVous.fxml");
+    }
+
+
+    @FXML
+    void goCalendrier(MouseEvent event) {
+        loadPage(event, "/gui/Calendrier.fxml");
+    }
+
+    @FXML
+    void goConsulterDossiers(MouseEvent event) {
+        loadPage(event, "/gui/ConsulterDossiers.fxml");
+    }
+
 
 
 

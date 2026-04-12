@@ -16,19 +16,19 @@
 
     <dependencies>
 
-    <dependency>
-        <groupId>org.openjfx</groupId>
-        <artifactId>javafx-fxml</artifactId>
-        <version>22.0.2</version>
-        <scope>compile</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>22.0.2</version>
+            <scope>compile</scope>
+        </dependency>
 
-    <dependency>
-        <groupId>org.openjfx</groupId>
-        <artifactId>javafx-controls</artifactId>
-        <version>22.0.2</version>
-        <scope>compile</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>22.0.2</version>
+            <scope>compile</scope>
+        </dependency>
 
         <dependency>
             <groupId>com.mysql</groupId>
@@ -36,6 +36,9 @@
             <version>9.6.0</version>
             <scope>compile</scope>
         </dependency>
+
+
+
 
     </dependencies>
 

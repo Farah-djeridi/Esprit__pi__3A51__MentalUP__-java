@@ -2,9 +2,17 @@ package controllers;
 
 import Models.Dossier;
 import Services.ServiceDossier;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.collections.*;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 
 public class ConsulterDossiersController {
 
@@ -17,6 +25,8 @@ public class ConsulterDossiersController {
 
     @FXML private TextArea notesArea;
     @FXML private ComboBox<String> niveauRisqueBox;
+    @FXML
+    private HBox navHome;
 
     private ServiceDossier service = new ServiceDossier();
 
@@ -131,4 +141,70 @@ public class ConsulterDossiersController {
         alert.setContentText(msg);
         alert.showAndWait();
     }
+
+
+    // ================= NAVIGATION =================
+    // ================= NAVIGATION =================
+    private void loadPage(MouseEvent event, String path) {
+        try {
+            java.net.URL url = getClass().getClassLoader().getResource(path.substring(1));
+
+            if (url == null) {
+                System.out.println("FXML introuvable: " + path);
+                return;
+            }
+
+            Parent root = FXMLLoader.load(url);
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    public void goHome(MouseEvent event) {
+        loadPage(event, "/gui/DashboardPsyVue.fxml");
+    }
+    @FXML
+    void goConsulterDossiers(MouseEvent event) {
+        loadPage(event, "/gui/ConsulterDossiers.fxml");
+    }
+
+    @FXML
+    public void goVoirRendezVous(MouseEvent event) {
+        loadPage(event, "/gui/VoirRendezVous.fxml");
+    }
+
+    @FXML
+    void goNouveauDossier(MouseEvent event) {
+        loadPage(event, "/gui/NouveauDossier.fxml");
+    }
+
+    @FXML
+    void goCalendrier(MouseEvent event) {
+        loadPage(event, "/gui/Calendrier.fxml");
+    }
+
+    @FXML
+    void goActivites(MouseEvent event) {}
+
+    @FXML
+    void goRessources(MouseEvent event) {}
+
+    @FXML
+    void goStats(MouseEvent event) {}
+
+    @FXML
+    void toggleRdvMenu(MouseEvent event) {}
+
+    @FXML
+    void toggleDossiersMenu(MouseEvent event) {}
+    @FXML
+    void logout(MouseEvent  event) {
+        System.out.println("Déconnexion...");
+    }
+
 }

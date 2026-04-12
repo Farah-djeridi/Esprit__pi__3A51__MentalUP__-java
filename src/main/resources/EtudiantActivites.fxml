@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="Controller.EtudiantActivitesController"
+            style="-fx-background-color: #e8f4f8;">
+
+    <!-- Sidebar Étudiant -->
+    <left>
+        <VBox style="-fx-background-color: linear-gradient(to bottom, #7ba7bc, #5a8a9f); -fx-pref-width: 240;">
+            <padding>
+                <Insets top="20" right="0" bottom="20" left="0"/>
+            </padding>
+
+            <!-- Header avec logo et titre -->
+            <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 20;">
+                <Label text="🧠" style="-fx-font-size: 32px;"/>
+                <VBox spacing="2">
+                    <Label text="MentalUp" style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+                    <Label text="Bien-être étudiant" style="-fx-text-fill: #d4e8f0; -fx-font-size: 11px;"/>
+                </VBox>
+            </HBox>
+
+            <!-- Séparateur -->
+            <Region style="-fx-background-color: rgba(255,255,255,0.2); -fx-pref-height: 1;">
+                <VBox.margin>
+                    <Insets top="10" bottom="10"/>
+                </VBox.margin>
+            </Region>
+
+            <!-- Menu Items -->
+            <VBox spacing="2" style="-fx-padding: 10 15;">
+
+                <Button text="🏠  Accueil" alignment="CENTER_LEFT" maxWidth="Infinity"
+                        style="-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 12 15; -fx-background-radius: 8; -fx-cursor: hand;">
+                    <VBox.margin>
+                        <Insets bottom="5"/>
+                    </VBox.margin>
+                </Button>
+
+                <Button text="📊  Suivi" alignment="CENTER_LEFT" maxWidth="Infinity"
+                        style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 12 15; -fx-background-radius: 8; -fx-cursor: hand;">
+                    <VBox.margin>
+                        <Insets bottom="5"/>
+                    </VBox.margin>
+                </Button>
+
+                <Button text="📅  Rendez-vous" alignment="CENTER_LEFT" maxWidth="Infinity"
+                        style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 12 15; -fx-background-radius: 8; -fx-cursor: hand;">
+                    <VBox.margin>
+                        <Insets bottom="5"/>
+                    </VBox.margin>
+                </Button>
+
+                <Button text="💬  Forum" alignment="CENTER_LEFT" maxWidth="Infinity"
+                        style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 12 15; -fx-background-radius: 8; -fx-cursor: hand;">
+                    <VBox.margin>
+                        <Insets bottom="5"/>
+                    </VBox.margin>
+                </Button>
+
+                <!-- Activités SÉLECTIONNÉ -->
+                <Button text="⚡  Activités" alignment="CENTER_LEFT" maxWidth="Infinity"
+                        style="-fx-background-color: rgba(45,55,72,0.4); -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 12 15; -fx-background-radius: 8; -fx-cursor: hand; -fx-font-weight: bold;">
+                    <VBox.margin>
+                        <Insets bottom="5"/>
+                    </VBox.margin>
+                </Button>
+
+                <Button text="📚  Ressources" alignment="CENTER_LEFT" maxWidth="Infinity"
+                        style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 12 15; -fx-background-radius: 8; -fx-cursor: hand;">
+                    <VBox.margin>
+                        <Insets bottom="5"/>
+                    </VBox.margin>
+                </Button>
+
+            </VBox>
+
+            <!-- Spacer pour pousser le footer en bas -->
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <!-- Footer User Info -->
+            <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 15; -fx-background-color: rgba(0,0,0,0.2); -fx-background-radius: 10;">
+                <VBox.margin>
+                    <Insets top="10" right="15" bottom="10" left="15"/>
+                </VBox.margin>
+
+                <Label text="👤" style="-fx-font-size: 24px; -fx-background-color: rgba(255,255,255,0.2); -fx-padding: 8; -fx-background-radius: 50%;"/>
+                <VBox spacing="2">
+                    <Label text="Sophie Am..." style="-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                    <Label text="L3 Informatique" style="-fx-text-fill: #d4e8f0; -fx-font-size: 10px;"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="⋮" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-cursor: hand;"/>
+            </HBox>
+
+        </VBox>
+    </left>
+
+    <!-- Main Content Area -->
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background: #e8f4f8; -fx-background-color: #e8f4f8;">
+            <VBox spacing="25" style="-fx-padding: 30; -fx-background-color: #e8f4f8;">
+
+                <!-- Header avec titre et date -->
+                <VBox spacing="5">
+                    <HBox alignment="CENTER_LEFT" spacing="15">
+                        <Label text="Bonjour, Sophie 👋" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2d3748;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label text="🔔" style="-fx-font-size: 24px; -fx-background-color: white; -fx-padding: 10; -fx-background-radius: 50%; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0, 0, 2);"/>
+                    </HBox>
+                    <Label text="Mardi 7 Avril 2026" style="-fx-font-size: 14px; -fx-text-fill: #718096;"/>
+                </VBox>
+
+                <!-- Hero Banner -->
+                <VBox spacing="15" style="-fx-background-color: linear-gradient(to right, #6b9fb5, #7ba7bc); -fx-padding: 40; -fx-background-radius: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 15, 0, 0, 5);">
+                    <Label text="✨ Bienvenue sur MentalUp ✨" style="-fx-font-size: 18px; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                    <Label text="Prenez soin de votre santé mentale" style="-fx-font-size: 32px; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                    <Label text="Une plateforme dédiée à votre bien-être avec des outils de suivi," style="-fx-font-size: 15px; -fx-text-fill: #e8f4f8;"/>
+                    <Button text="Commencer l'aventure →" 
+                            style="-fx-background-color: white; -fx-text-fill: #5a8a9f; -fx-font-size: 15px; -fx-font-weight: bold; -fx-padding: 12 30; -fx-cursor: hand; -fx-background-radius: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);">
+                        <VBox.margin>
+                            <Insets top="10"/>
+                        </VBox.margin>
+                    </Button>
+                </VBox>
+
+                <!-- Section Activités Disponibles -->
+                <VBox spacing="20">
+                    <HBox alignment="CENTER_LEFT" spacing="15">
+                        <Label text="⚡ Activités Disponibles" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2d3748;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <TextField fx:id="searchField" promptText="🔍  Rechercher une activité..."
+                                   style="-fx-pref-width: 250; -fx-padding: 10; -fx-font-size: 13px; -fx-border-color: #c5d8e8; -fx-border-width: 2; -fx-border-radius: 20; -fx-background-radius: 20; -fx-background-color: white;"/>
+                    </HBox>
+
+                    <!-- Grid des activités -->
+                    <GridPane fx:id="activitesGrid" hgap="20" vgap="20">
+                    </GridPane>
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

@@ -4,19 +4,16 @@ import models.Vote;
 import utils.MyDataBase;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+
 
 public class ServiceVote {
 
     private Connection cnx;
-    private static final int CURRENT_USER_ID = 2; // Utilisateur statique pour le moment
+    private static final int CURRENT_USER_ID = 2;
 
     public ServiceVote() {
         this.cnx = MyDataBase.getInstance().getCnx();
     }
-
-    // Vérifier si l'utilisateur a déjà voté pour un sujet
     public Vote getUserVoteOnSujet(int sujetId) {
         String req = "SELECT * FROM vote WHERE user_id = ? AND sujet_id = ?";
         try {
@@ -40,13 +37,11 @@ public class ServiceVote {
         return null;
     }
 
-    // Ajouter ou modifier un vote pour un sujet
     public void voteForSujet(int sujetId, String voteType) {
         Vote existingVote = getUserVoteOnSujet(sujetId);
 
         try {
             if (existingVote == null) {
-                // Nouveau vote
                 String req = "INSERT INTO vote (type, user_id, sujet_id, created_at) VALUES (?, ?, ?, NOW())";
                 PreparedStatement pstm = cnx.prepareStatement(req);
                 pstm.setString(1, voteType);
@@ -54,18 +49,16 @@ public class ServiceVote {
                 pstm.setInt(3, sujetId);
                 pstm.executeUpdate();
 
-                // Mettre à jour les compteurs du sujet
                 updateSujetCounters(sujetId, voteType, "add");
 
             } else if (!existingVote.getType().equals(voteType)) {
-                // Changement de vote (like -> dislike ou inverse)
+
                 String req = "UPDATE vote SET type = ?, created_at = NOW() WHERE id = ?";
                 PreparedStatement pstm = cnx.prepareStatement(req);
                 pstm.setString(1, voteType);
                 pstm.setInt(2, existingVote.getId());
                 pstm.executeUpdate();
 
-                // Mettre à jour les compteurs (annuler l'ancien, ajouter le nouveau)
                 updateSujetCounters(sujetId, existingVote.getType(), "remove");
                 updateSujetCounters(sujetId, voteType, "add");
             }
@@ -77,7 +70,6 @@ public class ServiceVote {
         }
     }
 
-    // Supprimer un vote
     public void removeVoteFromSujet(int sujetId) {
         Vote existingVote = getUserVoteOnSujet(sujetId);
 
@@ -88,7 +80,6 @@ public class ServiceVote {
                 pstm.setInt(1, existingVote.getId());
                 pstm.executeUpdate();
 
-                // Décrémenter le compteur correspondant
                 updateSujetCounters(sujetId, existingVote.getType(), "remove");
 
                 System.out.println("Vote supprimé !");
@@ -99,7 +90,6 @@ public class ServiceVote {
         }
     }
 
-    // Mettre à jour les compteurs de likes/dislikes d'un sujet
     private void updateSujetCounters(int sujetId, String voteType, String action) {
         String column = voteType.equals("like") ? "nb_likes" : "nb_dislikes";
         String operation = action.equals("add") ? "+" : "-";
@@ -115,39 +105,6 @@ public class ServiceVote {
         }
     }
 
-    // Obtenir le nombre de likes d'un sujet
-    public int getLikesCount(int sujetId) {
-        String req = "SELECT nb_likes FROM sujet WHERE id = ?";
-        try {
-            PreparedStatement pstm = cnx.prepareStatement(req);
-            pstm.setInt(1, sujetId);
-            ResultSet rs = pstm.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("nb_likes");
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return 0;
-    }
-
-    // Obtenir le nombre de dislikes d'un sujet
-    public int getDislikesCount(int sujetId) {
-        String req = "SELECT nb_dislikes FROM sujet WHERE id = ?";
-        try {
-            PreparedStatement pstm = cnx.prepareStatement(req);
-            pstm.setInt(1, sujetId);
-            ResultSet rs = pstm.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("nb_dislikes");
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return 0;
-    }
-
-    // Vérifier si l'utilisateur a déjà voté pour un commentaire
     public Vote getUserVoteOnCommentaire(int commentaireId) {
         String req = "SELECT * FROM vote WHERE user_id = ? AND commentaire_id = ?";
         try {
@@ -171,7 +128,6 @@ public class ServiceVote {
         return null;
     }
 
-    // Ajouter ou modifier un vote pour un commentaire
     public void voteForCommentaire(int commentaireId, String voteType) {
         Vote existingVote = getUserVoteOnCommentaire(commentaireId);
 
@@ -198,7 +154,6 @@ public class ServiceVote {
         }
     }
 
-    // Supprimer un vote d'un commentaire
     public void removeVoteFromCommentaire(int commentaireId) {
         Vote existingVote = getUserVoteOnCommentaire(commentaireId);
 
@@ -215,7 +170,6 @@ public class ServiceVote {
         }
     }
 
-    // Mettre à jour les compteurs de likes/dislikes d'un commentaire
     private void updateCommentaireCounters(int commentaireId, String voteType, String action) {
         String column = voteType.equals("like") ? "nb_likes" : "nb_dislikes";
         String operation = action.equals("add") ? "+" : "-";

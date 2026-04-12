@@ -5,10 +5,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.image.ImageView;
@@ -35,18 +34,15 @@ public class ControllerAdminSujet {
     @FXML private Button notifButton;
     @FXML private ImageView logoImage;
 
-    // Sidebar
     @FXML private HBox navAccueil, navSuivi, navForum, navRdv, navUtilisateurs, navDossiers, navContenus, navActivites;
     @FXML private HBox navSuiviStats, navObjectifs, navSujets, navCommentaires;
     @FXML private VBox submenuSuivi, submenuForum;
     @FXML private Label arrowSuivi, arrowForum;
 
-    // Filtres
     @FXML private TextField searchField;
     @FXML private ComboBox<String> filterCombo;
     @FXML private Label totalSujetsLabel;
 
-    // Container pour les lignes
     @FXML private VBox cardsContainer;
 
     private ServiceSujet serviceSujet;
@@ -57,11 +53,26 @@ public class ControllerAdminSujet {
     private boolean suiviOpen = false;
     private boolean forumOpen = true;
 
+    private static final String COLOR_PRIMARY = "#2C5F8A";
+    private static final String COLOR_DANGER = "#EF4444";
+    private static final String COLOR_WARNING = "#F59E0B";
+    private static final String COLOR_SUCCESS = "#22C55E";
+    private static final String COLOR_BG = "#F0F4FA";
+
     @FXML
     public void initialize() {
         updateDate();
         labelUserName.setText("Admin MentalUp");
         avatarInitials.setText("AD");
+
+        try {
+            Image logo = new Image(getClass().getResourceAsStream("/images/logo.png"));
+            if (logo != null) {
+                logoImage.setImage(logo);
+            }
+        } catch (Exception e) {
+            System.err.println("Logo non trouvé, utilisation du texte par défaut");
+        }
 
         serviceSujet = new ServiceSujet();
         serviceCommentaire = new ServiceCommentaire();
@@ -70,6 +81,7 @@ public class ControllerAdminSujet {
 
         setupFilters();
         loadSujets();
+        setupNavigationHoverEffects();
 
         submenuSuivi.setVisible(false);
         submenuSuivi.setManaged(false);
@@ -77,6 +89,40 @@ public class ControllerAdminSujet {
         submenuForum.setManaged(true);
         arrowSuivi.setText("▶");
         arrowForum.setText("▼");
+    }
+
+    private void setupNavigationHoverEffects() {
+        addHoverEffect(navAccueil);
+        addHoverEffect(navSuivi);
+        addHoverEffect(navRdv);
+        addHoverEffect(navUtilisateurs);
+        addHoverEffect(navDossiers);
+        addHoverEffect(navContenus);
+        addHoverEffect(navActivites);
+        addSubmenuHoverEffect(navSuiviStats);
+        addSubmenuHoverEffect(navCommentaires);
+    }
+
+    private void addHoverEffect(HBox navItem) {
+        navItem.setOnMouseEntered(e -> {
+            if (!navItem.equals(navForum)) {
+                navItem.setStyle("-fx-background-color: rgba(255,255,255,0.08); -fx-background-radius: 10; -fx-padding: 10 14; -fx-cursor: hand;");
+            }
+        });
+        navItem.setOnMouseExited(e -> {
+            if (!navItem.equals(navForum)) {
+                navItem.setStyle("-fx-background-color: transparent; -fx-background-radius: 10; -fx-padding: 10 14; -fx-cursor: hand;");
+            }
+        });
+    }
+
+    private void addSubmenuHoverEffect(HBox navItem) {
+        navItem.setOnMouseEntered(e -> {
+            navItem.setStyle("-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 8; -fx-padding: 8 12; -fx-cursor: hand;");
+        });
+        navItem.setOnMouseExited(e -> {
+            navItem.setStyle("-fx-background-radius: 8; -fx-padding: 8 12; -fx-cursor: hand;");
+        });
     }
 
     private void updateDate() {
@@ -137,82 +183,73 @@ public class ControllerAdminSujet {
     private HBox createSujetRow(Sujet sujet, boolean isEven) {
         HBox row = new HBox(10);
         row.setAlignment(Pos.CENTER_LEFT);
-        row.setStyle("-fx-background-color: " + (isEven ? "white" : "#F8FAFE") +
-                "; -fx-padding: 12 15; -fx-border-color: #E8EEF4; -fx-border-width: 0 0 1 0;");
+        row.setStyle("-fx-background-color: " + (isEven ? "rgba(255,255,255,0.9)" : "rgba(248,250,252,0.9)") +
+                "; -fx-padding: 12 16; -fx-border-color: #E2E8F0; -fx-border-width: 0 0 1 0;");
 
-        // ID
         Label idLabel = new Label(String.valueOf(sujet.getId()));
         idLabel.setPrefWidth(50);
-        idLabel.setStyle("-fx-text-fill: #2C3E50; -fx-font-weight: bold;");
+        idLabel.setStyle("-fx-text-fill: #1A2B3C; -fx-font-weight: bold; -fx-font-size: 12px;");
 
-        // Titre
         Label titreLabel = new Label(sujet.getTitre());
         titreLabel.setPrefWidth(200);
-        titreLabel.setStyle("-fx-text-fill: #2C3E50; -fx-font-weight: 500;");
+        titreLabel.setStyle("-fx-text-fill: #1A2B3C; -fx-font-weight: 600; -fx-font-size: 12px;");
         titreLabel.setWrapText(true);
 
-        // Auteur
         Label auteurLabel = new Label(sujet.isAnonyme() ? "Anonyme" : sujet.getUserName());
         auteurLabel.setPrefWidth(130);
-        auteurLabel.setStyle("-fx-text-fill: #7F8C8D;");
+        auteurLabel.setStyle("-fx-text-fill: #6B7C8D; -fx-font-size: 12px;");
 
-        // Contenu
         String contenuText = sujet.getContenu();
         if (contenuText.length() > 55) {
             contenuText = contenuText.substring(0, 55) + "...";
         }
         Label contenuLabel = new Label(contenuText);
         contenuLabel.setPrefWidth(220);
-        contenuLabel.setStyle("-fx-text-fill: #5A6C7D;");
+        contenuLabel.setStyle("-fx-text-fill: #4A5A6A; -fx-font-size: 12px;");
         contenuLabel.setWrapText(true);
 
-        // Date
         Label dateLabel = new Label(formatDate(sujet.getDateCreation()));
         dateLabel.setPrefWidth(100);
-        dateLabel.setStyle("-fx-text-fill: #7F8C8D;");
+        dateLabel.setStyle("-fx-text-fill: #6B7C8D; -fx-font-size: 12px;");
 
-        // Likes
-        Label likesLabel = new Label(String.valueOf(sujet.getNbLikes()));
+        Label likesLabel = new Label("👍 " + sujet.getNbLikes());
         likesLabel.setPrefWidth(50);
-        likesLabel.setStyle("-fx-text-fill: #27AE60; -fx-font-weight: bold;");
+        likesLabel.setStyle("-fx-text-fill: " + COLOR_SUCCESS + "; -fx-font-weight: bold; -fx-font-size: 12px;");
         likesLabel.setAlignment(Pos.CENTER);
 
-        // Dislikes
-        Label dislikesLabel = new Label(String.valueOf(sujet.getNbDislikes()));
+        Label dislikesLabel = new Label("👎 " + sujet.getNbDislikes());
         dislikesLabel.setPrefWidth(50);
-        dislikesLabel.setStyle("-fx-text-fill: #E74C3C; -fx-font-weight: bold;");
+        dislikesLabel.setStyle("-fx-text-fill: " + COLOR_DANGER + "; -fx-font-weight: bold; -fx-font-size: 12px;");
         dislikesLabel.setAlignment(Pos.CENTER);
 
-        // Vues
-        Label vuesLabel = new Label(String.valueOf(sujet.getNbVues()));
+        Label vuesLabel = new Label("👁 " + sujet.getNbVues());
         vuesLabel.setPrefWidth(50);
-        vuesLabel.setStyle("-fx-text-fill: #3498DB; -fx-font-weight: bold;");
+        vuesLabel.setStyle("-fx-text-fill: #3498DB; -fx-font-weight: bold; -fx-font-size: 12px;");
         vuesLabel.setAlignment(Pos.CENTER);
 
-        // Actions
         HBox actionsBox = new HBox(10);
         actionsBox.setAlignment(Pos.CENTER);
         actionsBox.setPrefWidth(180);
 
         Button editBtn = new Button("Modifier");
         editBtn.setStyle("-fx-background-color: #F39C12; -fx-text-fill: white; -fx-cursor: hand; " +
-                "-fx-background-radius: 5; -fx-padding: 6 16; -fx-font-size: 11px; -fx-font-weight: bold;");
+                "-fx-background-radius: 5; -fx-padding: 6 16; -fx-font-size: 10px; -fx-font-weight: bold;");
         editBtn.setMinWidth(80);
         editBtn.setOnAction(e -> editSujet(sujet));
         editBtn.setOnMouseEntered(e -> editBtn.setStyle("-fx-background-color: #E67E22; -fx-text-fill: white; -fx-cursor: hand; " +
-                "-fx-background-radius: 5; -fx-padding: 6 16; -fx-font-size: 11px; -fx-font-weight: bold;"));
+                "-fx-background-radius: 5; -fx-padding: 6 16; -fx-font-size: 10px; -fx-font-weight: bold;"));
         editBtn.setOnMouseExited(e -> editBtn.setStyle("-fx-background-color: #F39C12; -fx-text-fill: white; -fx-cursor: hand; " +
-                "-fx-background-radius: 5; -fx-padding: 6 16; -fx-font-size: 11px; -fx-font-weight: bold;"));
+                "-fx-background-radius: 5; -fx-padding: 6 16; -fx-font-size: 10px; -fx-font-weight: bold;"));
 
         Button deleteBtn = new Button("Supprimer");
         deleteBtn.setStyle("-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-cursor: hand; " +
-                "-fx-background-radius: 5; -fx-padding: 6 16; -fx-font-size: 11px; -fx-font-weight: bold;");
+                "-fx-background-radius: 5; -fx-padding: 6 16; -fx-font-size: 9px; -fx-font-weight: bold;");
         deleteBtn.setMinWidth(80);
         deleteBtn.setOnAction(e -> deleteSujet(sujet));
         deleteBtn.setOnMouseEntered(e -> deleteBtn.setStyle("-fx-background-color: #C0392B; -fx-text-fill: white; -fx-cursor: hand; " +
-                "-fx-background-radius: 5; -fx-padding: 6 16; -fx-font-size: 11px; -fx-font-weight: bold;"));
+                "-fx-background-radius: 5; -fx-padding: 6 16; -fx-font-size: 9px; -fx-font-weight: bold;"));
         deleteBtn.setOnMouseExited(e -> deleteBtn.setStyle("-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-cursor: hand; " +
-                "-fx-background-radius: 5; -fx-padding: 6 16; -fx-font-size: 11px; -fx-font-weight: bold;"));
+                "-fx-background-radius: 5; -fx-padding: 6 16; -fx-font-size: 9px; -fx-font-weight: bold;"));
 
         actionsBox.getChildren().addAll(editBtn, deleteBtn);
 
@@ -226,35 +263,40 @@ public class ControllerAdminSujet {
         dialog.setTitle("Modifier le sujet");
         dialog.setHeaderText("Modifier le sujet #" + sujet.getId());
 
-        VBox content = new VBox(10);
-        content.setPadding(new Insets(20));
+        VBox content = new VBox(12);
+        content.setPadding(new Insets(24));
+        content.setStyle("-fx-background-color: " + COLOR_BG + "; -fx-background-radius: 16;");
+
+        Label titreLabel = new Label("📌 Titre");
+        titreLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #1A2B3C;");
 
         TextField titreField = new TextField(sujet.getTitre());
         titreField.setPromptText("Titre");
-        titreField.setStyle("-fx-padding: 10; -fx-background-radius: 8; -fx-border-color: #E8EEF4; -fx-border-radius: 8;");
+        titreField.setStyle("-fx-padding: 10; -fx-background-radius: 12; -fx-border-color: #E2E8F0; -fx-border-radius: 12; -fx-background-color: rgba(255,255,255,0.9);");
+
+        Label contenuLabel = new Label("💬 Contenu");
+        contenuLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #1A2B3C;");
 
         TextArea contenuArea = new TextArea(sujet.getContenu());
         contenuArea.setPromptText("Contenu");
         contenuArea.setPrefHeight(200);
-        contenuArea.setStyle("-fx-padding: 10; -fx-background-radius: 8; -fx-border-color: #E8EEF4; -fx-border-radius: 8;");
+        contenuArea.setStyle("-fx-padding: 10; -fx-background-radius: 12; -fx-border-color: #E2E8F0; -fx-border-radius: 12; -fx-background-color: rgba(255,255,255,0.9);");
 
-        CheckBox anonymeCheck = new CheckBox("Publier anonymement");
+        CheckBox anonymeCheck = new CheckBox("📝 Publier anonymement");
         anonymeCheck.setSelected(sujet.isAnonyme());
-        anonymeCheck.setStyle("-fx-text-fill: #7F8C8D;");
+        anonymeCheck.setStyle("-fx-text-fill: #4A5A6A; -fx-font-size: 13px; -fx-font-weight: 500;");
 
-        content.getChildren().addAll(
-                new Label("Titre:"), titreField,
-                new Label("Contenu:"), contenuArea,
-                anonymeCheck
-        );
+        content.getChildren().addAll(titreLabel, titreField, contenuLabel, contenuArea, anonymeCheck);
 
         dialog.getDialogPane().setContent(content);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        dialog.getDialogPane().setStyle("-fx-background-color: " + COLOR_BG + "; -fx-background-radius: 16;");
 
         Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
-        okButton.setStyle("-fx-background-color: #2C5F8A; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 5; -fx-padding: 8 20;");
+        okButton.setStyle("-fx-background-color: " + COLOR_PRIMARY + "; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 8; -fx-padding: 8 24; -fx-font-weight: bold;");
+
         Button cancelButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL);
-        cancelButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #7F8C8D; -fx-cursor: hand; -fx-padding: 8 20;");
+        cancelButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #6B7C8D; -fx-cursor: hand; -fx-padding: 8 24; -fx-font-weight: 600;");
 
         Optional<ButtonType> result = dialog.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
@@ -263,6 +305,10 @@ public class ControllerAdminSujet {
 
             if (newTitre.isEmpty() || newTitre.length() < 3) {
                 showAlert("Erreur", "Titre invalide (min 3 caractères)", Alert.AlertType.ERROR);
+                return;
+            }
+            if (newTitre.length() > 100) {
+                showAlert("Erreur", "Titre trop long (max 100 caractères)", Alert.AlertType.ERROR);
                 return;
             }
             if (newContenu.isEmpty() || newContenu.length() < 10) {
@@ -279,7 +325,7 @@ public class ControllerAdminSujet {
             sujet.setAnonyme(anonymeCheck.isSelected());
             serviceSujet.update(sujet);
             loadSujets();
-            showAlert("Succès", "Sujet modifié !", Alert.AlertType.INFORMATION);
+            showAlert("Succès", "✓ Sujet modifié avec succès !", Alert.AlertType.INFORMATION);
         }
     }
 
@@ -290,19 +336,23 @@ public class ControllerAdminSujet {
         confirm.setContentText("Êtes-vous sûr de vouloir supprimer ce sujet ?\nTous les commentaires seront également supprimés.");
 
         DialogPane dialogPane = confirm.getDialogPane();
-        dialogPane.setStyle("-fx-background-color: #F8FAFE;");
+        dialogPane.setStyle("-fx-background-color: " + COLOR_BG + "; -fx-background-radius: 12;");
 
         Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
-        okButton.setStyle("-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 5; -fx-padding: 8 20;");
+        okButton.setStyle("-fx-background-color: " + COLOR_DANGER + "; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 8; -fx-padding: 8 24; -fx-font-weight: bold;");
 
         Button cancelButton = (Button) dialogPane.lookupButton(ButtonType.CANCEL);
-        cancelButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #7F8C8D; -fx-cursor: hand; -fx-padding: 8 20;");
+        cancelButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #6B7C8D; -fx-cursor: hand; -fx-padding: 8 24; -fx-font-weight: 600;");
 
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            serviceSujet.delete(sujet);
-            loadSujets();
-            showAlert("Succès", "Sujet supprimé !", Alert.AlertType.INFORMATION);
+            try {
+                serviceSujet.deleteByAdmin(sujet);
+                loadSujets();
+                showAlert("Succès", "✓ Sujet supprimé avec succès !", Alert.AlertType.INFORMATION);
+            } catch (Exception e) {
+                showAlert("Erreur", "Impossible de supprimer le sujet: " + e.getMessage(), Alert.AlertType.ERROR);
+            }
         }
     }
 
@@ -317,17 +367,16 @@ public class ControllerAdminSujet {
 
     @FXML private void onFilter() { filterAndDisplay(); }
 
-    // Navigation
     @FXML private void onNavHomeClicked() { navigateTo("/HomeAdmin.fxml"); }
-    @FXML private void onNavSuiviStatsClicked() { System.out.println("Statistiques"); }
-    @FXML private void onNavObjectifsClicked() { System.out.println("Objectifs"); }
+    @FXML private void onNavSuiviStatsClicked() { navigateTo("/StatistiquesAdmin.fxml"); }
+    @FXML private void onNavObjectifsClicked() { navigateTo("/ObjectifsAdmin.fxml"); }
     @FXML private void onNavSujetsClicked() { navigateTo("/AdminSujet.fxml"); }
     @FXML private void onNavCommentairesClicked() { navigateTo("/AdminCommentaire.fxml"); }
-    @FXML private void onNavRdvClicked() { System.out.println("Rendez-vous"); }
-    @FXML private void onNavUtilisateursClicked() { System.out.println("Utilisateurs"); }
-    @FXML private void onNavDossiersClicked() { System.out.println("Dossiers médicaux"); }
-    @FXML private void onNavContenusClicked() { System.out.println("Contenus"); }
-    @FXML private void onNavActivitesClicked() { System.out.println("Activités"); }
+    @FXML private void onNavRdvClicked() { navigateTo("/RendezVousAdmin.fxml"); }
+    @FXML private void onNavUtilisateursClicked() { navigateTo("/UtilisateursAdmin.fxml"); }
+    @FXML private void onNavDossiersClicked() { navigateTo("/DossiersMedicaux.fxml"); }
+    @FXML private void onNavContenusClicked() { navigateTo("/ContenusAdmin.fxml"); }
+    @FXML private void onNavActivitesClicked() { navigateTo("/ActivitesAdmin.fxml"); }
 
     @FXML private void toggleSuiviMenu() {
         suiviOpen = !suiviOpen;
@@ -343,15 +392,41 @@ public class ControllerAdminSujet {
         arrowForum.setText(forumOpen ? "▼" : "▶");
     }
 
-    @FXML private void onNotifications() { showAlert("Notifications", "Fonctionnalité à venir", Alert.AlertType.INFORMATION); }
-    @FXML private void onLogout() { System.out.println("Déconnexion"); }
+    @FXML private void onNotifications() {
+        showAlert("Notifications", "🔔 Aucune nouvelle notification", Alert.AlertType.INFORMATION);
+    }
+
+    @FXML private void onLogout() {
+        try {
+            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+            confirm.setTitle("Déconnexion");
+            confirm.setHeaderText(null);
+            confirm.setContentText("Voulez-vous vraiment vous déconnecter ?");
+
+            DialogPane dialogPane = confirm.getDialogPane();
+            dialogPane.setStyle("-fx-background-color: " + COLOR_BG + "; -fx-background-radius: 12;");
+
+            Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
+            okButton.setStyle("-fx-background-color: " + COLOR_PRIMARY + "; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 8; -fx-padding: 8 24;");
+
+            Optional<ButtonType> result = confirm.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                navigateTo("/views/Login.fxml");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     private void navigateTo(String fxmlPath) {
         try {
             Stage stage = (Stage) navAccueil.getScene().getWindow();
             Parent root = FXMLLoader.load(getClass().getResource(fxmlPath));
             stage.getScene().setRoot(root);
-        } catch (IOException e) { e.printStackTrace(); }
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Impossible de naviguer vers: " + fxmlPath, Alert.AlertType.ERROR);
+        }
     }
 
     private void showAlert(String title, String content, Alert.AlertType type) {
@@ -359,6 +434,13 @@ public class ControllerAdminSujet {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(content);
+
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.setStyle("-fx-background-color: " + COLOR_BG + "; -fx-background-radius: 12;");
+
+        Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
+        okButton.setStyle("-fx-background-color: " + COLOR_PRIMARY + "; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 8; -fx-padding: 8 24; -fx-font-weight: bold;");
+
         alert.showAndWait();
     }
 }

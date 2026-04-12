@@ -5,10 +5,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.image.ImageView;
@@ -36,20 +35,16 @@ public class ControllerAdminCommentaire {
     @FXML private Button notifButton;
     @FXML private ImageView logoImage;
 
-    // Sidebar
     @FXML private HBox navAccueil, navSuivi, navForum, navRdv, navUtilisateurs, navDossiers, navContenus, navActivites;
     @FXML private HBox navSuiviStats, navObjectifs, navSujets, navCommentaires;
     @FXML private VBox submenuSuivi, submenuForum;
     @FXML private Label arrowSuivi, arrowForum;
 
-    // Filtres
     @FXML private TextField searchField;
     @FXML private Label totalCommentairesLabel;
 
-    // Container pour les lignes
     @FXML private VBox cardsContainer;
 
-    // Pagination
     @FXML private HBox paginationBox;
 
     private ServiceCommentaire serviceCommentaire;
@@ -70,6 +65,15 @@ public class ControllerAdminCommentaire {
 
         labelUserName.setText("Admin MentalUp");
         avatarInitials.setText("AD");
+
+        try {
+            Image logo = new Image(getClass().getResourceAsStream("/images/logo.png"));
+            if (logo != null) {
+                logoImage.setImage(logo);
+            }
+        } catch (Exception e) {
+            System.err.println("Logo non trouvé, utilisation du texte par défaut");
+        }
 
         serviceCommentaire = new ServiceCommentaire();
         serviceSujet = new ServiceSujet();
@@ -150,12 +154,10 @@ public class ControllerAdminCommentaire {
         row.setStyle("-fx-background-color: " + (isEven ? "white" : "#F8FAFE") +
                 "; -fx-padding: 12 15; -fx-border-color: #E8EEF4; -fx-border-width: 0 0 1 0;");
 
-        // ID
         Label idLabel = new Label(String.valueOf(commentaire.getId()));
         idLabel.setPrefWidth(50);
         idLabel.setStyle("-fx-text-fill: #2C3E50; -fx-font-weight: bold;");
 
-        // Contenu (tronqué)
         String contenuText = commentaire.getContenu();
         if (contenuText.length() > 55) {
             contenuText = contenuText.substring(0, 55) + "...";
@@ -165,12 +167,10 @@ public class ControllerAdminCommentaire {
         contenuLabel.setStyle("-fx-text-fill: #2C3E50;");
         contenuLabel.setWrapText(true);
 
-        // Auteur
         Label auteurLabel = new Label(commentaire.isAnonyme() ? "Anonyme" : commentaire.getUserName());
         auteurLabel.setPrefWidth(130);
         auteurLabel.setStyle("-fx-text-fill: #7F8C8D;");
 
-        // Sujet
         String sujetTitre = "Chargement...";
         try {
             Sujet sujet = serviceSujet.getById(commentaire.getSujetId());
@@ -189,24 +189,20 @@ public class ControllerAdminCommentaire {
         sujetLabel.setPrefWidth(180);
         sujetLabel.setStyle("-fx-text-fill: #7F8C8D;");
 
-        // Date
         Label dateLabel = new Label(formatDate(commentaire.getDateCommentaire()));
         dateLabel.setPrefWidth(100);
         dateLabel.setStyle("-fx-text-fill: #7F8C8D;");
 
-        // Likes
         Label likesLabel = new Label(String.valueOf(commentaire.getNbLikes()));
         likesLabel.setPrefWidth(50);
         likesLabel.setStyle("-fx-text-fill: #27AE60; -fx-font-weight: bold;");
         likesLabel.setAlignment(Pos.CENTER);
 
-        // Dislikes
         Label dislikesLabel = new Label(String.valueOf(commentaire.getNbDislikes()));
         dislikesLabel.setPrefWidth(50);
         dislikesLabel.setStyle("-fx-text-fill: #E74C3C; -fx-font-weight: bold;");
         dislikesLabel.setAlignment(Pos.CENTER);
 
-        // Actions
         HBox actionsBox = new HBox(10);
         actionsBox.setPrefWidth(140);
         actionsBox.setAlignment(Pos.CENTER);
@@ -312,8 +308,6 @@ public class ControllerAdminCommentaire {
         }
     }
 
-
-
     private String formatDate(Date date) {
         if (date == null) return "Date inconnue";
         LocalDate localDate = date.toLocalDate();
@@ -325,7 +319,6 @@ public class ControllerAdminCommentaire {
 
     @FXML private void onFilter() { filterAndDisplay(); }
 
-    // Navigation
     @FXML private void onNavHomeClicked() { navigateTo("/HomeAdmin.fxml"); }
     @FXML private void onNavSuiviStatsClicked() { System.out.println("Statistiques"); }
     @FXML private void onNavObjectifsClicked() { System.out.println("Objectifs"); }

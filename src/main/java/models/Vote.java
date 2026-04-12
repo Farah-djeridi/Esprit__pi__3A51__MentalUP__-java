@@ -10,7 +10,6 @@ public class Vote {
     private Integer sujet_id;
     private Integer commentaire_id;
 
-    // Constructeurs
     public Vote() {}
 
     public Vote(String type, int user_id, Integer sujet_id, Integer commentaire_id) {
@@ -21,7 +20,6 @@ public class Vote {
         this.created_at = new Date();
     }
 
-    // Getters et Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

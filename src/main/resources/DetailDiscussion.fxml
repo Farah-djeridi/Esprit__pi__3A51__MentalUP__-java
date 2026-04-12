@@ -1,30 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.image.ImageView?>
 
+<?import javafx.scene.image.Image?>
 <BorderPane xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="Controllors.ControllerDetailDiscussion"
-            prefWidth="1024" prefHeight="650"
-            style="-fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #F4F8FF, #E8F0FE);">
+            prefWidth="1024" prefHeight="700"
+            style="-fx-background-color: #F0F4FA;">
 
-    <!-- SIDEBAR (identique au forum) -->
     <left>
         <VBox prefWidth="240" prefHeight="700"
               style="-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #D6E8F7, #2C5F8A);">
 
-            <!-- Logo / Brand -->
             <HBox alignment="CENTER_LEFT" spacing="10"
                   style="-fx-padding: 24 18 20 18;
                          -fx-border-color: transparent transparent rgba(255,255,255,0.12) transparent;
                          -fx-border-width: 0 0 1 0;">
                 <StackPane>
-                    <ImageView fx:id="logoImage" fitWidth="45" fitHeight="45" preserveRatio="true"/>
+                    <ImageView fx:id="logoImage" fitWidth="45" fitHeight="45" preserveRatio="true">
+                        <image>
+                            <Image url="/Images/logo.png" />
+                        </image>
+                    </ImageView>
                 </StackPane>
                 <VBox spacing="2">
                     <Label text="MentalUp"
@@ -35,9 +36,7 @@
                 </VBox>
             </HBox>
 
-            <!-- Navigation -->
             <VBox spacing="4" style="-fx-padding: 20 14 0 14;" VBox.vgrow="ALWAYS">
-
                 <HBox alignment="CENTER_LEFT" spacing="12"
                       fx:id="navAccueil"
                       onMouseClicked="#onNavHomeClicked"
@@ -121,10 +120,8 @@
                     <Label text="📚" style="-fx-font-size: 16px; -fx-text-fill: white;"/>
                     <Label text="Contenu" style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 500;"/>
                 </HBox>
-
             </VBox>
 
-            <!-- Profil utilisateur -->
             <VBox spacing="6" style="-fx-padding: 16 14 20 14; -fx-border-color: rgba(255,255,255,0.2); -fx-border-width: 1 0 0 0;">
                 <HBox alignment="CENTER_LEFT" spacing="10">
                     <Circle radius="18" style="-fx-fill: rgba(255,255,255,0.25);"/>
@@ -149,239 +146,215 @@
                                    -fx-font-weight: bold;"/>
                 </HBox>
             </VBox>
-
         </VBox>
     </left>
 
-    <!-- CONTENU PRINCIPAL - DÉTAIL DISCUSSION -->
     <center>
-        <VBox spacing="0" prefWidth="784" prefHeight="700"
-              style="-fx-background-color: #F4F8FF;">
+        <VBox spacing="0" prefWidth="784"
+              style="-fx-background-color: #F0F4FA;">
 
-            <!-- Barre supérieure -->
             <HBox alignment="CENTER_LEFT" spacing="12"
-                  style="-fx-background-color: rgba(255,255,255,0.95);
-                         -fx-padding: 14 24;
-                         -fx-border-color: transparent transparent rgba(151,187,228,0.2) transparent;
-                         -fx-border-width: 0 0 1 0;">
-                <VBox spacing="2">
+                  style="-fx-background-color: rgba(255,255,255,0.92);
+                         -fx-padding: 16 28;
+                         -fx-border-color: transparent transparent #E2E8F0 transparent;
+                         -fx-border-width: 0 0 1 0;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 8, 0, 0, 2);">
+                <VBox spacing="3">
                     <Label text="Discussion 💬"
-                           style="-fx-font-size: 18px; -fx-font-weight: bold;
-                                  -fx-text-fill: #2C3E50;"/>
+                           style="-fx-font-size: 20px; -fx-font-weight: bold;
+                                  -fx-text-fill: #1A2B3C;"/>
                     <Label fx:id="labelDate" text=""
-                           style="-fx-font-size: 12px; -fx-text-fill: #5A6C7D; -fx-font-weight: 500;"/>
+                           style="-fx-font-size: 12px; -fx-text-fill: #6B7C8D;
+                                  -fx-font-weight: 600;"/>
                 </VBox>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button fx:id="notifButton" text="🔔" onAction="#onNotifications"
-                        style="-fx-background-color: rgba(151,187,228,0.15);
-                               -fx-text-fill: #2C5F8A;
-                               -fx-padding: 6;
-                               -fx-cursor: hand;
-                               -fx-font-size: 16px;
-                               -fx-border-color: rgba(151,187,228,0.4);
-                               -fx-border-radius: 50;
-                               -fx-border-width: 1;
-                               -fx-min-width: 32;
-                               -fx-min-height: 32;"/>
+                <StackPane>
+                    <Button fx:id="notifButton" text="🔔" onAction="#onNotifications"
+                            style="-fx-background-color: rgba(44,95,138,0.08);
+                                   -fx-text-fill: #2C5F8A;
+                                   -fx-padding: 8;
+                                   -fx-cursor: hand;
+                                   -fx-font-size: 16px;
+                                   -fx-border-color: rgba(44,95,138,0.15);
+                                   -fx-border-radius: 50;
+                                   -fx-background-radius: 50;
+                                   -fx-border-width: 1;
+                                   -fx-min-width: 38;
+                                   -fx-min-height: 38;"/>
+                    <Circle radius="5" style="-fx-fill: #E74C3C;"
+                            translateX="10" translateY="-10"/>
+                </StackPane>
             </HBox>
 
-            <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 0;">
+            <ScrollPane fitToWidth="true"
+                        style="-fx-background-color: transparent;
+                               -fx-background: transparent;
+                               -fx-padding: 0;">
                 <content>
-                    <VBox spacing="20" style="-fx-padding: 20 24 24 24;">
+                    <VBox spacing="22" style="-fx-padding: 24 28 30 28;">
 
-                        <!-- Bouton retour -->
-                        <HBox alignment="CENTER_LEFT" spacing="10">
-                            <Button onAction="#onBackToForum"
-                                    style="-fx-background-color: #c3d7eb;
-                                            -fx-background-radius: 25;
-                                            -fx-padding: 8 15;
-                                            -fx-cursor: hand;">
+                        <Button onAction="#onBackToForum"
+                                style="-fx-background-color: rgba(255,255,255,0.85);
+                                       -fx-background-radius: 30;
+                                       -fx-padding: 8 20;
+                                       -fx-cursor: hand;
+                                       -fx-border-color: #E2E8F0;
+                                       -fx-border-radius: 30;
+                                       -fx-border-width: 1;
+                                       -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 4, 0, 0, 1);">
+                            <graphic>
+                                <HBox spacing="8" alignment="CENTER">
+                                    <Label text="←" style="-fx-font-size: 16px; -fx-text-fill: #2C5F8A; -fx-font-weight: bold;"/>
+                                    <Label text="Retour au forum" style="-fx-text-fill: #2C5F8A; -fx-font-size: 13px; -fx-font-weight: 600;"/>
+                                </HBox>
+                            </graphic>
+                        </Button>
 
-                                <graphic>
-                                    <HBox spacing="8" alignment="CENTER">
-                                        <Label text="←"
-                                               style="-fx-font-size: 16px;
-                              -fx-text-fill: #2C5F8A;
-                              -fx-font-weight: bold;"/>
-
-                                        <Label text="Retour au forum"
-                                               style="-fx-text-fill: #2C5F8A;
-                              -fx-font-size: 13px;
-                              -fx-font-weight: bold;"/>
-                                    </HBox>
-                                </graphic>
-                            </Button>
-
-                            <Region HBox.hgrow="ALWAYS"/>
-                        </HBox>
-                        <!-- Sujet Principal -->
-                        <VBox style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 24;
-                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 2);"
-                              spacing="15">
+                        <VBox style="-fx-background-color: rgba(255,255,255,0.85);
+                                     -fx-background-radius: 22;
+                                     -fx-padding: 24;
+                                     -fx-border-color: rgba(226,232,240,0.6);
+                                     -fx-border-radius: 22;
+                                     -fx-border-width: 1;
+                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 10, 0, 0, 2);"
+                              spacing="16">
 
                             <HBox spacing="15" alignment="CENTER_LEFT">
                                 <StackPane>
-                                    <Circle radius="30" style="-fx-fill: linear-gradient(from 0% 0% to 100% 100%, #4A6FA5, #2C5F8A);"/>
+                                    <Circle radius="32" style="-fx-fill: linear-gradient(from 0% 0% to 100% 100%, #3A6FA8, #2C5F8A);"/>
                                     <Label fx:id="sujetAvatar" text="S"
-                                           style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+                                           style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
                                 </StackPane>
-                                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                <VBox spacing="6" HBox.hgrow="ALWAYS">
                                     <Label fx:id="sujetTitre" text="Titre"
-                                           style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;"
+                                           style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1A2B3C;"
                                            wrapText="true"/>
-                                    <HBox spacing="15">
+                                    <HBox spacing="12">
                                         <Label fx:id="sujetAuteur" text="Par auteur"
-                                               style="-fx-font-size: 12px; -fx-text-fill: #7F8C8D;"/>
-                                        <Label text="•" style="-fx-font-size: 12px; -fx-text-fill: #7F8C8D;"/>
+                                               style="-fx-font-size: 12px; -fx-text-fill: #6B7C8D; -fx-font-weight: 500;"/>
+                                        <Label text="•" style="-fx-font-size: 12px; -fx-text-fill: #94A3B8;"/>
                                         <Label fx:id="sujetDate" text="Date"
-                                               style="-fx-font-size: 12px; -fx-text-fill: #7F8C8D;"/>
+                                               style="-fx-font-size: 12px; -fx-text-fill: #6B7C8D;"/>
                                     </HBox>
                                 </VBox>
-
-                                <!-- Menu actions (si propriétaire) -->
-                                <MenuButton fx:id="topicMenuButton" text="⋮" style="-fx-background-color: transparent; -fx-cursor: hand;"
-                                            visible="false" managed="false">
-                                    <items>
-                                        <MenuItem text="✏️ Modifier" onAction="#onEditSujet"/>
-                                        <SeparatorMenuItem/>
-                                        <MenuItem text="🗑️ Supprimer" onAction="#onDeleteSujet" style="-fx-text-fill: #E74C3C;"/>
-                                    </items>
-                                </MenuButton>
+                                <MenuButton fx:id="topicMenuButton" text="⋮"
+                                            style="-fx-background-color: transparent; -fx-cursor: hand; -fx-font-size: 18px; -fx-text-fill: #94A3B8;"
+                                            visible="false" managed="false"/>
                             </HBox>
 
-                            <Separator/>
+                            <Separator style="-fx-opacity: 0.5;"/>
 
                             <Label fx:id="sujetContenu" text="Contenu"
-                                   wrapText="true" style="-fx-font-size: 14px; -fx-text-fill: #5A6C7D; -fx-line-spacing: 1.5;"/>
+                                   wrapText="true" style="-fx-font-size: 14px; -fx-text-fill: #4A5A6A; -fx-line-spacing: 2;"/>
 
                             <Button fx:id="translateSujetBtn" text="🌐 Voir traduction"
-                                    style="-fx-background-color: transparent; -fx-text-fill: #2C5F8A; -fx-cursor: hand; -fx-alignment: CENTER_LEFT;"/>
+                                    style="-fx-background-color: transparent; -fx-text-fill: #2C5F8A; -fx-cursor: hand; -fx-alignment: CENTER_LEFT; -fx-padding: 0;"/>
 
-                            <HBox spacing="20" alignment="CENTER_LEFT">
+                            <HBox spacing="12" alignment="CENTER_LEFT">
                                 <Button fx:id="likeButton" text="👍 0"
-                                        style="-fx-background-color: transparent; -fx-text-fill: #7F8C8D; -fx-cursor: hand; -fx-padding: 5 10; -fx-background-radius: 20;"/>
+                                        style="-fx-background-color: rgba(34,197,94,0.1); -fx-text-fill: #22C55E; -fx-cursor: hand; -fx-padding: 6 14; -fx-background-radius: 20; -fx-font-weight: bold;"/>
                                 <Button fx:id="dislikeButton" text="👎 0"
-                                        style="-fx-background-color: transparent; -fx-text-fill: #7F8C8D; -fx-cursor: hand; -fx-padding: 5 10; -fx-background-radius: 20;"/>
+                                        style="-fx-background-color: rgba(239,68,68,0.1); -fx-text-fill: #EF4444; -fx-cursor: hand; -fx-padding: 6 14; -fx-background-radius: 20; -fx-font-weight: bold;"/>
                                 <Region HBox.hgrow="ALWAYS"/>
                                 <Label fx:id="nbVuesLabel"
                                        text="👁 0"
-                                       style="-fx-background-color: #27AE6022;
-                                                  -fx-text-fill: #27AE60;
-                                                  -fx-padding: 5 12;
-                                                  -fx-background-radius: 20;
-                                                  -fx-font-weight: bold;" />
+                                       style="-fx-background-color: rgba(34,197,94,0.1);
+                                              -fx-text-fill: #22C55E;
+                                              -fx-padding: 6 14;
+                                              -fx-background-radius: 20;
+                                              -fx-font-weight: bold;"/>
                             </HBox>
                         </VBox>
 
-                        <!-- Section Commentaires avec ScrollPane -->
-                        <VBox spacing="15">
-                            <HBox alignment="CENTER_LEFT" spacing="15">
-                                <Label text="💬 Commentaires" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;"/>
-                                <Label fx:id="totalCommentsLabel" style="-fx-font-size: 13px; -fx-text-fill: #7F8C8D; -fx-background-color: #E8EEF4; -fx-padding: 2 8; -fx-background-radius: 10;"/>
-                                <Region HBox.hgrow="ALWAYS"/>
+                        <VBox spacing="14">
+                            <HBox alignment="CENTER_LEFT" spacing="12">
+                                <Label text="💬 Commentaires" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1A2B3C;"/>
+                                <Label fx:id="totalCommentsLabel"
+                                       style="-fx-font-size: 12px; -fx-text-fill: #6B7C8D; -fx-background-color: rgba(44,95,138,0.1); -fx-padding: 4 12; -fx-background-radius: 20; -fx-font-weight: bold;"/>
                             </HBox>
 
-                            <!-- ScrollPane pour les commentaires -->
                             <ScrollPane fx:id="commentsScrollPane" fitToWidth="true"
                                         style="-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 0;"
                                         prefHeight="350" maxHeight="350">
                                 <content>
                                     <VBox>
-                                        <VBox fx:id="commentsContainer" spacing="12">
-                                            <!-- Commentaires ajoutés dynamiquement -->
+                                        <VBox fx:id="commentsContainer" spacing="10">
                                         </VBox>
 
-                                        <!-- Message aucun commentaire -->
-                                        <VBox fx:id="emptyCommentsState" spacing="15" alignment="CENTER"
-                                              style="-fx-padding: 60 20; -fx-display: none;">
-                                            <Label text="💬" style="-fx-font-size: 64px; -fx-opacity: 0.5;"/>
+                                        <VBox fx:id="emptyCommentsState" spacing="16" alignment="CENTER"
+                                              style="-fx-padding: 50 20; -fx-background-color: rgba(255,255,255,0.85); -fx-background-radius: 18;"
+                                              visible="false" managed="false">
+                                            <Label text="💬" style="-fx-font-size: 56px; -fx-opacity: 0.4;"/>
                                             <Label text="Aucun commentaire"
-                                                   style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;"/>
+                                                   style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1A2B3C;"/>
                                             <Label text="Soyez le premier à commenter cette discussion !"
-                                                   style="-fx-font-size: 13px; -fx-text-fill: #7F8C8D;"/>
+                                                   style="-fx-font-size: 13px; -fx-text-fill: #6B7C8D;"/>
                                         </VBox>
                                     </VBox>
                                 </content>
                             </ScrollPane>
 
-                            <!-- Pagination des commentaires -->
-                            <HBox fx:id="commentPaginationBox" spacing="10" alignment="CENTER"
-                                  style="-fx-padding: 10 0 0 0; -fx-display: none;">
-                                <!-- Pagination ajoutée dynamiquement -->
-                            </HBox>
+                            <HBox fx:id="commentPaginationBox" spacing="8" alignment="CENTER"
+                                  style="-fx-padding: 8 0 0 0;"/>
                         </VBox>
 
-                        <!-- Formulaire d'ajout de commentaire -->
                         <VBox spacing="18"
-                              style="-fx-background-color: white;
-             -fx-background-radius: 20;
-             -fx-padding: 22;
-             -fx-border-color: #E8EEF4;
-             -fx-border-radius: 20;
-             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 12, 0, 0, 3);">
+                              style="-fx-background-color: rgba(255,255,255,0.85);
+                                     -fx-background-radius: 22;
+                                     -fx-padding: 22;
+                                     -fx-border-color: rgba(226,232,240,0.6);
+                                     -fx-border-radius: 22;
+                                     -fx-border-width: 1;
+                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 10, 0, 0, 2);">
 
-                            <!-- Titre -->
                             <Label text="📝 Ajouter un commentaire"
-                                   style="-fx-font-size: 17px;
-                  -fx-font-weight: bold;
-                  -fx-text-fill: #2C3E50;"/>
+                                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1A2B3C;"/>
 
-                            <!-- Anonyme -->
                             <HBox spacing="10" alignment="CENTER_LEFT">
                                 <CheckBox fx:id="anonymeCheckBox"
                                           text="Publier anonymement"
-                                          style="-fx-text-fill: #2C3E50;
-                         -fx-font-size: 12px;"/>
-
+                                          style="-fx-text-fill: #4A5A6A; -fx-font-size: 12px;"/>
                                 <Label text="(Votre identité sera cachée)"
-                                       style="-fx-text-fill: #95A5A6;
-                      -fx-font-size: 11px;
-                      -fx-font-style: italic;"/>
+                                       style="-fx-text-fill: #94A3B8; -fx-font-size: 11px;"/>
                             </HBox>
 
-                            <!-- Zone texte -->
                             <TextArea fx:id="commentTextArea"
                                       promptText="💡 Partagez votre réponse, opinion ou conseil..."
                                       prefHeight="110"
                                       wrapText="true"
-                                      style="-fx-padding: 12;
-                     -fx-background-radius: 12;
-                     -fx-border-color: #E8EEF4;
-                     -fx-border-radius: 12;
-                     -fx-background-color: #F8FAFE;
-                     -fx-font-size: 13px;"/>
+                                      style="-fx-padding: 14;
+                                             -fx-background-radius: 16;
+                                             -fx-border-color: #E2E8F0;
+                                             -fx-border-radius: 16;
+                                             -fx-background-color: rgba(248,250,252,0.9);
+                                             -fx-font-size: 13px;"/>
 
-                            <!-- Actions -->
                             <HBox spacing="12" alignment="CENTER_RIGHT">
-
                                 <Button text="Annuler"
                                         onAction="#onCancelComment"
                                         style="-fx-background-color: transparent;
-                       -fx-text-fill: #7F8C8D;
-                       -fx-font-weight: bold;
-                       -fx-cursor: hand;
-                       -fx-padding: 8 18;
-                       -fx-background-radius: 20;"/>
+                                               -fx-text-fill: #6B7C8D;
+                                               -fx-font-weight: 600;
+                                               -fx-cursor: hand;
+                                               -fx-padding: 8 20;
+                                               -fx-background-radius: 25;"/>
 
                                 <Button fx:id="submitCommentButton"
                                         text="💬 Publier"
                                         onAction="#onSubmitComment"
-                                        style="-fx-background-color: #2C5F8A;
-                       -fx-text-fill: white;
-                       -fx-font-weight: bold;
-                       -fx-background-radius: 25;
-                       -fx-cursor: hand;
-                       -fx-padding: 9 22;
-                       -fx-effect: dropshadow(gaussian, rgba(44,95,138,0.3), 8, 0, 0, 2);"/>
+                                        style="-fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #3A6FA8, #2C5F8A);
+                                               -fx-text-fill: white;
+                                               -fx-font-weight: bold;
+                                               -fx-background-radius: 25;
+                                               -fx-cursor: hand;
+                                               -fx-padding: 9 24;
+                                               -fx-effect: dropshadow(gaussian, rgba(44,95,138,0.25), 8, 0, 0, 2);"/>
                             </HBox>
-
                         </VBox>
 
                     </VBox>
                 </content>
             </ScrollPane>
-
         </VBox>
     </center>
-
 </BorderPane>

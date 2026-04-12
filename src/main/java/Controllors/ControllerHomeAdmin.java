@@ -21,29 +21,24 @@ import java.io.IOException;
 
 public class ControllerHomeAdmin {
 
-    // Éléments FXML - Sidebar
     @FXML private HBox navAccueil, navSuivi, navForum, navRdv, navActivites, navContenus, navDossiers, navUtilisateurs;
     @FXML private HBox navSuiviStats, navObjectifs, navSujets, navCommentaires;
     @FXML private VBox submenuSuivi, submenuForum;
     @FXML private Label arrowSuivi, arrowForum;
 
-    // Éléments FXML - Statistiques
     @FXML private Label statUsers, statRdvs, statTopics, statMood;
     @FXML private Label labelDate, labelUserName, avatarInitials;
     @FXML private Button notifButton, logoutButton;
 
     @FXML private ImageView logoImage;
 
-    // État des sous-menus
     private boolean suiviOpen = false;
     private boolean forumOpen = false;
 
     @FXML
     public void initialize() {
-        // Mettre à jour la date
         labelDate.setText(new java.text.SimpleDateFormat("EEEE d MMMM yyyy").format(new java.util.Date()));
 
-        // Masquer les sous-menus au départ
         submenuSuivi.setVisible(false);
         submenuSuivi.setManaged(false);
         submenuForum.setVisible(false);
@@ -54,8 +49,6 @@ public class ControllerHomeAdmin {
 
         logoImage.setImage(new Image(getClass().getResourceAsStream("/Images/logo.png")));
     }
-
-    // ========== TOGGLE SOUS-MENUS ==========
 
     @FXML
     void toggleSuiviMenu(MouseEvent event) {
@@ -72,8 +65,6 @@ public class ControllerHomeAdmin {
         submenuForum.setManaged(forumOpen);
         arrowForum.setText(forumOpen ? "▼" : "▶");
     }
-
-    // ========== NAVIGATION PRINCIPALE ==========
 
     @FXML
     private void onNavHomeClicked(MouseEvent event) {
@@ -131,8 +122,6 @@ public class ControllerHomeAdmin {
         System.out.println("Activités");
     }
 
-    // ========== HOVER EFFECTS ==========
-
     @FXML
     private void onNavHoverEnter(MouseEvent event) {
         HBox source = (HBox) event.getSource();
@@ -167,8 +156,6 @@ public class ControllerHomeAdmin {
         }
     }
 
-    // ========== ACTIONS ==========
-
     @FXML
     private void onNotifications(ActionEvent event) {
         showAlert("Notifications", "Fonctionnalité à venir", Alert.AlertType.INFORMATION);
@@ -198,8 +185,6 @@ public class ControllerHomeAdmin {
     private void onExportData(ActionEvent event) {
         System.out.println("Exporter les données");
     }
-
-    // ========== UTILS ==========
 
     private void setActiveNav(HBox activeNav) {
         HBox[] allNavs = {navAccueil, navSuivi, navForum, navRdv, navActivites, navContenus, navDossiers, navUtilisateurs};

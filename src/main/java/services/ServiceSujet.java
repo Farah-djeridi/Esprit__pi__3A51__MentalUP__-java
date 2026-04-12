@@ -11,13 +11,12 @@ import java.util.List;
 public class ServiceSujet implements IService<Sujet> {
 
     private Connection cnx;
-    private static final int CURRENT_USER_ID = 2; // Utilisateur statique pour le moment
+    private static final int CURRENT_USER_ID = 2;
 
     public ServiceSujet() {
         this.cnx = MyDataBase.getInstance().getCnx();
     }
 
-    // 🔹 AJOUT
     @Override
     public void add(Sujet s) {
         String req = "INSERT INTO sujet (titre, contenu, date_creation, is_anonyme, nb_likes, nb_dislikes, nb_vues, score_toxicite, est_toxique, id_user_id) " +
@@ -35,7 +34,6 @@ public class ServiceSujet implements IService<Sujet> {
 
             pstm.executeUpdate();
 
-            // Récupérer l'ID généré
             ResultSet rs = pstm.getGeneratedKeys();
             if (rs.next()) {
                 s.setId(rs.getInt(1));
@@ -47,8 +45,6 @@ public class ServiceSujet implements IService<Sujet> {
         }
     }
 
-    // 🔹 AFFICHAGE
-    // 🔹 AFFICHAGE
     @Override
     public List<Sujet> getAll() {
         List<Sujet> sujets = new ArrayList<>();
@@ -91,7 +87,6 @@ public class ServiceSujet implements IService<Sujet> {
         return sujets;
     }
 
-    // Récupérer les sujets d'un utilisateur spécifique
     public List<Sujet> getSujetsByUser(int userId) {
         List<Sujet> sujets = new ArrayList<>();
         String req = "SELECT * FROM sujet WHERE id_user_id = ? ORDER BY date_creation DESC";
@@ -117,14 +112,9 @@ public class ServiceSujet implements IService<Sujet> {
         return sujets;
     }
 
-    // 🔹 UPDATE
     @Override
     public void update(Sujet s) {
-        // Vérifier que l'utilisateur est le propriétaire
-        if (!isUserOwner(s.getId(), CURRENT_USER_ID)) {
-            System.out.println("Vous ne pouvez modifier que vos propres sujets !");
-            return;
-        }
+
 
         String req = "UPDATE sujet SET titre=?, contenu=?, is_anonyme=? WHERE id=?";
         try {
@@ -140,41 +130,44 @@ public class ServiceSujet implements IService<Sujet> {
         }
     }
 
-    // 🔹 DELETE
     @Override
     public void delete(Sujet s) {
-        // Vérifier que l'utilisateur est le propriétaire
-        if (!isUserOwner(s.getId(), CURRENT_USER_ID)) {
+        deleteSujetWithCheck(s, CURRENT_USER_ID);
+    }
+
+    public void deleteByAdmin(Sujet s) {
+        deleteSujetWithCheck(s, 1); // 1 = ID Admin
+    }
+
+    private void deleteSujetWithCheck(Sujet s, int userId) {
+        // Admin (ID 1) ou propriétaire peut supprimer
+        if (userId != 1 && !isUserOwner(s.getId(), userId)) {
             System.out.println("Vous ne pouvez supprimer que vos propres sujets !");
             return;
         }
 
         try {
-            // 1. Supprimer les votes liés au sujet
             String reqVotes = "DELETE FROM vote WHERE sujet_id=?";
             PreparedStatement psVotes = cnx.prepareStatement(reqVotes);
             psVotes.setInt(1, s.getId());
             psVotes.executeUpdate();
 
-            // 2. Supprimer les commentaires liés
             String reqComments = "DELETE FROM commentaire WHERE sujet_id=?";
             PreparedStatement psComments = cnx.prepareStatement(reqComments);
             psComments.setInt(1, s.getId());
             psComments.executeUpdate();
 
-            // 3. Supprimer le sujet
             String reqSujet = "DELETE FROM sujet WHERE id=?";
             PreparedStatement psSujet = cnx.prepareStatement(reqSujet);
             psSujet.setInt(1, s.getId());
             psSujet.executeUpdate();
 
-            System.out.println("Sujet + commentaires + votes supprimés par l'utilisateur ID: " + CURRENT_USER_ID);
+            System.out.println("Sujet supprimé par l'utilisateur ID: " + userId);
         } catch (SQLException e) {
             System.out.println("Erreur lors de la suppression: " + e.getMessage());
         }
     }
 
-    // Vérifier si l'utilisateur est le propriétaire du sujet
     private boolean isUserOwner(int sujetId, int userId) {
         String req = "SELECT id_user_id FROM sujet WHERE id = ?";
         try {
@@ -190,7 +183,6 @@ public class ServiceSujet implements IService<Sujet> {
         return false;
     }
 
-    // Incrémenter le nombre de vues
     public void incrementVues(int sujetId) {
         String req = "UPDATE sujet SET nb_vues = nb_vues + 1 WHERE id = ?";
         try {
@@ -201,7 +193,7 @@ public class ServiceSujet implements IService<Sujet> {
             System.out.println(e.getMessage());
         }
     }
-    // 🔹 RECHERCHER UN SUJET PAR ID
+
     public Sujet getById(int id) {
         String req = "SELECT s.*, u.nom, u.prenom " +
                 "FROM sujet s " +

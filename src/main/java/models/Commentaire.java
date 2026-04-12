@@ -15,16 +15,13 @@ public class Commentaire {
     private int userId;
     private int sujetId;
 
-    // Champ pour le nom de l'utilisateur (comme dans Sujet)
     private String userName;
 
-    // 🔹 Constructeur vide
     public Commentaire() {
         this.scoreToxicite = 0.0;
         this.estToxique = false;
     }
 
-    // 🔹 Constructeur paramétré
     public Commentaire(String contenu, boolean isAnonyme, int userId, int sujetId) {
         this.contenu = contenu;
         this.isAnonyme = isAnonyme;
@@ -37,7 +34,6 @@ public class Commentaire {
         this.dateCommentaire = new Date(System.currentTimeMillis());
     }
 
-    // 🔹 Getters & Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -68,7 +64,6 @@ public class Commentaire {
     public int getSujetId() { return sujetId; }
     public void setSujetId(int sujetId) { this.sujetId = sujetId; }
 
-    // 🔹 Getter et Setter pour userName (comme dans Sujet)
     public String getUserName() {
         return userName;
     }
@@ -77,7 +72,6 @@ public class Commentaire {
         this.userName = userName;
     }
 
-    // 🔹 Méthode utilitaire pour obtenir les initiales
     public String getUserInitials() {
         if (userName == null || userName.isEmpty()) {
             return "U";

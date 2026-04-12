@@ -16,7 +16,6 @@ public class ServiceCommentaire implements IService<Commentaire> {
         this.cnx = MyDataBase.getInstance().getCnx();
     }
 
-    // 🔹 AJOUT
     @Override
     public void add(Commentaire c) {
 
@@ -35,7 +34,6 @@ public class ServiceCommentaire implements IService<Commentaire> {
 
             pstm.executeUpdate();
 
-            // 🔥 IMPORTANT : récupérer ID généré
             ResultSet rs = pstm.getGeneratedKeys();
             if (rs.next()) {
                 c.setId(rs.getInt(1));
@@ -47,7 +45,6 @@ public class ServiceCommentaire implements IService<Commentaire> {
         }
     }
 
-    // 🔹 AFFICHAGE TOUS LES COMMENTAIRES AVEC NOM UTILISATEUR
     @Override
     public List<Commentaire> getAll() {
 
@@ -73,7 +70,6 @@ public class ServiceCommentaire implements IService<Commentaire> {
         return commentaires;
     }
 
-    // 🔹 RECHERCHER COMMENTAIRES PAR SUJET ID AVEC NOM UTILISATEUR
     public List<Commentaire> getBySujetId(int sujetId) {
         List<Commentaire> commentaires = new ArrayList<>();
         String req = "SELECT c.*, CONCAT(u.prenom, ' ', u.nom) as user_name FROM commentaire c " +
@@ -97,7 +93,6 @@ public class ServiceCommentaire implements IService<Commentaire> {
         return commentaires;
     }
 
-    // 🔹 RECHERCHER COMMENTAIRES PAR UTILISATEUR ID AVEC NOM UTILISATEUR
     public List<Commentaire> getByUserId(int userId) {
         List<Commentaire> commentaires = new ArrayList<>();
         String req = "SELECT c.*, CONCAT(u.prenom, ' ', u.nom) as user_name FROM commentaire c " +
@@ -121,7 +116,6 @@ public class ServiceCommentaire implements IService<Commentaire> {
         return commentaires;
     }
 
-    // 🔹 RECHERCHER UN COMMENTAIRE PAR ID AVEC NOM UTILISATEUR
     public Commentaire getById(int id) {
         Commentaire commentaire = null;
         String req = "SELECT c.*, CONCAT(u.prenom, ' ', u.nom) as user_name FROM commentaire c " +
@@ -144,7 +138,6 @@ public class ServiceCommentaire implements IService<Commentaire> {
         return commentaire;
     }
 
-    // 🔹 RECHERCHER LE NOM D'UN UTILISATEUR PAR SON ID
     public String getUserNameById(int userId) {
         String req = "SELECT CONCAT(prenom, ' ', nom) as user_name FROM user WHERE id = ?";
         try {
@@ -160,7 +153,6 @@ public class ServiceCommentaire implements IService<Commentaire> {
         return "Utilisateur";
     }
 
-    // 🔹 RECHERCHER LES INITIALES D'UN UTILISATEUR PAR SON ID
     public String getUserInitialsById(int userId) {
         String req = "SELECT CONCAT(UPPER(SUBSTRING(prenom, 1, 1)), UPPER(SUBSTRING(nom, 1, 1))) as initials FROM user WHERE id = ?";
         try {
@@ -179,7 +171,6 @@ public class ServiceCommentaire implements IService<Commentaire> {
         return "U";
     }
 
-    // 🔹 UPDATE COMPLET
     @Override
     public void update(Commentaire c) {
         String req = "UPDATE commentaire SET contenu=?, is_anonyme=?, nb_likes=?, nb_dislikes=?, score_toxicite=?, est_toxique=? WHERE id=?";
@@ -203,7 +194,6 @@ public class ServiceCommentaire implements IService<Commentaire> {
         }
     }
 
-    // 🔹 UPDATE LIKES SEULEMENT
     public void updateLikes(int commentaireId, int nbLikes) {
         String req = "UPDATE commentaire SET nb_likes=? WHERE id=?";
 
@@ -217,7 +207,6 @@ public class ServiceCommentaire implements IService<Commentaire> {
         }
     }
 
-    // 🔹 UPDATE DISLIKES SEULEMENT
     public void updateDislikes(int commentaireId, int nbDislikes) {
         String req = "UPDATE commentaire SET nb_dislikes=? WHERE id=?";
 
@@ -231,7 +220,6 @@ public class ServiceCommentaire implements IService<Commentaire> {
         }
     }
 
-    // 🔹 DELETE
     @Override
     public void delete(Commentaire c) {
         String req = "DELETE FROM commentaire WHERE id=?";
@@ -247,8 +235,6 @@ public class ServiceCommentaire implements IService<Commentaire> {
         }
     }
 
-
-    // 🔹 COMPTER LES COMMENTAIRES PAR SUJET
     public int countBySujetId(int sujetId) {
         String req = "SELECT COUNT(*) FROM commentaire WHERE sujet_id = ?";
         try {
@@ -264,7 +250,6 @@ public class ServiceCommentaire implements IService<Commentaire> {
         return 0;
     }
 
-    // 🔹 MÉTHODE UTILITAIRE : Extraire un Commentaire d'un ResultSet
     private Commentaire extractCommentaireFromResultSet(ResultSet rs) throws SQLException {
         Commentaire c = new Commentaire();
         c.setId(rs.getInt("id"));
@@ -278,7 +263,6 @@ public class ServiceCommentaire implements IService<Commentaire> {
         c.setUserId(rs.getInt("user_id"));
         c.setSujetId(rs.getInt("sujet_id"));
 
-        // Récupérer le nom de l'utilisateur
         try {
             String userName = rs.getString("user_name");
             c.setUserName(userName);

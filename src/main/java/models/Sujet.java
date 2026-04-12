@@ -17,12 +17,11 @@ public class Sujet {
     private double scoreToxicite;
     private boolean estToxique;
 
-    private int idUser; // statique pour maintenant
+    private int idUser;
 
-    // 🔹 Constructeur vide
     public Sujet() {}
 
-    // 🔹 Constructeur paramétré
+
     public Sujet(String titre, String contenu, boolean isAnonyme, int idUser) {
         this.titre = titre;
         this.contenu = contenu;
@@ -30,7 +29,6 @@ public class Sujet {
         this.idUser = idUser;
     }
 
-    // 🔹 Getters & Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

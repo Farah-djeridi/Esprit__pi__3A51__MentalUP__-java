@@ -5,12 +5,17 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.geometry.Pos;
 import javafx.geometry.Insets;
+import javafx.animation.FadeTransition;
+import javafx.animation.TranslateTransition;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -20,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Locale;
-
 
 import models.Sujet;
 import services.ServiceSujet;
@@ -37,8 +41,6 @@ public class ControllerForum {
     @FXML private Label totalDiscussions;
 
     @FXML private Button logoutButton;
-    @FXML private Button notifButton;
-    @FXML private Button newDiscussionButton;
 
     @FXML private TextField searchField;
     @FXML private ComboBox<String> orderCombo;
@@ -47,7 +49,6 @@ public class ControllerForum {
     @FXML private VBox emptyState;
     @FXML private HBox paginationBox;
 
-    // Navigation
     @FXML private HBox navAccueil;
     @FXML private HBox navSuivi;
     @FXML private HBox navObjectif;
@@ -68,9 +69,24 @@ public class ControllerForum {
     private int totalPages = 1;
     private final int itemsPerPage = 5;
 
-    // Session utilisateur (ID 2 comme demandé)
     private int currentUserId = 2;
     private String currentUserName = "Sophie Amara";
+
+    private static final String COLOR_PRIMARY = "#2C5F8A";
+    private static final String COLOR_PRIMARY_DARK = "#1E4D7B";
+    private static final String COLOR_PRIMARY_LIGHT = "#3A6FA8";
+    private static final String COLOR_BG = "#F0F4FA";
+    private static final String COLOR_CARD = "rgba(255,255,255,0.85)";
+    private static final String COLOR_CARD_HOVER = "rgba(255,255,255,0.95)";
+    private static final String COLOR_TEXT_PRIMARY = "#1A2B3C";
+    private static final String COLOR_TEXT_SECONDARY = "#6B7C8D";
+    private static final String COLOR_TEXT_MUTED = "#94A3B8";
+    private static final String COLOR_BORDER = "rgba(226,232,240,0.6)";
+    private static final String COLOR_SUCCESS = "#22C55E";
+    private static final String COLOR_DANGER = "#EF4444";
+    private static final String COLOR_SUCCESS_BG = "rgba(34,197,94,0.1)";
+    private static final String COLOR_DANGER_BG = "rgba(239,68,68,0.1)";
+    private static final String COLOR_PRIMARY_BG = "rgba(44,95,138,0.08)";
 
     @FXML
     public void initialize() {
@@ -78,6 +94,15 @@ public class ControllerForum {
 
         labelUserName.setText(currentUserName);
         avatarInitials.setText(getInitials(currentUserName));
+
+        try {
+            Image logo = new Image(getClass().getResourceAsStream("/images/logo.png"));
+            if (logo != null) {
+                logoImage.setImage(logo);
+            }
+        } catch (Exception e) {
+            System.err.println("Logo non trouvé, utilisation du texte par défaut");
+        }
 
         serviceSujet = new ServiceSujet();
         serviceCommentaire = new ServiceCommentaire();
@@ -212,106 +237,152 @@ public class ControllerForum {
 
         for (int i = start; i < end; i++) {
             Sujet sujet = filteredSujets.get(i);
-            discussionsContainer.getChildren().add(createSujetCard(sujet));
+            VBox card = createSujetCard(sujet);
+
+            card.setOpacity(0);
+            card.setTranslateY(15);
+            FadeTransition ft = new FadeTransition(Duration.millis(350), card);
+            ft.setFromValue(0);
+            ft.setToValue(1);
+            ft.setDelay(Duration.millis((i - start) * 80));
+            TranslateTransition tt = new TranslateTransition(Duration.millis(350), card);
+            tt.setFromY(15);
+            tt.setToY(0);
+            tt.setDelay(Duration.millis((i - start) * 80));
+
+            discussionsContainer.getChildren().add(card);
+            ft.play();
+            tt.play();
         }
 
         updatePaginationControls();
     }
+
     private VBox createSujetCard(Sujet sujet) {
-        VBox card = new VBox(10);
-        card.setStyle("-fx-background-color: #F8FAFE; -fx-padding: 15; -fx-background-radius: 12; " +
-                "-fx-border-color: #E8EEF4; -fx-border-radius: 12; -fx-border-width: 1;");
+        VBox card = new VBox(12);
+        card.setStyle(
+                "-fx-background-color: " + COLOR_CARD + ";" +
+                        "-fx-padding: 18 20;" +
+                        "-fx-background-radius: 18;" +
+                        "-fx-border-color: " + COLOR_BORDER + ";" +
+                        "-fx-border-radius: 18;" +
+                        "-fx-border-width: 1;"
+        );
         card.setCursor(javafx.scene.Cursor.HAND);
+
+        card.setOnMouseEntered(e -> {
+            card.setStyle(
+                    "-fx-background-color: " + COLOR_CARD_HOVER + ";" +
+                            "-fx-padding: 18 20;" +
+                            "-fx-background-radius: 18;" +
+                            "-fx-border-color: rgba(44,95,138,0.2);" +
+                            "-fx-border-radius: 18;" +
+                            "-fx-border-width: 1;" +
+                            "-fx-effect: dropshadow(gaussian, rgba(44,95,138,0.12), 15, 0, 0, 4);"
+            );
+        });
+        card.setOnMouseExited(e -> {
+            card.setStyle(
+                    "-fx-background-color: " + COLOR_CARD + ";" +
+                            "-fx-padding: 18 20;" +
+                            "-fx-background-radius: 18;" +
+                            "-fx-border-color: " + COLOR_BORDER + ";" +
+                            "-fx-border-radius: 18;" +
+                            "-fx-border-width: 1;"
+            );
+        });
         card.setOnMouseClicked(e -> onSujetClicked(sujet, true));
 
-        HBox header = new HBox(12);
+        HBox header = new HBox(14);
+        header.setAlignment(Pos.TOP_LEFT);
 
         boolean isOwner = sujet.getIdUser() == currentUserId;
-
         String displayName = sujet.isAnonyme() ? "A" :
                 (sujet.getUserName() != null ? sujet.getUserName() : "Utilisateur");
 
-        Label avatar = new Label(sujet.isAnonyme() ? "A" : getInitials(displayName));
-
-        avatar.setStyle("-fx-background-color: " + (sujet.isAnonyme() ? "#8E9EAB" : "#2C5F8A") +
-                "; -fx-text-fill: white; -fx-padding: 10; -fx-background-radius: 50; " +
-                "-fx-font-weight: bold; -fx-font-size: 12px;");
-        avatar.setPrefWidth(40);
-        avatar.setPrefHeight(40);
+        Label avatar = new Label(sujet.isAnonyme() ? "?" : getInitials(displayName));
+        String avatarColor = sujet.isAnonyme() ? "#94A3B8" : COLOR_PRIMARY;
+        avatar.setStyle(
+                "-fx-background-color: " + avatarColor + ";" +
+                        "-fx-text-fill: white;" +
+                        "-fx-padding: 0;" +
+                        "-fx-background-radius: 50;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 13px;" +
+                        "-fx-alignment: center;"
+        );
+        avatar.setPrefWidth(44);
+        avatar.setPrefHeight(44);
+        avatar.setMinWidth(44);
+        avatar.setMinHeight(44);
         avatar.setAlignment(Pos.CENTER);
 
-        VBox contentBox = new VBox(5);
+        VBox contentBox = new VBox(6);
         HBox.setHgrow(contentBox, Priority.ALWAYS);
 
         Label title = new Label(sujet.getTitre());
-        title.setStyle("-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #2C3E50;");
+        title.setStyle("-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: " + COLOR_TEXT_PRIMARY + ";");
         title.setWrapText(true);
-
         String authorText;
         if (sujet.isAnonyme()) authorText = "Anonyme";
         else if (isOwner) authorText = "Vous";
         else authorText = sujet.getUserName() != null ? sujet.getUserName() : "Utilisateur";
 
-        HBox metaData = new HBox(10);
+        HBox metaData = new HBox(8);
+        metaData.setAlignment(Pos.CENTER_LEFT);
 
         Label authorLabel = new Label("Par " + authorText);
-        authorLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #7F8C8D;");
+        authorLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: " + COLOR_TEXT_SECONDARY + "; -fx-font-weight: 600;");
 
         Label dot = new Label("•");
-        dot.setStyle("-fx-text-fill: #7F8C8D;");
+        dot.setStyle("-fx-text-fill: " + COLOR_TEXT_MUTED + ";");
 
         Label dateValue = new Label(formatDate(sujet.getDateCreation()));
-        dateValue.setStyle("-fx-font-size: 12px; -fx-text-fill: #7F8C8D;");
+        dateValue.setStyle("-fx-font-size: 12px; -fx-text-fill: " + COLOR_TEXT_SECONDARY + ";");
 
         metaData.getChildren().addAll(authorLabel, dot, dateValue);
 
         String contentText = sujet.getContenu();
-        if (contentText != null && contentText.length() > 100) {
-            contentText = contentText.substring(0, 100) + "...";
+        if (contentText != null && contentText.length() > 120) {
+            contentText = contentText.substring(0, 120) + "...";
         }
-
         Label content = new Label(contentText);
         content.setWrapText(true);
-        content.setStyle("-fx-font-size: 13px; -fx-text-fill: #5A6C7D; -fx-font-weight: 500;");
+        content.setStyle("-fx-font-size: 13px; -fx-text-fill: " + COLOR_TEXT_SECONDARY + "; -fx-line-spacing: 2;");
 
-        // 🔥 STATS MODERNES
         int commentCount = getCommentCountForSujet(sujet.getId());
+
+        HBox statsAndActions = new HBox();
+        statsAndActions.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(statsAndActions, Priority.ALWAYS);
+
+        HBox statsRow = new HBox(8);
+        statsRow.setAlignment(Pos.CENTER_LEFT);
+        statsRow.setPadding(new Insets(4, 0, 0, 0));
 
         Label commentsLabel = new Label("💬 " + commentCount);
         commentsLabel.setStyle(
-                "-fx-background-color: #2C5F8A22;" +
-                        "-fx-text-fill: #2C5F8A;" +
-                        "-fx-font-size: 12px;" +
+                "-fx-background-color: " + COLOR_PRIMARY_BG + ";" +
+                        "-fx-text-fill: " + COLOR_PRIMARY + ";" +
+                        "-fx-font-size: 11px;" +
                         "-fx-font-weight: bold;" +
-                        "-fx-padding: 6 12;" +
-                        "-fx-background-radius: 20;" +
-                        "-fx-border-color: #2C5F8A33;" +
-                        "-fx-border-radius: 20;"
+                        "-fx-padding: 5 12;" +
+                        "-fx-background-radius: 20;"
         );
 
         Label vuesLabel = new Label("👁 " + sujet.getNbVues());
         vuesLabel.setStyle(
-                "-fx-background-color: #27AE6022;" +
-                        "-fx-text-fill: #27AE60;" +
-                        "-fx-font-size: 12px;" +
+                "-fx-background-color: " + COLOR_SUCCESS_BG + ";" +
+                        "-fx-text-fill: " + COLOR_SUCCESS + ";" +
+                        "-fx-font-size: 11px;" +
                         "-fx-font-weight: bold;" +
-                        "-fx-padding: 6 12;" +
-                        "-fx-background-radius: 20;" +
-                        "-fx-border-color: #27AE6033;" +
-                        "-fx-border-radius: 20;"
+                        "-fx-padding: 5 12;" +
+                        "-fx-background-radius: 20;"
         );
 
-        HBox statsRow = new HBox(10);
-        statsRow.setAlignment(Pos.CENTER_LEFT);
-        statsRow.setPadding(new Insets(5, 0, 0, 0));
         statsRow.getChildren().addAll(commentsLabel, vuesLabel);
 
-        contentBox.getChildren().addAll(title, metaData, content, statsRow);
-
-        header.getChildren().addAll(avatar, contentBox);
-
-        // 🔥 ACTIONS
-        HBox actionsBox = new HBox(10);
+        HBox actionsBox = new HBox(6);
         actionsBox.setAlignment(Pos.CENTER_RIGHT);
 
         Vote userVote = serviceVote.getUserVoteOnSujet(sujet.getId());
@@ -319,77 +390,86 @@ public class ControllerForum {
         boolean hasDisliked = userVote != null && "dislike".equals(userVote.getType());
 
         Button likeBtn = new Button("👍 " + sujet.getNbLikes());
-        likeBtn.setStyle("-fx-background-color: " + (hasLiked ? "#27AE60" : "transparent") +
-                "; -fx-text-fill: " + (hasLiked ? "white" : "#7F8C8D") +
-                "; -fx-background-radius: 20; -fx-padding: 5 12;");
+        String likeStyle = hasLiked
+                ? "-fx-background-color: " + COLOR_SUCCESS + "; -fx-text-fill: white;"
+                : "-fx-background-color: transparent; -fx-text-fill: " + COLOR_TEXT_MUTED + ";";
+        likeBtn.setStyle(likeStyle +
+                "-fx-background-radius: 20; -fx-padding: 5 14; -fx-font-size: 12px; -fx-font-weight: bold; -fx-cursor: hand;");
 
         likeBtn.setOnMouseEntered(e -> {
             if (!hasLiked)
-                likeBtn.setStyle("-fx-background-color: #E8F8F5; -fx-text-fill: #27AE60; -fx-background-radius: 20; -fx-padding: 5 12;");
+                likeBtn.setStyle("-fx-background-color: " + COLOR_SUCCESS_BG + "; -fx-text-fill: " + COLOR_SUCCESS +
+                        "; -fx-background-radius: 20; -fx-padding: 5 14; -fx-font-size: 12px; -fx-font-weight: bold; -fx-cursor: hand;");
         });
-
         likeBtn.setOnMouseExited(e -> {
-            likeBtn.setStyle("-fx-background-color: " + (hasLiked ? "#27AE60" : "transparent") +
-                    "; -fx-text-fill: " + (hasLiked ? "white" : "#7F8C8D") +
-                    "; -fx-background-radius: 20; -fx-padding: 5 12;");
+            String resetStyle = hasLiked
+                    ? "-fx-background-color: " + COLOR_SUCCESS + "; -fx-text-fill: white;"
+                    : "-fx-background-color: transparent; -fx-text-fill: " + COLOR_TEXT_MUTED + ";";
+            likeBtn.setStyle(resetStyle +
+                    "-fx-background-radius: 20; -fx-padding: 5 14; -fx-font-size: 12px; -fx-font-weight: bold; -fx-cursor: hand;");
         });
-
         likeBtn.setOnAction(e -> {
             e.consume();
             Vote currentVote = serviceVote.getUserVoteOnSujet(sujet.getId());
-
             if (currentVote != null && "like".equals(currentVote.getType())) {
                 serviceVote.removeVoteFromSujet(sujet.getId());
                 sujet.setNbLikes(sujet.getNbLikes() - 1);
             } else {
                 serviceVote.voteForSujet(sujet.getId(), "like");
-
                 if (currentVote != null && "dislike".equals(currentVote.getType())) {
                     sujet.setNbDislikes(sujet.getNbDislikes() - 1);
                 }
                 sujet.setNbLikes(sujet.getNbLikes() + 1);
             }
-
             refreshDisplay();
         });
 
         Button dislikeBtn = new Button("👎 " + sujet.getNbDislikes());
-        dislikeBtn.setStyle("-fx-background-color: " + (hasDisliked ? "#E74C3C" : "transparent") +
-                "; -fx-text-fill: " + (hasDisliked ? "white" : "#7F8C8D") +
-                "; -fx-background-radius: 20; -fx-padding: 5 12;");
+        String dislikeStyle = hasDisliked
+                ? "-fx-background-color: " + COLOR_DANGER + "; -fx-text-fill: white;"
+                : "-fx-background-color: transparent; -fx-text-fill: " + COLOR_TEXT_MUTED + ";";
+        dislikeBtn.setStyle(dislikeStyle +
+                "-fx-background-radius: 20; -fx-padding: 5 14; -fx-font-size: 12px; -fx-font-weight: bold; -fx-cursor: hand;");
 
         dislikeBtn.setOnMouseEntered(e -> {
             if (!hasDisliked)
-                dislikeBtn.setStyle("-fx-background-color: #FDEDEC; -fx-text-fill: #E74C3C; -fx-background-radius: 20; -fx-padding: 5 12;");
+                dislikeBtn.setStyle("-fx-background-color: " + COLOR_DANGER_BG + "; -fx-text-fill: " + COLOR_DANGER +
+                        "; -fx-background-radius: 20; -fx-padding: 5 14; -fx-font-size: 12px; -fx-font-weight: bold; -fx-cursor: hand;");
         });
-
         dislikeBtn.setOnMouseExited(e -> {
-            dislikeBtn.setStyle("-fx-background-color: " + (hasDisliked ? "#E74C3C" : "transparent") +
-                    "; -fx-text-fill: " + (hasDisliked ? "white" : "#7F8C8D") +
-                    "; -fx-background-radius: 20; -fx-padding: 5 12;");
+            String resetStyle = hasDisliked
+                    ? "-fx-background-color: " + COLOR_DANGER + "; -fx-text-fill: white;"
+                    : "-fx-background-color: transparent; -fx-text-fill: " + COLOR_TEXT_MUTED + ";";
+            dislikeBtn.setStyle(resetStyle +
+                    "-fx-background-radius: 20; -fx-padding: 5 14; -fx-font-size: 12px; -fx-font-weight: bold; -fx-cursor: hand;");
         });
-
         dislikeBtn.setOnAction(e -> {
             e.consume();
             Vote currentVote = serviceVote.getUserVoteOnSujet(sujet.getId());
-
             if (currentVote != null && "dislike".equals(currentVote.getType())) {
                 serviceVote.removeVoteFromSujet(sujet.getId());
                 sujet.setNbDislikes(sujet.getNbDislikes() - 1);
             } else {
                 serviceVote.voteForSujet(sujet.getId(), "dislike");
-
                 if (currentVote != null && "like".equals(currentVote.getType())) {
                     sujet.setNbLikes(sujet.getNbLikes() - 1);
                 }
                 sujet.setNbDislikes(sujet.getNbDislikes() + 1);
             }
-
             refreshDisplay();
         });
 
         Button commentBtn = new Button("💬 Répondre");
-        commentBtn.setStyle("-fx-background-color: #2C5F8A; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 5 15;");
+        commentBtn.setStyle(
+                "-fx-background-color: linear-gradient(from 0% 0% to 100% 100%, " + COLOR_PRIMARY_LIGHT + ", " + COLOR_PRIMARY + ");" +
+                        "-fx-text-fill: white;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-padding: 6 18;" +
+                        "-fx-font-size: 12px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-cursor: hand;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(44,95,138,0.2), 4, 0, 0, 2);"
+        );
         commentBtn.setOnAction(e -> {
             e.consume();
             onSujetClicked(sujet, true);
@@ -399,75 +479,77 @@ public class ControllerForum {
 
         if (isOwner) {
             MenuButton actionsMenu = new MenuButton("⋮");
+            actionsMenu.setStyle(
+                    "-fx-background-color: transparent;" +
+                            "-fx-text-fill: " + COLOR_TEXT_MUTED + ";" +
+                            "-fx-font-size: 16px;" +
+                            "-fx-cursor: hand;" +
+                            "-fx-padding: 2 6;"
+            );
 
-            MenuItem editItem = new MenuItem("✏️ Modifier");
-            editItem.setOnAction(e -> {
-                e.consume();
-                editSujet(sujet);
-            });
+            MenuItem editItem = new MenuItem("✏ Modifier");
+            editItem.setOnAction(e -> { e.consume(); editSujet(sujet); });
 
-            MenuItem deleteItem = new MenuItem("🗑️ Supprimer");
-            deleteItem.setOnAction(e -> {
-                e.consume();
-                deleteSujet(sujet);
-            });
+            MenuItem deleteItem = new MenuItem("🗑 Supprimer");
+            deleteItem.setOnAction(e -> { e.consume(); deleteSujet(sujet); });
 
             actionsMenu.getItems().addAll(editItem, new SeparatorMenuItem(), deleteItem);
             actionsBox.getChildren().add(actionsMenu);
         }
 
-        card.getChildren().addAll(header, actionsBox);
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        HBox bottomRow = new HBox();
+        bottomRow.setAlignment(Pos.CENTER);
+        bottomRow.getChildren().addAll(statsRow, spacer, actionsBox);
+
+        contentBox.getChildren().addAll(title, metaData, content, bottomRow);
+        header.getChildren().addAll(avatar, contentBox);
+        card.getChildren().add(header);
 
         return card;
     }
 
-    // Méthode pour éditer un sujet (utilise la fenêtre FXML existante)
+
     private void editSujet(Sujet sujet) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/EditSujet.fxml"));
             Parent root = loader.load();
-
             ControllerEditSujet controller = loader.getController();
             controller.setSujet(sujet, serviceSujet);
-
             Stage stage = new Stage();
             stage.setTitle("Modifier la discussion");
             stage.setScene(new Scene(root));
             stage.setResizable(false);
-            // Pas de initModality - la fenêtre n'est pas modale
             stage.showAndWait();
-
-            // Recharger la liste après modification
             loadSujetsFromDatabase();
-
         } catch (IOException e) {
             e.printStackTrace();
             showAlert("Erreur", "Impossible d'ouvrir la fenêtre de modification: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
-    // Méthode pour supprimer un sujet
     private void deleteSujet(Sujet sujet) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Supprimer la discussion");
         confirm.setHeaderText(null);
-        confirm.setContentText("Êtes-vous sûr de vouloir supprimer cette discussion ? Cette action est irréversible et supprimera tous les commentaires.");
+        confirm.setContentText("Êtes-vous sûr de vouloir supprimer cette discussion ? Cette action est irréversible.");
 
-        // Styliser le dialogue de confirmation
         DialogPane dialogPane = confirm.getDialogPane();
-        dialogPane.setStyle("-fx-background-color: #F8FAFE;");
+        dialogPane.setStyle("-fx-background-color: " + COLOR_BG + "; -fx-background-radius: 12;");
 
         Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
-        okButton.setStyle("-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 5; -fx-padding: 8 20;");
+        okButton.setStyle("-fx-background-color: " + COLOR_DANGER + "; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 8; -fx-padding: 8 22; -fx-font-weight: bold;");
 
         Button cancelButton = (Button) dialogPane.lookupButton(ButtonType.CANCEL);
-        cancelButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #7F8C8D; -fx-cursor: hand; -fx-padding: 8 20;");
+        cancelButton.setStyle("-fx-background-color: transparent; -fx-text-fill: " + COLOR_TEXT_SECONDARY + "; -fx-cursor: hand; -fx-padding: 8 22;");
 
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             serviceSujet.delete(sujet);
             loadSujetsFromDatabase();
-            showAlert("Succès", "Sujet supprimé !", Alert.AlertType.INFORMATION);
+            showAlert("Succès", "Discussion supprimée avec succès !", Alert.AlertType.INFORMATION);
         }
     }
 
@@ -478,6 +560,7 @@ public class ControllerForum {
             return 0;
         }
     }
+
 
     private void updatePaginationControls() {
         paginationBox.getChildren().clear();
@@ -490,28 +573,23 @@ public class ControllerForum {
             return;
         }
 
-        Button prevBtn = new Button("◀ Précédent");
-        prevBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: #2C5F8A; -fx-cursor: hand; -fx-padding: 5 10;");
+        Button prevBtn = new Button("← Précédent");
+        prevBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: " + COLOR_PRIMARY +
+                "; -fx-cursor: hand; -fx-padding: 6 14; -fx-font-weight: 600; -fx-font-size: 12px;");
         prevBtn.setDisable(currentPage == 1);
-        prevBtn.setOnAction(e -> {
-            if (currentPage > 1) {
-                currentPage--;
-                displayCurrentPage();
-            }
-        });
+        prevBtn.setOnAction(e -> { if (currentPage > 1) { currentPage--; displayCurrentPage(); } });
 
-        HBox pagesBox = new HBox(5);
+        HBox pagesBox = new HBox(6);
         pagesBox.setAlignment(Pos.CENTER);
 
         int startPage = Math.max(1, currentPage - 2);
         int endPage = Math.min(totalPages, startPage + 4);
 
         if (startPage > 1) {
-            Button page1 = createPageButton(1);
-            pagesBox.getChildren().add(page1);
+            pagesBox.getChildren().add(createPageButton(1));
             if (startPage > 2) {
-                Label dots = new Label("...");
-                dots.setStyle("-fx-text-fill: #7F8C8D; -fx-padding: 5;");
+                Label dots = new Label("···");
+                dots.setStyle("-fx-text-fill: " + COLOR_TEXT_MUTED + "; -fx-padding: 5;");
                 pagesBox.getChildren().add(dots);
             }
         }
@@ -519,43 +597,38 @@ public class ControllerForum {
         for (int i = startPage; i <= endPage; i++) {
             Button pageBtn = createPageButton(i);
             if (i == currentPage) {
-                pageBtn.setStyle("-fx-background-color: #2C5F8A; -fx-text-fill: white; " +
-                        "-fx-background-radius: 8; -fx-padding: 5 12; -fx-font-weight: bold;");
+                pageBtn.setStyle(
+                        "-fx-background-color: linear-gradient(from 0% 0% to 100% 100%, " + COLOR_PRIMARY_LIGHT + ", " + COLOR_PRIMARY + ");" +
+                                "-fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 6 14; -fx-font-weight: bold; -fx-font-size: 12px;" +
+                                "-fx-effect: dropshadow(gaussian, rgba(44,95,138,0.25), 4, 0, 0, 2);"
+                );
             }
             pagesBox.getChildren().add(pageBtn);
         }
 
         if (endPage < totalPages) {
             if (endPage < totalPages - 1) {
-                Label dots = new Label("...");
-                dots.setStyle("-fx-text-fill: #7F8C8D; -fx-padding: 5;");
+                Label dots = new Label("···");
+                dots.setStyle("-fx-text-fill: " + COLOR_TEXT_MUTED + "; -fx-padding: 5;");
                 pagesBox.getChildren().add(dots);
             }
-            Button lastPage = createPageButton(totalPages);
-            pagesBox.getChildren().add(lastPage);
+            pagesBox.getChildren().add(createPageButton(totalPages));
         }
 
-        Button nextBtn = new Button("Suivant ▶");
-        nextBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: #2C5F8A; -fx-cursor: hand; -fx-padding: 5 10;");
+        Button nextBtn = new Button("Suivant →");
+        nextBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: " + COLOR_PRIMARY +
+                "; -fx-cursor: hand; -fx-padding: 6 14; -fx-font-weight: 600; -fx-font-size: 12px;");
         nextBtn.setDisable(currentPage == totalPages);
-        nextBtn.setOnAction(e -> {
-            if (currentPage < totalPages) {
-                currentPage++;
-                displayCurrentPage();
-            }
-        });
+        nextBtn.setOnAction(e -> { if (currentPage < totalPages) { currentPage++; displayCurrentPage(); } });
 
         paginationBox.getChildren().addAll(prevBtn, pagesBox, nextBtn);
     }
 
     private Button createPageButton(int pageNum) {
         Button btn = new Button(String.valueOf(pageNum));
-        btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #2C5F8A; " +
-                "-fx-background-radius: 8; -fx-padding: 5 12; -fx-cursor: hand;");
-        btn.setOnAction(e -> {
-            currentPage = pageNum;
-            displayCurrentPage();
-        });
+        btn.setStyle("-fx-background-color: " + COLOR_PRIMARY_BG + "; -fx-text-fill: " + COLOR_PRIMARY +
+                "; -fx-background-radius: 10; -fx-padding: 6 14; -fx-cursor: hand; -fx-font-size: 12px; -fx-font-weight: 600;");
+        btn.setOnAction(e -> { currentPage = pageNum; displayCurrentPage(); });
         return btn;
     }
 
@@ -564,11 +637,11 @@ public class ControllerForum {
         LocalDate localDate = date.toLocalDate();
         LocalDate today = LocalDate.now();
 
-        if (localDate.equals(today)) {
-            return "Aujourd'hui";
-        } else if (localDate.equals(today.minusDays(1))) {
-            return "Hier";
-        } else {
+        if (localDate.equals(today)) return "Aujourd'hui";
+        else if (localDate.equals(today.minusDays(1))) return "Hier";
+        else {
+            long daysAgo = java.time.temporal.ChronoUnit.DAYS.between(localDate, today);
+            if (daysAgo <= 7) return "Il y a " + daysAgo + " jours";
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             return localDate.format(formatter);
         }
@@ -580,12 +653,11 @@ public class ControllerForum {
         alert.setHeaderText(null);
         alert.setContentText(content);
 
-        // Styliser l'alerte
         DialogPane dialogPane = alert.getDialogPane();
-        dialogPane.setStyle("-fx-background-color: #F8FAFE;");
+        dialogPane.setStyle("-fx-background-color: " + COLOR_BG + ";");
 
         Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
-        okButton.setStyle("-fx-background-color: #2C5F8A; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 5; -fx-padding: 8 20;");
+        okButton.setStyle("-fx-background-color: " + COLOR_PRIMARY + "; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 8; -fx-padding: 8 22; -fx-font-weight: bold;");
 
         alert.showAndWait();
     }
@@ -594,42 +666,14 @@ public class ControllerForum {
         return 3;
     }
 
-    // ========== NAVIGATION ==========
 
-    @FXML
-    private void onNavHomeClicked() {
-        navigateTo("/Home.fxml");
-    }
-
-    @FXML
-    private void onNavSuiviClicked() {
-        navigateTo("/Suivi.fxml");
-    }
-
-    @FXML
-    private void onNavObjectifClicked() {
-        navigateTo("/Objectif.fxml");
-    }
-
-    @FXML
-    private void onNavForumClicked() {
-        loadSujetsFromDatabase();
-    }
-
-    @FXML
-    private void onNavRendezVousClicked() {
-        navigateTo("/RendezVous.fxml");
-    }
-
-    @FXML
-    private void onNavActivitesClicked() {
-        navigateTo("/Activites.fxml");
-    }
-
-    @FXML
-    private void onNavContenuClicked() {
-        navigateTo("/Contenu.fxml");
-    }
+    @FXML private void onNavHomeClicked() { navigateTo("/Home.fxml"); }
+    @FXML private void onNavSuiviClicked() { navigateTo("/Suivi.fxml"); }
+    @FXML private void onNavObjectifClicked() { navigateTo("/Objectif.fxml"); }
+    @FXML private void onNavForumClicked() { loadSujetsFromDatabase(); }
+    @FXML private void onNavRendezVousClicked() { navigateTo("/RendezVous.fxml"); }
+    @FXML private void onNavActivitesClicked() { navigateTo("/Activites.fxml"); }
+    @FXML private void onNavContenuClicked() { navigateTo("/Contenu.fxml"); }
 
     @FXML
     private void onNavHoverEnter(javafx.scene.input.MouseEvent event) {
@@ -647,25 +691,20 @@ public class ControllerForum {
         }
     }
 
-    // ========== ACTIONS ==========
 
     @FXML
     private void onNewDiscussion() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/NouvelleDiscussion.fxml"));
             Parent root = loader.load();
-
             ControllerNouvelleDiscussion controller = loader.getController();
             controller.setServiceSujet(serviceSujet);
             controller.setUserId(currentUserId);
-
-
             Stage stage = new Stage();
             stage.setTitle("Nouvelle discussion");
             stage.setScene(new Scene(root));
             stage.setResizable(false);
             stage.showAndWait();
-
             loadSujetsFromDatabase();
         } catch (IOException e) {
             e.printStackTrace();
@@ -682,20 +721,15 @@ public class ControllerForum {
         try {
             if (incrementVues) {
                 serviceSujet.incrementVues(sujet.getId());
-                // Recharger les données pour avoir le vrai nombre de vues
                 loadSujetsFromDatabase();
             }
-
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/DetailDiscussion.fxml"));
             Parent root = loader.load();
-
             ControllerDetailDiscussion controller = loader.getController();
             controller.setSujet(sujet);
             controller.setCurrentUserId(currentUserId);
-
             Stage stage = (Stage) navForum.getScene().getWindow();
             stage.getScene().setRoot(root);
-
         } catch (IOException e) {
             e.printStackTrace();
             showAlert("Erreur", "Impossible d'ouvrir la discussion", Alert.AlertType.ERROR);
@@ -725,13 +759,13 @@ public class ControllerForum {
             confirm.setContentText("Voulez-vous vraiment vous déconnecter ?");
 
             DialogPane dialogPane = confirm.getDialogPane();
-            dialogPane.setStyle("-fx-background-color: #F8FAFE;");
+            dialogPane.setStyle("-fx-background-color: " + COLOR_BG + ";");
 
             Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
-            okButton.setStyle("-fx-background-color: #2C5F8A; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 5;");
+            okButton.setStyle("-fx-background-color: " + COLOR_PRIMARY + "; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 8; -fx-font-weight: bold;");
 
             Button cancelButton = (Button) dialogPane.lookupButton(ButtonType.CANCEL);
-            cancelButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #7F8C8D; -fx-cursor: hand;");
+            cancelButton.setStyle("-fx-background-color: transparent; -fx-text-fill: " + COLOR_TEXT_SECONDARY + "; -fx-cursor: hand;");
 
             Optional<ButtonType> result = confirm.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {

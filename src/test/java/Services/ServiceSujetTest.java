@@ -18,7 +18,6 @@ public class ServiceSujetTest {
         service = new ServiceSujet();
     }
 
-    // 🔹 TEST ADD
     @Test
     @Order(1)
     public void testAdd() {
@@ -30,7 +29,6 @@ public class ServiceSujetTest {
         sujetId = s.getId(); // sauvegarde pour les autres tests
     }
 
-    // 🔹 TEST GET BY ID
     @Test
     @Order(2)
     public void testGetById() {
@@ -41,7 +39,6 @@ public class ServiceSujetTest {
         assertEquals("Contenu test JUnit", s.getContenu());
     }
 
-    // 🔹 TEST GET ALL
     @Test
     @Order(3)
     public void testGetAll() {
@@ -51,7 +48,6 @@ public class ServiceSujetTest {
         assertTrue(list.size() > 0, "La liste doit contenir au moins un sujet");
     }
 
-    // 🔹 TEST UPDATE
     @Test
     @Order(4)
     public void testUpdate() {
@@ -68,7 +64,6 @@ public class ServiceSujetTest {
         assertEquals("Contenu modifié", updated.getContenu());
     }
 
-    // 🔹 TEST INCREMENT VUES
     @Test
     @Order(5)
     public void testIncrementVues() {
@@ -82,7 +77,6 @@ public class ServiceSujetTest {
         assertEquals(oldViews + 1, updated.getNbVues());
     }
 
-    // 🔹 TEST GET BY USER
     @Test
     @Order(6)
     public void testGetByUser() {
@@ -92,7 +86,6 @@ public class ServiceSujetTest {
         assertTrue(list.size() >= 0);
     }
 
-    // 🔹 TEST DELETE
     @Test
     @Order(7)
     public void testDelete() {

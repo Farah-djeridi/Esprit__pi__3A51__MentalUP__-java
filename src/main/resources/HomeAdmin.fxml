@@ -2,15 +2,8 @@
 
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.scene.shape.*?>
-<?import javafx.geometry.*?>
 
-<!--
-    MentalUp — HomeAdmin.fxml
-    Sidebar : #2C3E50 avec sous-menus masqués au départ
-    Fenêtre : 1024×700
--->
 <?import javafx.scene.image.ImageView?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
@@ -18,14 +11,10 @@
             prefWidth="1024" prefHeight="700"
             style="-fx-background-color: #F4F8FF;">
 
-    <!-- ═══════════════════════════════════════════
-         SIDEBAR ADMIN (#2C3E50) - Couleur unie
-    ═══════════════════════════════════════════ -->
     <left>
         <VBox prefWidth="260" prefHeight="700"
               style="-fx-background-color: #2C3E50;">
 
-            <!-- Logo / Brand -->
             <HBox alignment="CENTER_LEFT" spacing="10"
                   style="-fx-padding: 24 18 20 18;
                          -fx-border-color: transparent transparent rgba(255,255,255,0.1) transparent;
@@ -42,10 +31,8 @@
                 </VBox>
             </HBox>
 
-            <!-- Navigation avec sous-menus -->
             <VBox spacing="2" style="-fx-padding: 16 12 0 12;" VBox.vgrow="ALWAYS">
 
-                <!-- Accueil -->
                 <HBox alignment="CENTER_LEFT" spacing="12"
                       fx:id="navAccueil"
                       onMouseClicked="#onNavHomeClicked"
@@ -60,7 +47,6 @@
                                   -fx-font-weight: bold;"/>
                 </HBox>
 
-                <!-- Suivi Mental avec sous-menu -->
                 <VBox spacing="0">
                     <HBox alignment="CENTER_LEFT" spacing="12"
                           fx:id="navSuivi"
@@ -78,7 +64,6 @@
                         <Label fx:id="arrowSuivi" text="▶" style="-fx-text-fill: rgba(255,255,255,0.5); -fx-font-size: 11px;"/>
                     </HBox>
 
-                    <!-- Sous-menu Suivi (masqué au départ) -->
                     <VBox fx:id="submenuSuivi" spacing="2" style="-fx-padding: 4 0 6 28; -fx-display: none;">
                         <HBox alignment="CENTER_LEFT" spacing="10"
                               fx:id="navSuiviStats"
@@ -103,7 +88,6 @@
                     </VBox>
                 </VBox>
 
-                <!-- Forum avec sous-menu -->
                 <VBox spacing="0">
                     <HBox alignment="CENTER_LEFT" spacing="12"
                           fx:id="navForum"
@@ -121,7 +105,6 @@
                         <Label fx:id="arrowForum" text="▶" style="-fx-text-fill: rgba(255,255,255,0.5); -fx-font-size: 11px;"/>
                     </HBox>
 
-                    <!-- Sous-menu Forum (masqué au départ) -->
                     <VBox fx:id="submenuForum" spacing="2" style="-fx-padding: 4 0 6 28; -fx-display: none;">
                         <HBox alignment="CENTER_LEFT" spacing="10"
                               fx:id="navSujets"
@@ -146,7 +129,6 @@
                     </VBox>
                 </VBox>
 
-                <!-- Rendez-vous -->
                 <HBox alignment="CENTER_LEFT" spacing="12"
                       fx:id="navRdv"
                       onMouseClicked="#onNavRdvClicked"
@@ -161,7 +143,6 @@
                            style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px; -fx-font-weight: 500;"/>
                 </HBox>
 
-                <!-- Utilisateurs -->
                 <HBox alignment="CENTER_LEFT" spacing="12"
                       fx:id="navUtilisateurs"
                       onMouseClicked="#onNavUtilisateursClicked"
@@ -176,7 +157,6 @@
                            style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px; -fx-font-weight: 500;"/>
                 </HBox>
 
-                <!-- Dossiers médicaux -->
                 <HBox alignment="CENTER_LEFT" spacing="12"
                       fx:id="navDossiers"
                       onMouseClicked="#onNavDossiersClicked"
@@ -191,7 +171,6 @@
                            style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px; -fx-font-weight: 500;"/>
                 </HBox>
 
-                <!-- Contenus -->
                 <HBox alignment="CENTER_LEFT" spacing="12"
                       fx:id="navContenus"
                       onMouseClicked="#onNavContenusClicked"
@@ -206,7 +185,6 @@
                            style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px; -fx-font-weight: 500;"/>
                 </HBox>
 
-                <!-- Activités -->
                 <HBox alignment="CENTER_LEFT" spacing="12"
                       fx:id="navActivites"
                       onMouseClicked="#onNavActivitesClicked"
@@ -223,7 +201,6 @@
 
             </VBox>
 
-            <!-- Profil administrateur -->
             <VBox spacing="6" style="-fx-padding: 16 14 20 14; -fx-border-color: rgba(255,255,255,0.08); -fx-border-width: 1 0 0 0;">
                 <HBox alignment="CENTER_LEFT" spacing="10">
                     <Circle radius="18" style="-fx-fill: rgba(255,255,255,0.15);"/>
@@ -252,9 +229,6 @@
         </VBox>
     </left>
 
-    <!-- ═══════════════════════════════════════════
-         CONTENU PRINCIPAL - ACCUEIL ADMIN
-    ═══════════════════════════════════════════ -->
     <center>
         <VBox spacing="0" prefWidth="764" prefHeight="700"
               style="-fx-background-color: #F4F8FF;">
@@ -286,10 +260,8 @@
                                -fx-min-height: 32;"/>
             </HBox>
 
-            <!-- Page d'accueil Admin -->
             <VBox spacing="20" style="-fx-padding: 24 28 28 28;" VBox.vgrow="ALWAYS">
 
-                <!-- Bannière Admin -->
                 <HBox style="-fx-background-color: linear-gradient(to right, #2C3E50, #34495E);
                              -fx-background-radius: 20;
                              -fx-padding: 35 40;
@@ -310,7 +282,6 @@
                            HBox.hgrow="NEVER"/>
                 </HBox>
 
-                <!-- Statistiques rapides (4 cartes) -->
                 <HBox spacing="16">
 
                     <VBox spacing="8" HBox.hgrow="ALWAYS"
@@ -375,7 +346,6 @@
 
                 </HBox>
 
-                <!-- Actions rapides -->
                 <VBox spacing="12"
                       style="-fx-background-color: white;
                              -fx-background-radius: 16;
@@ -426,5 +396,4 @@
 
         </VBox>
     </center>
-
 </BorderPane>

@@ -25,7 +25,7 @@ public class MainFX extends Application {
             stage.show();
 
         } catch (Exception e) {
-            e.printStackTrace(); // 🔥 IMPORTANT
+            e.printStackTrace();
         }
     }
 

@@ -21,7 +21,6 @@ public class ServiceCommentTest {
         service = new ServiceCommentaire();
     }
 
-    // 🔹 TEST ADD
     @Test
     @Order(1)
     public void testAdd() {
@@ -39,7 +38,6 @@ public class ServiceCommentTest {
         commentaireId = c.getId();
     }
 
-    // 🔹 TEST GET BY ID
     @Test
     @Order(2)
     public void testGetById() {
@@ -51,7 +49,6 @@ public class ServiceCommentTest {
         assertEquals(SUJET_ID, c.getSujetId());
     }
 
-    // 🔹 TEST GET ALL
     @Test
     @Order(3)
     public void testGetAll() {
@@ -61,7 +58,6 @@ public class ServiceCommentTest {
         assertTrue(list.size() > 0, "La liste doit contenir au moins un commentaire");
     }
 
-    // 🔹 TEST GET BY SUJET
     @Test
     @Order(4)
     public void testGetBySujetId() {
@@ -71,7 +67,6 @@ public class ServiceCommentTest {
         assertTrue(list.size() >= 0);
     }
 
-    // 🔹 TEST GET BY USER
     @Test
     @Order(5)
     public void testGetByUserId() {
@@ -81,7 +76,6 @@ public class ServiceCommentTest {
         assertTrue(list.size() >= 0);
     }
 
-    // 🔹 TEST UPDATE
     @Test
     @Order(6)
     public void testUpdate() {
@@ -100,7 +94,6 @@ public class ServiceCommentTest {
         assertEquals(1, updated.getNbDislikes());
     }
 
-    // 🔹 TEST UPDATE LIKES
     @Test
     @Order(7)
     public void testUpdateLikes() {
@@ -111,7 +104,6 @@ public class ServiceCommentTest {
         assertEquals(10, c.getNbLikes());
     }
 
-    // 🔹 TEST UPDATE DISLIKES
     @Test
     @Order(8)
     public void testUpdateDislikes() {
@@ -122,7 +114,6 @@ public class ServiceCommentTest {
         assertEquals(3, c.getNbDislikes());
     }
 
-    // 🔹 TEST COUNT
     @Test
     @Order(9)
     public void testCountBySujet() {
@@ -131,7 +122,6 @@ public class ServiceCommentTest {
         assertTrue(count >= 0);
     }
 
-    // 🔹 TEST DELETE
     @Test
     @Order(10)
     public void testDelete() {

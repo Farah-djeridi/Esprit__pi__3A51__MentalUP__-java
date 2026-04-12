@@ -190,18 +190,30 @@
                     <VBox spacing="20" style="-fx-padding: 20 24 24 24;">
 
                         <!-- Bouton retour -->
-                        <HBox>
-                            <Button onAction="#onBackToForum" style="-fx-background-color: transparent; -fx-cursor: hand;">
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Button onAction="#onBackToForum"
+                                    style="-fx-background-color: #c3d7eb;
+                                            -fx-background-radius: 25;
+                                            -fx-padding: 8 15;
+                                            -fx-cursor: hand;">
+
                                 <graphic>
                                     <HBox spacing="8" alignment="CENTER">
-                                        <Label text="←" style="-fx-font-size: 16px; -fx-text-fill: #2C5F8A;"/>
-                                        <Label text="Retour au forum" style="-fx-text-fill: #2C5F8A; -fx-font-size: 13px; -fx-font-weight: 500;"/>
+                                        <Label text="←"
+                                               style="-fx-font-size: 16px;
+                              -fx-text-fill: #2C5F8A;
+                              -fx-font-weight: bold;"/>
+
+                                        <Label text="Retour au forum"
+                                               style="-fx-text-fill: #2C5F8A;
+                              -fx-font-size: 13px;
+                              -fx-font-weight: bold;"/>
                                     </HBox>
                                 </graphic>
                             </Button>
+
                             <Region HBox.hgrow="ALWAYS"/>
                         </HBox>
-
                         <!-- Sujet Principal -->
                         <VBox style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 24;
                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 2);"
@@ -251,11 +263,13 @@
                                 <Button fx:id="dislikeButton" text="👎 0"
                                         style="-fx-background-color: transparent; -fx-text-fill: #7F8C8D; -fx-cursor: hand; -fx-padding: 5 10; -fx-background-radius: 20;"/>
                                 <Region HBox.hgrow="ALWAYS"/>
-                                <Label style="-fx-background-color: rgba(74,111,165,0.1); -fx-padding: 5 12; -fx-background-radius: 15; -fx-text-fill: #2C5F8A;">
-                                    <fx:define>
-                                        <Label fx:id="nbVuesLabel" text="0 vues"/>
-                                    </fx:define>
-                                </Label>
+                                <Label fx:id="nbVuesLabel"
+                                       text="👁 0"
+                                       style="-fx-background-color: #27AE6022;
+                                                  -fx-text-fill: #27AE60;
+                                                  -fx-padding: 5 12;
+                                                  -fx-background-radius: 20;
+                                                  -fx-font-weight: bold;" />
                             </HBox>
                         </VBox>
 
@@ -298,28 +312,69 @@
                         </VBox>
 
                         <!-- Formulaire d'ajout de commentaire -->
-                        <VBox spacing="15" style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 20;
-                                                  -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 2);">
+                        <VBox spacing="18"
+                              style="-fx-background-color: white;
+             -fx-background-radius: 20;
+             -fx-padding: 22;
+             -fx-border-color: #E8EEF4;
+             -fx-border-radius: 20;
+             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 12, 0, 0, 3);">
+
+                            <!-- Titre -->
                             <Label text="📝 Ajouter un commentaire"
-                                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;"/>
+                                   style="-fx-font-size: 17px;
+                  -fx-font-weight: bold;
+                  -fx-text-fill: #2C3E50;"/>
 
+                            <!-- Anonyme -->
                             <HBox spacing="10" alignment="CENTER_LEFT">
-                                <CheckBox fx:id="anonymeCheckBox" text="Publier anonymement"
-                                          style="-fx-text-fill: #7F8C8D;"/>
-                                <Label text="Votre identité sera cachée"
-                                       style="-fx-text-fill: #95A5A6; -fx-font-size: 11px;"/>
+                                <CheckBox fx:id="anonymeCheckBox"
+                                          text="Publier anonymement"
+                                          style="-fx-text-fill: #2C3E50;
+                         -fx-font-size: 12px;"/>
+
+                                <Label text="(Votre identité sera cachée)"
+                                       style="-fx-text-fill: #95A5A6;
+                      -fx-font-size: 11px;
+                      -fx-font-style: italic;"/>
                             </HBox>
 
-                            <TextArea fx:id="commentTextArea" promptText="Partagez votre réponse, opinion ou conseil..."
-                                      prefHeight="100" wrapText="true"
-                                      style="-fx-padding: 12; -fx-background-radius: 12; -fx-border-color: #E8EEF4; -fx-border-radius: 12;"/>
+                            <!-- Zone texte -->
+                            <TextArea fx:id="commentTextArea"
+                                      promptText="💡 Partagez votre réponse, opinion ou conseil..."
+                                      prefHeight="110"
+                                      wrapText="true"
+                                      style="-fx-padding: 12;
+                     -fx-background-radius: 12;
+                     -fx-border-color: #E8EEF4;
+                     -fx-border-radius: 12;
+                     -fx-background-color: #F8FAFE;
+                     -fx-font-size: 13px;"/>
 
-                            <HBox spacing="15" alignment="CENTER_RIGHT">
-                                <Button text="Annuler" onAction="#onCancelComment"
-                                        style="-fx-background-color: transparent; -fx-text-fill: #7F8C8D; -fx-cursor: hand; -fx-padding: 8 20;"/>
-                                <Button fx:id="submitCommentButton" text="💬 Publier le commentaire" onAction="#onSubmitComment"
-                                        style="-fx-background-color: #2C5F8A; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 25; -fx-cursor: hand; -fx-padding: 8 25;"/>
+                            <!-- Actions -->
+                            <HBox spacing="12" alignment="CENTER_RIGHT">
+
+                                <Button text="Annuler"
+                                        onAction="#onCancelComment"
+                                        style="-fx-background-color: transparent;
+                       -fx-text-fill: #7F8C8D;
+                       -fx-font-weight: bold;
+                       -fx-cursor: hand;
+                       -fx-padding: 8 18;
+                       -fx-background-radius: 20;"/>
+
+                                <Button fx:id="submitCommentButton"
+                                        text="💬 Publier"
+                                        onAction="#onSubmitComment"
+                                        style="-fx-background-color: #2C5F8A;
+                       -fx-text-fill: white;
+                       -fx-font-weight: bold;
+                       -fx-background-radius: 25;
+                       -fx-cursor: hand;
+                       -fx-padding: 9 22;
+                       -fx-effect: dropshadow(gaussian, rgba(44,95,138,0.3), 8, 0, 0, 2);"/>
                             </HBox>
+
                         </VBox>
 
                     </VBox>

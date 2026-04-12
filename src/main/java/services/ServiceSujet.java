@@ -48,6 +48,7 @@ public class ServiceSujet implements IService<Sujet> {
     }
 
     // 🔹 AFFICHAGE
+    // 🔹 AFFICHAGE
     @Override
     public List<Sujet> getAll() {
         List<Sujet> sujets = new ArrayList<>();
@@ -69,15 +70,14 @@ public class ServiceSujet implements IService<Sujet> {
                 s.setContenu(rs.getString("contenu"));
                 s.setNbLikes(rs.getInt("nb_likes"));
                 s.setNbDislikes(rs.getInt("nb_dislikes"));
+                s.setNbVues(rs.getInt("nb_vues"));  // 🔥 IMPORTANT : récupérer les vues
                 s.setDateCreation(rs.getDate("date_creation"));
                 s.setAnonyme(rs.getBoolean("is_anonyme"));
                 s.setScoreToxicite(rs.getDouble("score_toxicite"));
                 s.setEstToxique(rs.getBoolean("est_toxique"));
 
-                // 🔥 IMPORTANT : récupérer ID user
                 s.setIdUser(rs.getInt("id_user_id"));
 
-                // 🔥 Nom complet
                 String fullName = rs.getString("nom") + " " + rs.getString("prenom");
                 s.setUserName(fullName);
 

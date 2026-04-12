@@ -24,7 +24,7 @@ public class ServiceCommentaire implements IService<Commentaire> {
                 "VALUES (?, NOW(), ?, 0, 0, ?, ?, ?, ?)";
 
         try {
-            PreparedStatement pstm = cnx.prepareStatement(req);
+            PreparedStatement pstm = cnx.prepareStatement(req, Statement.RETURN_GENERATED_KEYS);
 
             pstm.setString(1, c.getContenu());
             pstm.setBoolean(2, c.isAnonyme());
@@ -34,6 +34,12 @@ public class ServiceCommentaire implements IService<Commentaire> {
             pstm.setInt(6, c.getSujetId());
 
             pstm.executeUpdate();
+
+            // 🔥 IMPORTANT : récupérer ID généré
+            ResultSet rs = pstm.getGeneratedKeys();
+            if (rs.next()) {
+                c.setId(rs.getInt(1));
+            }
 
             System.out.println("Commentaire ajouté !");
         } catch (SQLException e) {
@@ -241,20 +247,6 @@ public class ServiceCommentaire implements IService<Commentaire> {
         }
     }
 
-    // 🔹 DELETE PAR SUJET ID (supprime tous les commentaires d'un sujet)
-    public void deleteBySujetId(int sujetId) {
-        String req = "DELETE FROM commentaire WHERE sujet_id=?";
-
-        try {
-            PreparedStatement pstm = cnx.prepareStatement(req);
-            pstm.setInt(1, sujetId);
-            pstm.executeUpdate();
-
-            System.out.println("Commentaires du sujet " + sujetId + " supprimés !");
-        } catch (SQLException e) {
-            System.out.println("Erreur lors de la suppression des commentaires du sujet: " + e.getMessage());
-        }
-    }
 
     // 🔹 COMPTER LES COMMENTAIRES PAR SUJET
     public int countBySujetId(int sujetId) {

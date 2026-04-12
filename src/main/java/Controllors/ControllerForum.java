@@ -217,19 +217,20 @@ public class ControllerForum {
 
         updatePaginationControls();
     }
-
     private VBox createSujetCard(Sujet sujet) {
         VBox card = new VBox(10);
         card.setStyle("-fx-background-color: #F8FAFE; -fx-padding: 15; -fx-background-radius: 12; " +
                 "-fx-border-color: #E8EEF4; -fx-border-radius: 12; -fx-border-width: 1;");
         card.setCursor(javafx.scene.Cursor.HAND);
-        card.setOnMouseClicked(e -> onSujetClicked(sujet));
+        card.setOnMouseClicked(e -> onSujetClicked(sujet, true));
 
         HBox header = new HBox(12);
 
         boolean isOwner = sujet.getIdUser() == currentUserId;
 
-        String displayName = sujet.isAnonyme() ? "A" : (sujet.getUserName() != null ? sujet.getUserName() : "Utilisateur");
+        String displayName = sujet.isAnonyme() ? "A" :
+                (sujet.getUserName() != null ? sujet.getUserName() : "Utilisateur");
+
         Label avatar = new Label(sujet.isAnonyme() ? "A" : getInitials(displayName));
 
         avatar.setStyle("-fx-background-color: " + (sujet.isAnonyme() ? "#8E9EAB" : "#2C5F8A") +
@@ -247,13 +248,9 @@ public class ControllerForum {
         title.setWrapText(true);
 
         String authorText;
-        if (sujet.isAnonyme()) {
-            authorText = "Anonyme";
-        } else if (isOwner) {
-            authorText = "Vous";
-        } else {
-            authorText = sujet.getUserName() != null ? sujet.getUserName() : "Utilisateur";
-        }
+        if (sujet.isAnonyme()) authorText = "Anonyme";
+        else if (isOwner) authorText = "Vous";
+        else authorText = sujet.getUserName() != null ? sujet.getUserName() : "Utilisateur";
 
         HBox metaData = new HBox(10);
 
@@ -277,23 +274,43 @@ public class ControllerForum {
         content.setWrapText(true);
         content.setStyle("-fx-font-size: 13px; -fx-text-fill: #5A6C7D; -fx-font-weight: 500;");
 
-        contentBox.getChildren().addAll(title, metaData, content);
-
-        VBox statsBox = new VBox(5);
-        statsBox.setAlignment(Pos.CENTER_RIGHT);
-
+        // 🔥 STATS MODERNES
         int commentCount = getCommentCountForSujet(sujet.getId());
 
         Label commentsLabel = new Label("💬 " + commentCount);
-        commentsLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #2C5F8A; -fx-font-weight: bold;");
+        commentsLabel.setStyle(
+                "-fx-background-color: #2C5F8A22;" +
+                        "-fx-text-fill: #2C5F8A;" +
+                        "-fx-font-size: 12px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-padding: 6 12;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-border-color: #2C5F8A33;" +
+                        "-fx-border-radius: 20;"
+        );
 
-        Label likesLabel = new Label("👍 " + sujet.getNbLikes());
-        likesLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #7F8C8D;");
+        Label vuesLabel = new Label("👁 " + sujet.getNbVues());
+        vuesLabel.setStyle(
+                "-fx-background-color: #27AE6022;" +
+                        "-fx-text-fill: #27AE60;" +
+                        "-fx-font-size: 12px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-padding: 6 12;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-border-color: #27AE6033;" +
+                        "-fx-border-radius: 20;"
+        );
 
-        statsBox.getChildren().addAll(commentsLabel, likesLabel);
+        HBox statsRow = new HBox(10);
+        statsRow.setAlignment(Pos.CENTER_LEFT);
+        statsRow.setPadding(new Insets(5, 0, 0, 0));
+        statsRow.getChildren().addAll(commentsLabel, vuesLabel);
 
-        header.getChildren().addAll(avatar, contentBox, statsBox);
+        contentBox.getChildren().addAll(title, metaData, content, statsRow);
 
+        header.getChildren().addAll(avatar, contentBox);
+
+        // 🔥 ACTIONS
         HBox actionsBox = new HBox(10);
         actionsBox.setAlignment(Pos.CENTER_RIGHT);
 
@@ -302,13 +319,23 @@ public class ControllerForum {
         boolean hasDisliked = userVote != null && "dislike".equals(userVote.getType());
 
         Button likeBtn = new Button("👍 " + sujet.getNbLikes());
-        likeBtn.setStyle("-fx-background-color: " + (hasLiked ? "#2C5F8A" : "transparent") +
+        likeBtn.setStyle("-fx-background-color: " + (hasLiked ? "#27AE60" : "transparent") +
                 "; -fx-text-fill: " + (hasLiked ? "white" : "#7F8C8D") +
-                "; -fx-cursor: hand; -fx-background-radius: 20; -fx-padding: 5 10;");
+                "; -fx-background-radius: 20; -fx-padding: 5 12;");
+
+        likeBtn.setOnMouseEntered(e -> {
+            if (!hasLiked)
+                likeBtn.setStyle("-fx-background-color: #E8F8F5; -fx-text-fill: #27AE60; -fx-background-radius: 20; -fx-padding: 5 12;");
+        });
+
+        likeBtn.setOnMouseExited(e -> {
+            likeBtn.setStyle("-fx-background-color: " + (hasLiked ? "#27AE60" : "transparent") +
+                    "; -fx-text-fill: " + (hasLiked ? "white" : "#7F8C8D") +
+                    "; -fx-background-radius: 20; -fx-padding: 5 12;");
+        });
 
         likeBtn.setOnAction(e -> {
             e.consume();
-
             Vote currentVote = serviceVote.getUserVoteOnSujet(sujet.getId());
 
             if (currentVote != null && "like".equals(currentVote.getType())) {
@@ -329,11 +356,21 @@ public class ControllerForum {
         Button dislikeBtn = new Button("👎 " + sujet.getNbDislikes());
         dislikeBtn.setStyle("-fx-background-color: " + (hasDisliked ? "#E74C3C" : "transparent") +
                 "; -fx-text-fill: " + (hasDisliked ? "white" : "#7F8C8D") +
-                "; -fx-cursor: hand; -fx-background-radius: 20; -fx-padding: 5 10;");
+                "; -fx-background-radius: 20; -fx-padding: 5 12;");
+
+        dislikeBtn.setOnMouseEntered(e -> {
+            if (!hasDisliked)
+                dislikeBtn.setStyle("-fx-background-color: #FDEDEC; -fx-text-fill: #E74C3C; -fx-background-radius: 20; -fx-padding: 5 12;");
+        });
+
+        dislikeBtn.setOnMouseExited(e -> {
+            dislikeBtn.setStyle("-fx-background-color: " + (hasDisliked ? "#E74C3C" : "transparent") +
+                    "; -fx-text-fill: " + (hasDisliked ? "white" : "#7F8C8D") +
+                    "; -fx-background-radius: 20; -fx-padding: 5 12;");
+        });
 
         dislikeBtn.setOnAction(e -> {
             e.consume();
-
             Vote currentVote = serviceVote.getUserVoteOnSujet(sujet.getId());
 
             if (currentVote != null && "dislike".equals(currentVote.getType())) {
@@ -352,17 +389,16 @@ public class ControllerForum {
         });
 
         Button commentBtn = new Button("💬 Répondre");
-        commentBtn.setStyle("-fx-background-color: #2C5F8A; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 20; -fx-padding: 5 15;");
+        commentBtn.setStyle("-fx-background-color: #2C5F8A; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 5 15;");
         commentBtn.setOnAction(e -> {
             e.consume();
-            onSujetClicked(sujet);
+            onSujetClicked(sujet, true);
         });
 
         actionsBox.getChildren().addAll(likeBtn, dislikeBtn, commentBtn);
 
         if (isOwner) {
             MenuButton actionsMenu = new MenuButton("⋮");
-            actionsMenu.setStyle("-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 5 10;");
 
             MenuItem editItem = new MenuItem("✏️ Modifier");
             editItem.setOnAction(e -> {
@@ -371,7 +407,6 @@ public class ControllerForum {
             });
 
             MenuItem deleteItem = new MenuItem("🗑️ Supprimer");
-            deleteItem.setStyle("-fx-text-fill: #E74C3C;");
             deleteItem.setOnAction(e -> {
                 e.consume();
                 deleteSujet(sujet);
@@ -643,9 +678,13 @@ public class ControllerForum {
         refreshDisplay();
     }
 
-    private void onSujetClicked(Sujet sujet) {
+    private void onSujetClicked(Sujet sujet, boolean incrementVues) {
         try {
-            serviceSujet.incrementVues(sujet.getId());
+            if (incrementVues) {
+                serviceSujet.incrementVues(sujet.getId());
+                // Recharger les données pour avoir le vrai nombre de vues
+                loadSujetsFromDatabase();
+            }
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/DetailDiscussion.fxml"));
             Parent root = loader.load();

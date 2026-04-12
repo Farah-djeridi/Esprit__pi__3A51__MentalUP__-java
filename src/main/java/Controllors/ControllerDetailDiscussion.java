@@ -171,6 +171,12 @@ public class ControllerDetailDiscussion {
     private void loadSujetDetails() {
         sujetTitre.setText(currentSujet.getTitre());
         sujetContenu.setText(currentSujet.getContenu());
+        sujetContenu.getParent().setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-padding: 20;" +
+                        "-fx-background-radius: 12;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10,0,0,2);"
+        );
 
         boolean isOwner = currentSujet.getIdUser() == currentUserId;
 
@@ -203,7 +209,14 @@ public class ControllerDetailDiscussion {
         sujetAvatar.setStyle("-fx-background-color: " + avatarColor + "; -fx-text-fill: white; -fx-font-weight: bold;");
 
         sujetDate.setText(formatDate(currentSujet.getDateCreation()));
-        nbVuesLabel.setText(currentSujet.getNbVues() + " vues");
+        nbVuesLabel.setText("👁 " + currentSujet.getNbVues());
+        nbVuesLabel.setStyle(
+                "-fx-background-color: #27AE6022;" +
+                        "-fx-text-fill: #27AE60;" +
+                        "-fx-padding: 5 12;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-font-weight: bold;"
+        );
 
         updateLikeDislikeButtons();
 
@@ -213,10 +226,10 @@ public class ControllerDetailDiscussion {
         if (isOwner) {
             topicMenuButton.getItems().clear();
 
-            MenuItem editItem = new MenuItem("✏️ Modifier");
+            MenuItem editItem = new MenuItem("✏ Modifier");
             editItem.setOnAction(e -> onEditSujet());
 
-            MenuItem deleteItem = new MenuItem("🗑️ Supprimer");
+            MenuItem deleteItem = new MenuItem("🗑 Supprimer");
             deleteItem.setStyle("-fx-text-fill: #E74C3C;");
             deleteItem.setOnAction(e -> onDeleteSujet());
 
@@ -232,14 +245,37 @@ public class ControllerDetailDiscussion {
         boolean hasDisliked = userVote != null && "dislike".equals(userVote.getType());
 
         likeButton.setText("👍 " + currentSujet.getNbLikes());
-        likeButton.setStyle("-fx-background-color: " + (hasLiked ? "#2C5F8A" : "transparent") +
-                "; -fx-text-fill: " + (hasLiked ? "white" : "#7F8C8D") +
-                "; -fx-cursor: hand; -fx-padding: 5 10; -fx-background-radius: 20;");
+        likeButton.setStyle(
+                "-fx-background-color: " + (hasLiked ? "#27AE60" : "transparent") + ";" +
+                        "-fx-text-fill: " + (hasLiked ? "white" : "#7F8C8D") + ";" +
+                        "-fx-padding: 6 14;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-cursor: hand;"
+        );
 
         dislikeButton.setText("👎 " + currentSujet.getNbDislikes());
-        dislikeButton.setStyle("-fx-background-color: " + (hasDisliked ? "#E74C3C" : "transparent") +
-                "; -fx-text-fill: " + (hasDisliked ? "white" : "#7F8C8D") +
-                "; -fx-cursor: hand; -fx-padding: 5 10; -fx-background-radius: 20;");
+        dislikeButton.setStyle(
+                "-fx-background-color: " + (hasDisliked ? "#E74C3C" : "transparent") + ";" +
+                        "-fx-text-fill: " + (hasDisliked ? "white" : "#7F8C8D") + ";" +
+                        "-fx-padding: 6 14;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-cursor: hand;"
+        );
+
+        // 🔥 Hover effects
+        likeButton.setOnMouseEntered(e -> {
+            if (!hasLiked)
+                likeButton.setStyle("-fx-background-color: #E8F8F5; -fx-text-fill: #27AE60; -fx-padding: 6 14; -fx-background-radius: 20;");
+        });
+
+        likeButton.setOnMouseExited(e -> updateLikeDislikeButtons());
+
+        dislikeButton.setOnMouseEntered(e -> {
+            if (!hasDisliked)
+                dislikeButton.setStyle("-fx-background-color: #FDEDEC; -fx-text-fill: #E74C3C; -fx-padding: 6 14; -fx-background-radius: 20;");
+        });
+
+        dislikeButton.setOnMouseExited(e -> updateLikeDislikeButtons());
 
         likeButton.setOnAction(e -> handleLike());
         dislikeButton.setOnAction(e -> handleDislike());
@@ -414,37 +450,18 @@ public class ControllerDetailDiscussion {
         VBox card = new VBox(10);
         card.setStyle("-fx-background-color: #F8FAFE; -fx-padding: 15; -fx-background-radius: 12; " +
                 "-fx-border-color: #E8EEF4; -fx-border-radius: 12; -fx-border-width: 1;");
+        card.setCursor(javafx.scene.Cursor.HAND);
 
         HBox header = new HBox(12);
 
         boolean isOwner = commentaire.getUserId() == currentUserId;
 
-        String authorText;
-        String avatarText;
-        String avatarColor;
+        String displayName = commentaire.isAnonyme() ? "A" :
+                (commentaire.getUserName() != null ? commentaire.getUserName() : "Utilisateur");
 
-        if (commentaire.isAnonyme()) {
-            authorText = "Anonyme";
-            avatarText = "A";
-            avatarColor = "#8E9EAB";
-        } else if (isOwner) {
-            authorText = "Vous";
-            avatarText = currentUserInitials;
-            avatarColor = "#2C5F8A";
-        } else {
-            String userName = commentaire.getUserName();
-            if (userName == null || userName.isEmpty()) {
-                authorText = "Utilisateur";
-                avatarText = "U";
-            } else {
-                authorText = userName;
-                avatarText = getInitials(userName);
-            }
-            avatarColor = "#6C8DA8";
-        }
+        Label avatar = new Label(commentaire.isAnonyme() ? "A" : getInitials(displayName));
 
-        Label avatar = new Label(avatarText);
-        avatar.setStyle("-fx-background-color: " + avatarColor +
+        avatar.setStyle("-fx-background-color: " + (commentaire.isAnonyme() ? "#8E9EAB" : "#2C5F8A") +
                 "; -fx-text-fill: white; -fx-padding: 10; -fx-background-radius: 50; " +
                 "-fx-font-weight: bold; -fx-font-size: 12px;");
         avatar.setPrefWidth(40);
@@ -454,55 +471,147 @@ public class ControllerDetailDiscussion {
         VBox contentBox = new VBox(5);
         HBox.setHgrow(contentBox, Priority.ALWAYS);
 
-        HBox authorDateBox = new HBox(10);
-        authorDateBox.setAlignment(Pos.CENTER_LEFT);
+        String authorText;
+        if (commentaire.isAnonyme()) authorText = "Anonyme";
+        else if (isOwner) authorText = "Vous";
+        else authorText = commentaire.getUserName() != null ? commentaire.getUserName() : "Utilisateur";
 
-        Label authorLabel = new Label(authorText);
-        authorLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #2C3E50;");
+        HBox metaData = new HBox(10);
 
-        Label dateLabel = new Label(formatDate(commentaire.getDateCommentaire()));
-        dateLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #7F8C8D;");
+        Label authorLabel = new Label("Par " + authorText);
+        authorLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #7F8C8D;");
 
-        authorDateBox.getChildren().addAll(authorLabel, dateLabel);
+        Label dot = new Label("•");
+        dot.setStyle("-fx-text-fill: #7F8C8D;");
 
-        Label contentLabel = new Label(commentaire.getContenu());
-        contentLabel.setWrapText(true);
-        contentLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #5A6C7D;");
+        Label dateValue = new Label(formatDate(commentaire.getDateCommentaire()));
+        dateValue.setStyle("-fx-font-size: 12px; -fx-text-fill: #7F8C8D;");
 
-        Button translateBtn = new Button("🌐 Traduire");
-        translateBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: #2C5F8A; -fx-cursor: hand; -fx-font-size: 11px;");
-        translateBtn.setOnAction(e -> translateText(commentaire.getContenu(), contentLabel, translateBtn));
+        metaData.getChildren().addAll(authorLabel, dot, dateValue);
 
-        contentBox.getChildren().addAll(authorDateBox, contentLabel, translateBtn);
+        Label content = new Label(commentaire.getContenu());
+        content.setWrapText(true);
+        content.setStyle("-fx-font-size: 13px; -fx-text-fill: #5A6C7D; -fx-font-weight: 500;");
 
+        contentBox.getChildren().addAll(metaData, content);
+
+        header.getChildren().addAll(avatar, contentBox);
+
+        // 🔥 ACTIONS (Like/Dislike pour commentaire)
+        HBox actionsBox = new HBox(10);
+        actionsBox.setAlignment(Pos.CENTER_RIGHT);
+        actionsBox.setStyle("-fx-padding: 10 0 0 0;");
+
+        Vote userVote = serviceVote.getUserVoteOnCommentaire(commentaire.getId());
+        boolean hasLiked = userVote != null && "like".equals(userVote.getType());
+        boolean hasDisliked = userVote != null && "dislike".equals(userVote.getType());
+
+        // Bouton Like
+        Button likeBtn = new Button("👍 " + commentaire.getNbLikes());
+        likeBtn.setStyle("-fx-background-color: " + (hasLiked ? "#27AE60" : "transparent") +
+                "; -fx-text-fill: " + (hasLiked ? "white" : "#7F8C8D") +
+                "; -fx-background-radius: 20; -fx-padding: 5 12;");
+
+        likeBtn.setOnMouseEntered(e -> {
+            if (!hasLiked)
+                likeBtn.setStyle("-fx-background-color: #E8F8F5; -fx-text-fill: #27AE60; -fx-background-radius: 20; -fx-padding: 5 12;");
+        });
+
+        likeBtn.setOnMouseExited(e -> {
+            likeBtn.setStyle("-fx-background-color: " + (hasLiked ? "#27AE60" : "transparent") +
+                    "; -fx-text-fill: " + (hasLiked ? "white" : "#7F8C8D") +
+                    "; -fx-background-radius: 20; -fx-padding: 5 12;");
+        });
+
+        likeBtn.setOnAction(e -> {
+            e.consume();
+            Vote currentVote = serviceVote.getUserVoteOnCommentaire(commentaire.getId());
+
+            if (currentVote != null && "like".equals(currentVote.getType())) {
+                serviceVote.removeVoteFromCommentaire(commentaire.getId());
+                commentaire.setNbLikes(commentaire.getNbLikes() - 1);
+            } else {
+                serviceVote.voteForCommentaire(commentaire.getId(), "like");
+                if (currentVote != null && "dislike".equals(currentVote.getType())) {
+                    commentaire.setNbDislikes(commentaire.getNbDislikes() - 1);
+                    commentaire.setNbLikes(commentaire.getNbLikes() + 1);
+                } else {
+                    commentaire.setNbLikes(commentaire.getNbLikes() + 1);
+                }
+            }
+            loadCommentaires();
+        });
+
+        // Bouton Dislike
+        Button dislikeBtn = new Button("👎 " + commentaire.getNbDislikes());
+        dislikeBtn.setStyle("-fx-background-color: " + (hasDisliked ? "#E74C3C" : "transparent") +
+                "; -fx-text-fill: " + (hasDisliked ? "white" : "#7F8C8D") +
+                "; -fx-background-radius: 20; -fx-padding: 5 12;");
+
+        dislikeBtn.setOnMouseEntered(e -> {
+            if (!hasDisliked)
+                dislikeBtn.setStyle("-fx-background-color: #FDEDEC; -fx-text-fill: #E74C3C; -fx-background-radius: 20; -fx-padding: 5 12;");
+        });
+
+        dislikeBtn.setOnMouseExited(e -> {
+            dislikeBtn.setStyle("-fx-background-color: " + (hasDisliked ? "#E74C3C" : "transparent") +
+                    "; -fx-text-fill: " + (hasDisliked ? "white" : "#7F8C8D") +
+                    "; -fx-background-radius: 20; -fx-padding: 5 12;");
+        });
+
+        dislikeBtn.setOnAction(e -> {
+            e.consume();
+            Vote currentVote = serviceVote.getUserVoteOnCommentaire(commentaire.getId());
+
+            if (currentVote != null && "dislike".equals(currentVote.getType())) {
+                serviceVote.removeVoteFromCommentaire(commentaire.getId());
+                commentaire.setNbDislikes(commentaire.getNbDislikes() - 1);
+            } else {
+                serviceVote.voteForCommentaire(commentaire.getId(), "dislike");
+                if (currentVote != null && "like".equals(currentVote.getType())) {
+                    commentaire.setNbLikes(commentaire.getNbLikes() - 1);
+                    commentaire.setNbDislikes(commentaire.getNbDislikes() + 1);
+                } else {
+                    commentaire.setNbDislikes(commentaire.getNbDislikes() + 1);
+                }
+            }
+            loadCommentaires();
+        });
+
+        actionsBox.getChildren().addAll(likeBtn, dislikeBtn);
+
+        // Menu actions (Modifier/Supprimer) pour le propriétaire
         if (isOwner) {
-            MenuButton commentMenuButton = new MenuButton("⋮");
-            commentMenuButton.setStyle("-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 5 10;");
+            MenuButton actionsMenu = new MenuButton("⋮");
+            actionsMenu.setStyle("-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 5 10;");
 
             MenuItem editItem = new MenuItem("✏️ Modifier");
-            editItem.setOnAction(e -> editComment(commentaire, contentLabel, commentMenuButton));
+            editItem.setOnAction(e -> editComment(commentaire, content, actionsMenu));
 
             MenuItem deleteItem = new MenuItem("🗑️ Supprimer");
             deleteItem.setStyle("-fx-text-fill: #E74C3C;");
             deleteItem.setOnAction(e -> deleteComment(commentaire));
 
-            commentMenuButton.getItems().addAll(editItem, new SeparatorMenuItem(), deleteItem);
-
-            HBox actionBox = new HBox(commentMenuButton);
-            actionBox.setAlignment(Pos.CENTER_RIGHT);
-
-            HBox headerWithActions = new HBox();
-            headerWithActions.setHgrow(contentBox, Priority.ALWAYS);
-            headerWithActions.getChildren().addAll(contentBox, actionBox);
-            header.getChildren().addAll(avatar, headerWithActions);
-        } else {
-            header.getChildren().addAll(avatar, contentBox);
+            actionsMenu.getItems().addAll(editItem, new SeparatorMenuItem(), deleteItem);
+            actionsBox.getChildren().add(actionsMenu);
         }
 
-        card.getChildren().add(header);
+        card.getChildren().addAll(header, actionsBox);
+
+        // Effet hover
+        card.setOnMouseEntered(e -> {
+            card.setStyle("-fx-background-color: #F8FAFE; -fx-padding: 15; -fx-background-radius: 12; " +
+                    "-fx-border-color: #D6EAF8; -fx-border-radius: 12; -fx-border-width: 1; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);");
+        });
+
+        card.setOnMouseExited(e -> {
+            card.setStyle("-fx-background-color: #F8FAFE; -fx-padding: 15; -fx-background-radius: 12; " +
+                    "-fx-border-color: #E8EEF4; -fx-border-radius: 12; -fx-border-width: 1;");
+        });
+
         return card;
     }
-
     // ========== VALIDATION DES CHAMPS ==========
 
     private boolean validateCommentContent(String content) {

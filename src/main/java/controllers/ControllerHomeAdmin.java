@@ -1,6 +1,9 @@
 package controllers;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -9,6 +12,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
+import javafx.stage.Stage;
 
 public class ControllerHomeAdmin {
 
@@ -74,8 +78,7 @@ public class ControllerHomeAdmin {
 
     @FXML
     void onNavRdvClicked(MouseEvent event) {
-        setActiveNav(navRdv);
-        System.out.println("Rendez-vous");
+        loadPage(event, "/gui/AdminRdv.fxml");
     }
 
     @FXML
@@ -92,8 +95,7 @@ public class ControllerHomeAdmin {
 
     @FXML
     void onNavDossiersClicked(MouseEvent event) {
-        setActiveNav(navDossiers);
-        System.out.println("Dossiers médicaux");
+        loadPage(event, "/gui/AdminDossiers.fxml");
     }
 
     @FXML
@@ -189,4 +191,20 @@ public class ControllerHomeAdmin {
         }
         if (activeNav != null) activeNav.setStyle("-fx-background-color: #34495E; -fx-background-radius: 8; -fx-padding: 10 14; -fx-cursor: hand;");
     }
+
+
+    // ── Helper navigation ──
+    private void loadPage(MouseEvent event, String path) {
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource(path));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new javafx.scene.Scene(root));
+            stage.show();
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+
+
+
+
 }

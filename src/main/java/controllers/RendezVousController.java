@@ -40,7 +40,7 @@ public class RendezVousController {
 
         filtreStatut.getItems().addAll("libre", "réservé", "confirmé");
         filtreType.getItems().addAll("consultation", "suivi");
-
+        filtreStatut.getItems().add("en attente");
         loadData();
     }
 
@@ -86,16 +86,14 @@ public class RendezVousController {
             btnDelete.setStyle("-fx-background-color: red; -fx-text-fill: white;");
 
             btnConfirm.setOnAction(e -> {
-                r.setStatut("confirmé");
-                service.update(r);
+                service.confirmerRdv(r.getId());
                 loadData();
             });
 
             btnDelete.setOnAction(e -> {
-
+                service.delete(r.getId());
                 loadData();
             });
-
             HBox actions = new HBox(10, btnConfirm, btnDelete);
 
             card.getChildren().addAll(date, heure, type, statut, actions);
@@ -106,17 +104,18 @@ public class RendezVousController {
 
     // ================= COLORS =================
     private String getColorStyle(String statut) {
-        switch (statut) {
+        switch (statut.toLowerCase()) {
             case "libre":
                 return "-fx-background-color: green; -fx-text-fill: white; -fx-padding:5;";
             case "réservé":
-                return "-fx-background-color: orange; -fx-padding:5;";
+                return "-fx-background-color: orange; -fx-text-fill: white; -fx-padding:5;";
             case "confirmé":
                 return "-fx-background-color: blue; -fx-text-fill: white; -fx-padding:5;";
             default:
                 return "";
         }
     }
+
 
     // ================= FILTERS =================
     @FXML

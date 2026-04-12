@@ -100,7 +100,7 @@ public class CalendrierController {
         }
 
         // Rows heures
-        List<RendezVous> rdvs = service.getAll();
+        List<RendezVous> rdvs = service.getByPsychologueId(2);
         for (int h = 0; h < (HOUR_END - HOUR_START); h++) {
             int hour = HOUR_START + h;
             int row  = h + 1;
@@ -155,6 +155,7 @@ public class CalendrierController {
         String bg = isToday ? "#f5faff" : "white";
 
         StackPane cell = new StackPane();
+
         cell.setMinHeight(CELL_HEIGHT);
         cell.setMaxWidth(Double.MAX_VALUE);
         cell.setStyle("-fx-background-color:" + bg +
@@ -169,6 +170,7 @@ public class CalendrierController {
                 StackPane.setAlignment(rdvBox, Pos.TOP_LEFT);
                 StackPane.setMargin(rdvBox, new Insets(2));
                 cell.setOnMouseClicked(e -> ouvrirDialogEdition(r));
+
                 return cell;
             }
         }
@@ -363,13 +365,15 @@ public class CalendrierController {
                                 ComboBox cbStat, ComboBox cbType, int id) {
         try {
             RendezVous r = new RendezVous();
+            buildCalendar(); // ✔️ refresh
             r.setId(id);
             r.setDate(Date.valueOf(dp.getValue()));
             r.setHeureDebut(Time.valueOf(tfS.getText().trim() + ":00"));
             r.setHeureFin(Time.valueOf(tfE.getText().trim() + ":00"));
             r.setStatut((String) cbStat.getValue());
             r.setTypeRdv((String) cbType.getValue());
-            r.setPsychologueId(1);
+            r.setPsychologueId(2);
+
             return r;
         } catch (Exception ex) {
             new Alert(Alert.AlertType.ERROR, "Format heure invalide (HH:mm)").showAndWait();

@@ -86,7 +86,7 @@ public class ControllerHome {
     // 🔹 Navigation
     @FXML
     void onNavHomeClicked(MouseEvent event) {
-        loadPage("/Home.fxml", event);
+        loadPage("/gui/Home.fxml", event);
     }
 
     @FXML
@@ -96,9 +96,8 @@ public class ControllerHome {
 
     @FXML
     private void onNavRdvClicked(MouseEvent event) {
-        System.out.println("Rendez-vous");
+        loadPage("/gui/RendezVous_Etudiant.fxml", event);
     }
-
     @FXML
     private void onNavBlogClicked(MouseEvent event) {
         loadPage("/forum.fxml", event);

@@ -3,7 +3,11 @@ package services;
 import models.Objectif;
 import utils.MyDataBase;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +22,7 @@ public class ServiceObjectifAdmin {
     }
 
     public List<Objectif> afficherTous() {
-        List<Objectif> liste = new ArrayList<>();
+        List<Objectif> liste = new ArrayList<Objectif>();
         String sql = "SELECT * FROM objectif ORDER BY id DESC";
 
         try (PreparedStatement ps = cnx.prepareStatement(sql);
@@ -36,9 +40,9 @@ public class ServiceObjectifAdmin {
     }
 
     public List<Objectif> filtrer(String titre, String statut) {
-        List<Objectif> liste = new ArrayList<>();
+        List<Objectif> liste = new ArrayList<Objectif>();
         StringBuilder sql = new StringBuilder("SELECT * FROM objectif WHERE 1=1");
-        List<Object> params = new ArrayList<>();
+        List<Object> params = new ArrayList<Object>();
 
         if (titre != null && !titre.isEmpty()) {
             sql.append(" AND LOWER(titre) LIKE ?");
@@ -111,16 +115,15 @@ public class ServiceObjectifAdmin {
     }
 
     public Map<String, Integer> getStatistiques() {
-        Map<String, Integer> stats = new HashMap<>();
+        Map<String, Integer> stats = new HashMap<String, Integer>();
 
-        String sql = """
-                SELECT
-                    COUNT(*) AS total,
-                    SUM(CASE WHEN LOWER(statut_objectif) = 'en cours' THEN 1 ELSE 0 END) AS en_cours,
-                    SUM(CASE WHEN LOWER(statut_objectif) LIKE 'atteint%' THEN 1 ELSE 0 END) AS atteints,
-                    SUM(CASE WHEN LOWER(statut_objectif) LIKE 'annul%' THEN 1 ELSE 0 END) AS annules
-                FROM objectif
-                """;
+        String sql =
+                "SELECT " +
+                        "COUNT(*) AS total, " +
+                        "SUM(CASE WHEN LOWER(statut_objectif) = 'en cours' THEN 1 ELSE 0 END) AS en_cours, " +
+                        "SUM(CASE WHEN LOWER(statut_objectif) LIKE 'atteint%' THEN 1 ELSE 0 END) AS atteints, " +
+                        "SUM(CASE WHEN LOWER(statut_objectif) LIKE 'annul%' THEN 1 ELSE 0 END) AS annules " +
+                        "FROM objectif";
 
         try (PreparedStatement ps = cnx.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -137,6 +140,58 @@ public class ServiceObjectifAdmin {
         }
 
         return stats;
+    }
+
+    public List<Map<String, Object>> getRepartitionStatuts() {
+        List<Map<String, Object>> liste = new ArrayList<Map<String, Object>>();
+
+        String sql =
+                "SELECT statut_objectif, COUNT(*) AS total " +
+                        "FROM objectif " +
+                        "GROUP BY statut_objectif " +
+                        "ORDER BY total DESC";
+
+        try (PreparedStatement ps = cnx.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Map<String, Object> row = new HashMap<String, Object>();
+                row.put("statut", rs.getString("statut_objectif"));
+                row.put("total", rs.getInt("total"));
+                liste.add(row);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur répartition statuts : " + e.getMessage(), e);
+        }
+
+        return liste;
+    }
+
+    public List<Map<String, Object>> getProgressionMoyenneParStatut() {
+        List<Map<String, Object>> liste = new ArrayList<Map<String, Object>>();
+
+        String sql =
+                "SELECT statut_objectif, AVG(progression) AS moyenne_progression " +
+                        "FROM objectif " +
+                        "GROUP BY statut_objectif " +
+                        "ORDER BY moyenne_progression DESC";
+
+        try (PreparedStatement ps = cnx.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Map<String, Object> row = new HashMap<String, Object>();
+                row.put("statut", rs.getString("statut_objectif"));
+                row.put("moyenne_progression", rs.getDouble("moyenne_progression"));
+                liste.add(row);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur progression moyenne par statut : " + e.getMessage(), e);
+        }
+
+        return liste;
     }
 
     public String getNomUtilisateurParId(int userId) {
@@ -179,7 +234,6 @@ public class ServiceObjectifAdmin {
         o.setValeurCible(rs.getDouble("valeur_cible"));
         o.setUserId(rs.getInt("user_id"));
 
-        // On ignore id_activite ici pour éviter l'erreur
         o.setIdActivite(null);
 
         return o;

@@ -1,9 +1,26 @@
 package controllers;
 
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
+import javafx.scene.Node;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.PieChart;
+import javafx.scene.chart.XYChart;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import models.Objectif;
 import services.ServiceObjectifAdmin;
@@ -23,13 +40,36 @@ public class ObjectifAdminController {
     @FXML private Label lblAtteints;
     @FXML private Label lblAnnules;
 
+    @FXML private PieChart pieChartStatuts;
+    @FXML private BarChart<String, Number> barChartProgressionStatut;
+    @FXML private CategoryAxis xAxisProgressionStatut;
+    @FXML private NumberAxis yAxisProgressionStatut;
+
     private final ServiceObjectifAdmin service = new ServiceObjectifAdmin();
 
     @FXML
     public void initialize() {
         comboStatut.getItems().addAll("En cours", "Atteint", "Annulé");
+
+        if (xAxisProgressionStatut != null) {
+            xAxisProgressionStatut.setAnimated(false);
+            xAxisProgressionStatut.setTickLabelRotation(-10);
+        }
+
+        if (yAxisProgressionStatut != null) {
+            yAxisProgressionStatut.setAnimated(false);
+            yAxisProgressionStatut.setAutoRanging(true);
+            yAxisProgressionStatut.setForceZeroInRange(false);
+        }
+
+        if (barChartProgressionStatut != null) {
+            barChartProgressionStatut.setAnimated(false);
+            barChartProgressionStatut.setLegendVisible(false);
+        }
+
         chargerObjectifs();
         chargerStatistiques();
+        chargerCharts();
     }
 
     private void chargerObjectifs() {
@@ -50,6 +90,134 @@ public class ObjectifAdminController {
             lblAnnules.setText(String.valueOf(stats.getOrDefault("annules", 0)));
         } catch (Exception e) {
             showError("Erreur", "Erreur lors du chargement des statistiques : " + e.getMessage());
+        }
+    }
+
+    private void chargerCharts() {
+        chargerPieChartStatuts();
+        chargerBarChartProgressionStatut();
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                appliquerCouleursCharts();
+
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        appliquerCouleursCharts();
+                    }
+                });
+            }
+        });
+    }
+
+    private void chargerPieChartStatuts() {
+        if (pieChartStatuts == null) {
+            return;
+        }
+
+        ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
+        List<Map<String, Object>> data = service.getRepartitionStatuts();
+
+        for (Map<String, Object> row : data) {
+            String statut = String.valueOf(row.get("statut"));
+            Number total = (Number) row.get("total");
+            pieData.add(new PieChart.Data(statut, total.doubleValue()));
+        }
+
+        pieChartStatuts.setData(pieData);
+        pieChartStatuts.setTitle("Statuts");
+        pieChartStatuts.setLegendVisible(false);
+        pieChartStatuts.setLabelsVisible(true);
+    }
+
+    private void chargerBarChartProgressionStatut() {
+        if (barChartProgressionStatut == null) {
+            return;
+        }
+
+        barChartProgressionStatut.getData().clear();
+        barChartProgressionStatut.setLegendVisible(false);
+        barChartProgressionStatut.setAnimated(false);
+
+        XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
+        series.setName("Progression moyenne");
+
+        List<Map<String, Object>> data = service.getProgressionMoyenneParStatut();
+
+        for (Map<String, Object> row : data) {
+            String statut = String.valueOf(row.get("statut"));
+            Number moyenne = (Number) row.get("moyenne_progression");
+            XYChart.Data<String, Number> chartData = new XYChart.Data<String, Number>(statut, moyenne);
+            series.getData().add(chartData);
+        }
+
+        barChartProgressionStatut.getData().add(series);
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                for (XYChart.Data<String, Number> dataItem : series.getData()) {
+                    Node node = dataItem.getNode();
+                    if (node != null) {
+                        node.setStyle("-fx-bar-fill: #AAB8C7;");
+                    }
+                }
+            }
+        });
+    }
+
+    private void appliquerCouleursCharts() {
+        if (pieChartStatuts != null && pieChartStatuts.getData() != null) {
+            String[] pieColors = {
+                    "#A8C3BC",
+                    "#B7C9E2",
+                    "#CBBBAF",
+                    "#C7D7C0",
+                    "#D6C6E1",
+                    "#BFCAD6"
+            };
+
+            int i = 0;
+            for (PieChart.Data data : pieChartStatuts.getData()) {
+                Node node = data.getNode();
+                if (node != null) {
+                    node.setStyle("-fx-pie-color: " + pieColors[i % pieColors.length] + ";");
+                }
+                i++;
+            }
+
+            Node pieTitle = pieChartStatuts.lookup(".chart-title");
+            if (pieTitle != null) {
+                pieTitle.setStyle("-fx-text-fill: #223A5E; -fx-font-size: 16px; -fx-font-weight: bold;");
+            }
+        }
+
+        if (barChartProgressionStatut != null) {
+            for (Node node : barChartProgressionStatut.lookupAll(".default-color0.chart-bar")) {
+                node.setStyle("-fx-bar-fill: #AAB8C7;");
+            }
+
+            for (XYChart.Series<String, Number> series : barChartProgressionStatut.getData()) {
+                for (XYChart.Data<String, Number> data : series.getData()) {
+                    Node node = data.getNode();
+                    if (node != null) {
+                        node.setStyle("-fx-bar-fill: #AAB8C7;");
+                    }
+                }
+            }
+
+            styliserAxes(barChartProgressionStatut);
+        }
+    }
+
+    private void styliserAxes(javafx.scene.chart.Chart chart) {
+        for (Node node : chart.lookupAll(".axis")) {
+            node.setStyle("-fx-tick-label-fill: #5B6B7A;");
+        }
+        for (Node node : chart.lookupAll(".axis-label")) {
+            node.setStyle("-fx-text-fill: #50627A; -fx-font-weight: bold;");
         }
     }
 
@@ -78,9 +246,19 @@ public class ObjectifAdminController {
         containerObjectifs.getChildren().clear();
 
         if (liste == null || liste.isEmpty()) {
+            VBox videCard = new VBox(8);
+            videCard.setStyle(
+                    "-fx-background-color: white;" +
+                            "-fx-background-radius: 18;" +
+                            "-fx-padding: 20;" +
+                            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);"
+            );
+
             Label vide = new Label("Aucun objectif trouvé.");
             vide.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 14px;");
-            containerObjectifs.getChildren().add(vide);
+
+            videCard.getChildren().add(vide);
+            containerObjectifs.getChildren().add(videCard);
             return;
         }
 
@@ -90,93 +268,127 @@ public class ObjectifAdminController {
     }
 
     private HBox createRow(Objectif o) {
-        HBox row = new HBox(20);
-        row.setStyle("""
-                -fx-padding: 10 0 10 0;
-                -fx-border-color: transparent transparent #E5E7EB transparent;
-                -fx-border-width: 0 0 1 0;
-                """);
+        HBox row = new HBox(14);
+        row.setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-background-radius: 16;" +
+                        "-fx-padding: 14;" +
+                        "-fx-border-color: #E5E7EB;" +
+                        "-fx-border-radius: 16;"
+        );
 
         VBox userBox = new VBox(3);
-        userBox.setPrefWidth(250);
+        userBox.setPrefWidth(180);
+        userBox.setMinWidth(180);
+
         Label lblUser = new Label(service.getNomUtilisateurParId(o.getUserId()));
-        lblUser.setStyle("-fx-font-size: 14px; -fx-text-fill: #1F2937;");
+        lblUser.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #1F2937;");
+        lblUser.setWrapText(true);
         userBox.getChildren().add(lblUser);
 
-        VBox titreBox = new VBox(3);
-        titreBox.setPrefWidth(420);
+        VBox titreBox = new VBox(4);
+        titreBox.setPrefWidth(300);
+        titreBox.setMinWidth(300);
+
         Label lblTitre = new Label(o.getTitre());
-        lblTitre.setStyle("-fx-font-size: 14px; -fx-text-fill: #1F2937;");
-        titreBox.getChildren().add(lblTitre);
+        lblTitre.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #1F2937;");
+        lblTitre.setWrapText(true);
+
+        Label lblDates = new Label("Début : " + o.getDateDebut() + " | Fin : " + o.getDateFin());
+        lblDates.setStyle("-fx-font-size: 12px; -fx-text-fill: #6B7280;");
+        lblDates.setWrapText(true);
+
+        titreBox.getChildren().addAll(lblTitre, lblDates);
+
+        VBox typeBox = new VBox(3);
+        typeBox.setPrefWidth(110);
+        typeBox.setMinWidth(110);
+
+        Label lblType = new Label(o.getTypeObjectif() == null ? "" : o.getTypeObjectif());
+        lblType.setStyle("-fx-font-size: 13px; -fx-text-fill: #4B5563;");
+        lblType.setWrapText(true);
+        typeBox.getChildren().add(lblType);
 
         VBox statutBox = new VBox();
-        statutBox.setPrefWidth(220);
+        statutBox.setPrefWidth(120);
+        statutBox.setMinWidth(120);
+
         Label badge = createStatutBadge(o.getStatutObjectif());
         statutBox.getChildren().add(badge);
 
-        VBox progressionBox = new VBox(4);
-        progressionBox.setPrefWidth(280);
+        VBox progressionBox = new VBox(6);
+        progressionBox.setPrefWidth(180);
+        progressionBox.setMinWidth(180);
 
         double progress = Math.max(0, Math.min(100, o.getProgression())) / 100.0;
         ProgressBar bar = new ProgressBar(progress);
-        bar.setPrefWidth(180);
+        bar.setPrefWidth(150);
+        bar.setStyle("-fx-accent: #8FA6B8;");
 
         Label lblProg = new Label(o.getProgression() + "%");
-        lblProg.setStyle("-fx-text-fill: #4B5563; -fx-font-size: 13px;");
+        lblProg.setStyle("-fx-text-fill: #4B5563; -fx-font-size: 13px; -fx-font-weight: bold;");
 
         progressionBox.getChildren().addAll(bar, lblProg);
 
         HBox actions = new HBox(8);
-        actions.setPrefWidth(130);
+        actions.setPrefWidth(170);
+        actions.setMinWidth(170);
+        actions.setMaxWidth(170);
+        HBox.setHgrow(actions, Priority.NEVER);
 
-        Button btnModifier = new Button("✎");
-        btnModifier.setStyle("""
-                -fx-background-color: white;
-                -fx-text-fill: #2563EB;
-                -fx-border-color: #2563EB;
-                -fx-border-radius: 8;
-                -fx-background-radius: 8;
-                -fx-font-weight: bold;
-                -fx-cursor: hand;
-                """);
+        Button btnModifier = new Button("Modifier");
+        btnModifier.setPrefWidth(80);
+        btnModifier.setMinWidth(80);
+        btnModifier.setMaxWidth(80);
+        btnModifier.setStyle(
+                "-fx-background-color: #8E9AAF;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-background-radius: 10;" +
+                        "-fx-cursor: hand;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-padding: 8 10;"
+        );
 
-        Button btnSupprimer = new Button("🗑");
-        btnSupprimer.setStyle("""
-                -fx-background-color: white;
-                -fx-text-fill: #EF4444;
-                -fx-border-color: #EF4444;
-                -fx-border-radius: 8;
-                -fx-background-radius: 8;
-                -fx-font-weight: bold;
-                -fx-cursor: hand;
-                """);
+        Button btnSupprimer = new Button("Supprimer");
+        btnSupprimer.setPrefWidth(82);
+        btnSupprimer.setMinWidth(82);
+        btnSupprimer.setMaxWidth(82);
+        btnSupprimer.setStyle(
+                "-fx-background-color: #B98C8C;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-background-radius: 10;" +
+                        "-fx-cursor: hand;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-padding: 8 10;"
+        );
 
         btnModifier.setOnAction(e -> modifierObjectif(o));
         btnSupprimer.setOnAction(e -> supprimerObjectif(o));
 
         actions.getChildren().addAll(btnModifier, btnSupprimer);
 
-        row.getChildren().addAll(userBox, titreBox, statutBox, progressionBox, actions);
+        row.getChildren().addAll(userBox, titreBox, typeBox, statutBox, progressionBox, actions);
         return row;
     }
 
     private Label createStatutBadge(String statut) {
         String s = statut == null ? "" : statut.toLowerCase();
 
-        String bg = "#FBBF24";
+        String bg = "#D4C4A8";
+        String textColor = "#4B5563";
 
         if (s.contains("atteint")) {
-            bg = "#10B981";
+            bg = "#C7D7C0";
         } else if (s.contains("annul")) {
-            bg = "#EF4444";
+            bg = "#D6C6E1";
         } else if (s.contains("cours")) {
-            bg = "#FBBF24";
+            bg = "#B7C9E2";
         }
 
         Label badge = new Label(statut == null ? "" : statut);
         badge.setStyle(
                 "-fx-background-color: " + bg + ";" +
-                        "-fx-text-fill: white;" +
+                        "-fx-text-fill: " + textColor + ";" +
                         "-fx-padding: 6 16;" +
                         "-fx-background-radius: 20;" +
                         "-fx-font-weight: bold;"
@@ -185,34 +397,62 @@ public class ObjectifAdminController {
     }
 
     private void modifierObjectif(Objectif o) {
-        Dialog<ButtonType> dialog = new Dialog<>();
+        Dialog<ButtonType> dialog = new Dialog<ButtonType>();
         dialog.setTitle("Modifier objectif");
         dialog.setHeaderText("Modification de l'objectif #" + o.getId());
 
-        ButtonType okButton = new ButtonType("Enregistrer", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(okButton, ButtonType.CANCEL);
+        dialog.getDialogPane().setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-padding: 20;"
+        );
 
-        VBox content = new VBox(10);
+        ButtonType okButtonType = new ButtonType("Enregistrer", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
 
-        TextField titreField = new TextField(o.getTitre());
+        VBox content = new VBox(12);
+        content.setStyle("-fx-padding: 10;");
 
-        ComboBox<String> statutField = new ComboBox<>();
+        TextField titreField = createStyledField(o.getTitre());
+
+        ComboBox<String> statutField = new ComboBox<String>();
         statutField.getItems().addAll("En cours", "Atteint", "Annulé");
         statutField.setValue(o.getStatutObjectif());
+        statutField.setStyle("-fx-background-radius: 12;");
 
-        TextField progressionField = new TextField(String.valueOf(o.getProgression()));
+        TextField progressionField = createStyledField(String.valueOf(o.getProgression()));
 
         content.getChildren().addAll(
-                new Label("Titre"), titreField,
-                new Label("Statut"), statutField,
-                new Label("Progression"), progressionField
+                createPopupLabel("Titre"), titreField,
+                createPopupLabel("Statut"), statutField,
+                createPopupLabel("Progression"), progressionField
         );
 
         dialog.getDialogPane().setContent(content);
 
+        Button ok = (Button) dialog.getDialogPane().lookupButton(okButtonType);
+        ok.setStyle(
+                "-fx-background-color: linear-gradient(to right, #8E9AAF, #7D8CA3);" +
+                        "-fx-text-fill: white;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-padding: 10 20;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-cursor: hand;"
+        );
+
+        Button cancel = (Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL);
+        cancel.setStyle(
+                "-fx-background-color: #E8EDF2;" +
+                        "-fx-text-fill: #4B5563;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-padding: 10 20;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-cursor: hand;"
+        );
+
         Optional<ButtonType> result = dialog.showAndWait();
 
-        if (result.isPresent() && result.get() == okButton) {
+        if (result.isPresent() && result.get() == okButtonType) {
             try {
                 String titre = titreField.getText().trim();
                 String statut = statutField.getValue();
@@ -240,6 +480,7 @@ public class ObjectifAdminController {
                 service.modifier(o);
                 chargerObjectifs();
                 chargerStatistiques();
+                chargerCharts();
 
                 showInfo("Succès", "Objectif modifié avec succès.");
 
@@ -254,8 +495,36 @@ public class ObjectifAdminController {
     private void supprimerObjectif(Objectif o) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirmation");
-        confirm.setHeaderText(null);
-        confirm.setContentText("Supprimer cet objectif ?");
+        confirm.setHeaderText("Supprimer cet objectif ?");
+        confirm.setContentText("Cette action est irréversible.");
+
+        confirm.getDialogPane().setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-background-radius: 18;" +
+                        "-fx-padding: 20;"
+        );
+
+        Button ok = (Button) confirm.getDialogPane().lookupButton(ButtonType.OK);
+        ok.setText("Supprimer");
+        ok.setStyle(
+                "-fx-background-color: #B98C8C;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-padding: 10 20;" +
+                        "-fx-cursor: hand;"
+        );
+
+        Button cancel = (Button) confirm.getDialogPane().lookupButton(ButtonType.CANCEL);
+        cancel.setText("Annuler");
+        cancel.setStyle(
+                "-fx-background-color: #E8EDF2;" +
+                        "-fx-text-fill: #4B5563;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-padding: 10 20;" +
+                        "-fx-cursor: hand;"
+        );
 
         Optional<ButtonType> result = confirm.showAndWait();
 
@@ -264,6 +533,7 @@ public class ObjectifAdminController {
                 service.supprimer(o);
                 chargerObjectifs();
                 chargerStatistiques();
+                chargerCharts();
 
                 showInfo("Succès", "Objectif supprimé avec succès.");
 
@@ -273,11 +543,44 @@ public class ObjectifAdminController {
         }
     }
 
+    private TextField createStyledField(String value) {
+        TextField field = new TextField(value);
+        field.setStyle(
+                "-fx-background-radius: 12;" +
+                        "-fx-border-radius: 12;" +
+                        "-fx-border-color: #DCE3EA;" +
+                        "-fx-padding: 10;"
+        );
+        return field;
+    }
+
+    private Label createPopupLabel(String text) {
+        Label label = new Label(text);
+        label.setStyle("-fx-font-size: 13px; -fx-text-fill: #6B7280; -fx-font-weight: bold;");
+        return label;
+    }
+
     private void showInfo(String title, String message) {
         Alert a = new Alert(Alert.AlertType.INFORMATION);
         a.setTitle(title);
         a.setHeaderText(null);
         a.setContentText(message);
+        a.getDialogPane().setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-background-radius: 18;" +
+                        "-fx-padding: 20;"
+        );
+
+        Button ok = (Button) a.getDialogPane().lookupButton(ButtonType.OK);
+        ok.setStyle(
+                "-fx-background-color: linear-gradient(to right, #9BB7A5, #89A393);" +
+                        "-fx-text-fill: white;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-padding: 10 20;" +
+                        "-fx-cursor: hand;"
+        );
+
         a.showAndWait();
     }
 
@@ -286,6 +589,22 @@ public class ObjectifAdminController {
         a.setTitle(title);
         a.setHeaderText(null);
         a.setContentText(message);
+        a.getDialogPane().setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-background-radius: 18;" +
+                        "-fx-padding: 20;"
+        );
+
+        Button ok = (Button) a.getDialogPane().lookupButton(ButtonType.OK);
+        ok.setStyle(
+                "-fx-background-color: #B98C8C;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-padding: 10 20;" +
+                        "-fx-cursor: hand;"
+        );
+
         a.showAndWait();
     }
 }

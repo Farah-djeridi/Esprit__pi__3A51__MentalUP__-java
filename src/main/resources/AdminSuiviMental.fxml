@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -14,7 +15,7 @@
         <VBox spacing="20"
               style="-fx-padding: 24; -fx-background-color: #F4F8FF;">
 
-            <!-- Titre -->
+            <!-- Titre principal -->
             <VBox spacing="8"
                   style="-fx-background-color: white;
                          -fx-background-radius: 18;
@@ -22,7 +23,7 @@
                          -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
                 <Label text="Suivis mentaux par utilisateur"
                        style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #223A5E;"/>
-                <Label text="Affichage actuel : suivis liés à user_id = 2"
+                <Label text="Affichage de tous les suivis mentaux"
                        style="-fx-font-size: 13px; -fx-text-fill: #6B7280;"/>
             </VBox>
 
@@ -37,7 +38,7 @@
                        style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #223A5E;"/>
 
                 <FlowPane hgap="14" vgap="14" prefWrapLength="900">
-                    <VBox style="-fx-background-color: linear-gradient(to right, #6D5EF6, #4F46E5);
+                    <VBox style="-fx-background-color: linear-gradient(to right, #8E9AAF, #7D8CA3);
                                  -fx-background-radius: 16;
                                  -fx-padding: 16;"
                           prefWidth="200">
@@ -48,7 +49,7 @@
                     </VBox>
 
                     <VBox style="-fx-background-color: white;
-                                 -fx-border-color: #E5E7EB;
+                                 -fx-border-color: #DCE3EA;
                                  -fx-border-radius: 16;
                                  -fx-background-radius: 16;
                                  -fx-padding: 16;"
@@ -56,11 +57,11 @@
                         <Label text="Score mental moyen"
                                style="-fx-text-fill: #6B7280; -fx-font-size: 13px; -fx-font-weight: bold;"/>
                         <Label fx:id="lblScoreMoyen" text="0"
-                               style="-fx-text-fill: #223A5E; -fx-font-size: 26px; -fx-font-weight: bold;"/>
+                               style="-fx-text-fill: #50627A; -fx-font-size: 26px; -fx-font-weight: bold;"/>
                     </VBox>
 
                     <VBox style="-fx-background-color: white;
-                                 -fx-border-color: #E5E7EB;
+                                 -fx-border-color: #DCE3EA;
                                  -fx-border-radius: 16;
                                  -fx-background-radius: 16;
                                  -fx-padding: 16;"
@@ -68,11 +69,11 @@
                         <Label text="Stress moyen"
                                style="-fx-text-fill: #6B7280; -fx-font-size: 13px; -fx-font-weight: bold;"/>
                         <Label fx:id="lblStressMoyen" text="0"
-                               style="-fx-text-fill: #223A5E; -fx-font-size: 26px; -fx-font-weight: bold;"/>
+                               style="-fx-text-fill: #50627A; -fx-font-size: 26px; -fx-font-weight: bold;"/>
                     </VBox>
 
                     <VBox style="-fx-background-color: white;
-                                 -fx-border-color: #E5E7EB;
+                                 -fx-border-color: #DCE3EA;
                                  -fx-border-radius: 16;
                                  -fx-background-radius: 16;
                                  -fx-padding: 16;"
@@ -80,12 +81,12 @@
                         <Label text="Énergie moyenne"
                                style="-fx-text-fill: #6B7280; -fx-font-size: 13px; -fx-font-weight: bold;"/>
                         <Label fx:id="lblEnergieMoyenne" text="0"
-                               style="-fx-text-fill: #223A5E; -fx-font-size: 26px; -fx-font-weight: bold;"/>
+                               style="-fx-text-fill: #50627A; -fx-font-size: 26px; -fx-font-weight: bold;"/>
                     </VBox>
                 </FlowPane>
             </VBox>
 
-            <!-- Statistiques par user -->
+            <!-- Statistiques par utilisateur -->
             <VBox spacing="14"
                   style="-fx-background-color: white;
                          -fx-background-radius: 18;
@@ -98,7 +99,91 @@
                 <FlowPane fx:id="containerStatsUsers" hgap="14" vgap="14" prefWrapLength="900"/>
             </VBox>
 
-            <!-- Recherche -->
+            <!-- Charts -->
+            <VBox spacing="14"
+                  style="-fx-background-color: white;
+                         -fx-background-radius: 18;
+                         -fx-padding: 18;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
+
+                <Label text="Visualisation des statistiques"
+                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #223A5E;"/>
+
+                <HBox spacing="16">
+                    <VBox HBox.hgrow="ALWAYS"
+                          style="-fx-background-color: #F7F9FB;
+                                 -fx-background-radius: 16;
+                                 -fx-padding: 14;">
+                        <Label text="Évolution du score mental"
+                               style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #3F5368;"/>
+                        <LineChart fx:id="lineChartScoreMental"
+                                   prefHeight="220"
+                                   createSymbols="true"
+                                   animated="false"
+                                   legendVisible="false"
+                                   style="-fx-background-color: transparent;">
+                            <xAxis>
+                                <CategoryAxis fx:id="xAxisScoreMental"
+                                              label="Dates"
+                                              tickLabelRotation="0"
+                                              tickLabelFill="#4B5563"/>
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis fx:id="yAxisScoreMental"
+                                            label="Score mental"
+                                            tickLabelFill="#4B5563"/>
+                            </yAxis>
+                        </LineChart>
+                        <Label text="Score mental moyen par date"
+                               style="-fx-text-fill: #5F7287; -fx-font-size: 12px;"/>
+                    </VBox>
+
+                    <VBox HBox.hgrow="ALWAYS"
+                          style="-fx-background-color: #F7F9FB;
+                                 -fx-background-radius: 16;
+                                 -fx-padding: 14;">
+                        <Label text="Répartition des humeurs"
+                               style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #3F5368;"/>
+                        <PieChart fx:id="pieChartHumeurs"
+                                  prefHeight="220"
+                                  legendVisible="false"
+                                  labelsVisible="true"
+                                  style="-fx-background-color: transparent;"/>
+                        <Label text="Répartition globale des humeurs"
+                               style="-fx-text-fill: #5F7287; -fx-font-size: 12px;"/>
+                    </VBox>
+                </HBox>
+
+                <VBox style="-fx-background-color: #F7F9FB;
+                             -fx-background-radius: 16;
+                             -fx-padding: 14;">
+                    <Label text="Moyenne du sommeil par utilisateur"
+                           style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #3F5368;"/>
+                    <BarChart fx:id="barChartSommeil"
+                              prefHeight="260"
+                              animated="false"
+                              legendVisible="false"
+                              categoryGap="18"
+                              barGap="4"
+                              style="-fx-background-color: transparent;">
+                        <xAxis>
+                            <CategoryAxis fx:id="xAxisSommeil"
+                                          label="Utilisateurs"
+                                          tickLabelRotation="-20"
+                                          tickLabelFill="#4B5563"/>
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis fx:id="yAxisSommeil"
+                                        label="Heures de sommeil moyennes"
+                                        tickLabelFill="#4B5563"/>
+                        </yAxis>
+                    </BarChart>
+                    <Label text="Comparaison des habitudes de sommeil par utilisateur"
+                           style="-fx-text-fill: #5F7287; -fx-font-size: 12px;"/>
+                </VBox>
+            </VBox>
+
+            <!-- Recherche juste avant la liste -->
             <VBox spacing="14"
                   style="-fx-background-color: white;
                          -fx-background-radius: 18;
@@ -128,7 +213,7 @@
                 <HBox spacing="10">
                     <Button text="Filtrer"
                             onAction="#rechercherSuivis"
-                            style="-fx-background-color: linear-gradient(to right, #6D5EF6, #4338CA);
+                            style="-fx-background-color: linear-gradient(to right, #8E9AAF, #7D8CA3);
                                    -fx-text-fill: white;
                                    -fx-font-size: 14px;
                                    -fx-font-weight: bold;
@@ -138,8 +223,8 @@
 
                     <Button text="Réinitialiser"
                             onAction="#reinitialiserRecherche"
-                            style="-fx-background-color: #E5E7EB;
-                                   -fx-text-fill: #374151;
+                            style="-fx-background-color: #E8EDF2;
+                                   -fx-text-fill: #4B5563;
                                    -fx-font-size: 14px;
                                    -fx-font-weight: bold;
                                    -fx-background-radius: 22;

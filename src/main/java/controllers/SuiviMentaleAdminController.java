@@ -1,6 +1,11 @@
 package controllers;
 
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import models.SuiviMentale;
@@ -25,20 +30,58 @@ public class SuiviMentaleAdminController {
     @FXML private Label lblStressMoyen;
     @FXML private Label lblEnergieMoyenne;
 
-    private final SuiviMentaleAdminService service = new SuiviMentaleAdminService();
+    @FXML private LineChart<String, Number> lineChartScoreMental;
+    @FXML private PieChart pieChartHumeurs;
+    @FXML private BarChart<String, Number> barChartSommeil;
 
-    private static final int DEFAULT_USER_ID = 2;
+    @FXML private CategoryAxis xAxisScoreMental;
+    @FXML private NumberAxis yAxisScoreMental;
+    @FXML private CategoryAxis xAxisSommeil;
+    @FXML private NumberAxis yAxisSommeil;
+
+    private final SuiviMentaleAdminService service = new SuiviMentaleAdminService();
 
     @FXML
     public void initialize() {
-        txtRechercheUserId.setText(String.valueOf(DEFAULT_USER_ID));
+        txtRechercheUserId.clear();
+        txtRechercheDate.clear();
+        txtRechercheHumeur.clear();
+
+        configurerAxes();
         chargerSuivisParDefaut();
         chargerStatistiques();
+        chargerCharts();
+    }
+
+    private void configurerAxes() {
+        if (xAxisScoreMental != null) {
+            xAxisScoreMental.setAnimated(false);
+            xAxisScoreMental.setTickLabelRotation(0);
+            xAxisScoreMental.setTickLabelGap(8);
+        }
+
+        if (yAxisScoreMental != null) {
+            yAxisScoreMental.setAnimated(false);
+            yAxisScoreMental.setAutoRanging(true);
+            yAxisScoreMental.setForceZeroInRange(false);
+        }
+
+        if (xAxisSommeil != null) {
+            xAxisSommeil.setAnimated(false);
+            xAxisSommeil.setTickLabelRotation(-20);
+            xAxisSommeil.setTickLabelGap(10);
+        }
+
+        if (yAxisSommeil != null) {
+            yAxisSommeil.setAnimated(false);
+            yAxisSommeil.setAutoRanging(true);
+            yAxisSommeil.setForceZeroInRange(false);
+        }
     }
 
     private void chargerSuivisParDefaut() {
         try {
-            List<SuiviMentale> liste = service.afficherParUserId(DEFAULT_USER_ID);
+            List<SuiviMentale> liste = service.afficherTous();
             afficherCartes(liste);
         } catch (Exception e) {
             afficherErreurDansPage("Erreur de chargement", e.getMessage());
@@ -61,6 +104,145 @@ public class SuiviMentaleAdminController {
             Label error = new Label("Erreur statistiques : " + e.getMessage());
             error.setStyle("-fx-text-fill: #DC2626;");
             containerStatsUsers.getChildren().add(error);
+        }
+    }
+
+    private void chargerCharts() {
+        chargerLineChartScoreMental();
+        chargerPieChartHumeurs();
+        chargerBarChartSommeil();
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                appliquerCouleursCalmesCharts();
+            }
+        });
+    }
+
+    private void chargerLineChartScoreMental() {
+        if (lineChartScoreMental == null) {
+            return;
+        }
+
+        lineChartScoreMental.getData().clear();
+
+        XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
+        series.setName("Score mental");
+
+        List<Map<String, Object>> data = service.getEvolutionScoreMental();
+
+        for (Map<String, Object> row : data) {
+            String date = String.valueOf(row.get("date"));
+            Number score = (Number) row.get("score");
+            series.getData().add(new XYChart.Data<String, Number>(date, score));
+        }
+
+        lineChartScoreMental.getData().add(series);
+    }
+
+    private void chargerPieChartHumeurs() {
+        if (pieChartHumeurs == null) {
+            return;
+        }
+
+        ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
+
+        List<Map<String, Object>> data = service.getRepartitionHumeurs();
+
+        for (Map<String, Object> row : data) {
+            String humeur = String.valueOf(row.get("humeur"));
+            Number total = (Number) row.get("total");
+            pieData.add(new PieChart.Data(humeur, total.doubleValue()));
+        }
+
+        pieChartHumeurs.setData(pieData);
+        pieChartHumeurs.setTitle("Humeurs dominantes");
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                Node title = pieChartHumeurs.lookup(".chart-title");
+                if (title != null) {
+                    title.setStyle("-fx-text-fill: #223A5E; -fx-font-size: 16px; -fx-font-weight: bold;");
+                }
+            }
+        });
+    }
+
+    private void chargerBarChartSommeil() {
+        if (barChartSommeil == null) {
+            return;
+        }
+
+        barChartSommeil.getData().clear();
+
+        XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
+        series.setName("Sommeil moyen");
+
+        List<Map<String, Object>> data = service.getMoyenneSommeilParUser();
+
+        for (Map<String, Object> row : data) {
+            String user = String.valueOf(row.get("user_name"));
+            Number moyenne = (Number) row.get("moyenne_sommeil");
+            series.getData().add(new XYChart.Data<String, Number>(user, moyenne));
+        }
+
+        barChartSommeil.getData().add(series);
+    }
+
+    private void appliquerCouleursCalmesCharts() {
+        if (lineChartScoreMental != null && !lineChartScoreMental.getData().isEmpty()) {
+            Node line = lineChartScoreMental.lookup(".chart-series-line");
+            if (line != null) {
+                line.setStyle("-fx-stroke: #8FA6B8; -fx-stroke-width: 2px;");
+            }
+
+            for (Node node : lineChartScoreMental.lookupAll(".chart-line-symbol")) {
+                node.setStyle("-fx-background-color: #8FA6B8, white;");
+            }
+        }
+
+        if (pieChartHumeurs != null && pieChartHumeurs.getData() != null) {
+            String[] pieColors = {
+                    "#A8C3BC",
+                    "#B7C9E2",
+                    "#CBBBAF",
+                    "#C7D7C0",
+                    "#D6C6E1",
+                    "#BFCAD6"
+            };
+
+            int i = 0;
+            for (PieChart.Data data : pieChartHumeurs.getData()) {
+                Node node = data.getNode();
+                if (node != null) {
+                    node.setStyle("-fx-pie-color: " + pieColors[i % pieColors.length] + ";");
+                }
+                i++;
+            }
+        }
+
+        if (barChartSommeil != null) {
+            for (Node node : barChartSommeil.lookupAll(".default-color0.chart-bar")) {
+                node.setStyle("-fx-bar-fill: #AAB8C7;");
+            }
+        }
+
+        if (lineChartScoreMental != null) {
+            styliserAxes(lineChartScoreMental);
+        }
+        if (barChartSommeil != null) {
+            styliserAxes(barChartSommeil);
+        }
+    }
+
+    private void styliserAxes(Chart chart) {
+        for (Node node : chart.lookupAll(".axis")) {
+            node.setStyle("-fx-tick-label-fill: #5B6B7A;");
+        }
+        for (Node node : chart.lookupAll(".axis-label")) {
+            node.setStyle("-fx-text-fill: #50627A; -fx-font-weight: bold;");
         }
     }
 
@@ -88,7 +270,7 @@ public class SuiviMentaleAdminController {
 
     @FXML
     private void reinitialiserRecherche() {
-        txtRechercheUserId.setText(String.valueOf(DEFAULT_USER_ID));
+        txtRechercheUserId.clear();
         txtRechercheDate.clear();
         txtRechercheHumeur.clear();
         chargerSuivisParDefaut();
@@ -100,13 +282,13 @@ public class SuiviMentaleAdminController {
         for (Map<String, Object> row : liste) {
             VBox card = new VBox(8);
             card.setPrefWidth(230);
-            card.setStyle("""
-                    -fx-background-color: white;
-                    -fx-border-color: #E5E7EB;
-                    -fx-border-radius: 16;
-                    -fx-background-radius: 16;
-                    -fx-padding: 16;
-                    """);
+            card.setStyle(
+                    "-fx-background-color: white;" +
+                            "-fx-border-color: #E5E7EB;" +
+                            "-fx-border-radius: 16;" +
+                            "-fx-background-radius: 16;" +
+                            "-fx-padding: 16;"
+            );
 
             Label title = new Label(String.valueOf(row.get("user_name")));
             title.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #223A5E;");
@@ -134,12 +316,12 @@ public class SuiviMentaleAdminController {
 
         if (liste == null || liste.isEmpty()) {
             VBox emptyCard = new VBox(8);
-            emptyCard.setStyle("""
-                    -fx-background-color: white;
-                    -fx-background-radius: 18;
-                    -fx-padding: 20;
-                    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);
-                    """);
+            emptyCard.setStyle(
+                    "-fx-background-color: white;" +
+                            "-fx-background-radius: 18;" +
+                            "-fx-padding: 20;" +
+                            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);"
+            );
 
             Label title = new Label("Aucun suivi trouvé");
             title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;");
@@ -161,12 +343,12 @@ public class SuiviMentaleAdminController {
         containerSuivis.getChildren().clear();
 
         VBox errorCard = new VBox(8);
-        errorCard.setStyle("""
-                -fx-background-color: white;
-                -fx-background-radius: 18;
-                -fx-padding: 20;
-                -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);
-                """);
+        errorCard.setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-background-radius: 18;" +
+                        "-fx-padding: 20;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);"
+        );
 
         Label title = new Label(titre);
         title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #DC2626;");
@@ -181,12 +363,12 @@ public class SuiviMentaleAdminController {
 
     private HBox createSuiviCardHorizontal(SuiviMentale s) {
         HBox card = new HBox(24);
-        card.setStyle("""
-                -fx-background-color: white;
-                -fx-background-radius: 18;
-                -fx-padding: 18;
-                -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);
-                """);
+        card.setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-background-radius: 18;" +
+                        "-fx-padding: 18;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);"
+        );
 
         String nomUtilisateur = service.getNomUtilisateurParId(s.getUserId());
 
@@ -206,9 +388,9 @@ public class SuiviMentaleAdminController {
         badges.setHgap(10);
         badges.setVgap(10);
         badges.getChildren().addAll(
-                createBadge("Stress " + s.getTauxDeStress() + "/10", "#FBBF24", "white"),
-                createBadge("Énergie " + s.getNiveauDenergie() + "/10", "#2563EB", "white"),
-                createBadge(safe(s.getHumeur()), "#F59E0B", "white")
+                createBadge("Stress " + s.getTauxDeStress() + "/10", "#D4C4A8", "#4B5563"),
+                createBadge("Énergie " + s.getNiveauDenergie() + "/10", "#B7C9E2", "#4B5563"),
+                createBadge(safe(s.getHumeur()), "#C7D7C0", "#4B5563")
         );
 
         bloc2.getChildren().addAll(
@@ -232,23 +414,23 @@ public class SuiviMentaleAdminController {
         btnModifier.setPrefWidth(110);
         btnSupprimer.setPrefWidth(110);
 
-        btnModifier.setStyle("""
-                -fx-background-color: #2563EB;
-                -fx-text-fill: white;
-                -fx-background-radius: 10;
-                -fx-cursor: hand;
-                -fx-font-weight: bold;
-                -fx-padding: 10 14;
-                """);
+        btnModifier.setStyle(
+                "-fx-background-color: #8E9AAF;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-background-radius: 10;" +
+                        "-fx-cursor: hand;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-padding: 10 14;"
+        );
 
-        btnSupprimer.setStyle("""
-                -fx-background-color: #EF4444;
-                -fx-text-fill: white;
-                -fx-background-radius: 10;
-                -fx-cursor: hand;
-                -fx-font-weight: bold;
-                -fx-padding: 10 14;
-                """);
+        btnSupprimer.setStyle(
+                "-fx-background-color: #B98C8C;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-background-radius: 10;" +
+                        "-fx-cursor: hand;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-padding: 10 14;"
+        );
 
         btnModifier.setOnAction(e -> ouvrirPopupModification(s));
         btnSupprimer.setOnAction(e -> supprimerSuivi(s));
@@ -278,14 +460,14 @@ public class SuiviMentaleAdminController {
 
     private Label createBadge(String text, String bgColor, String textColor) {
         Label badge = new Label(text);
-        badge.setMinHeight(34);
+        badge.setMinHeight(30);
         badge.setStyle(
                 "-fx-background-color: " + bgColor + ";" +
                         "-fx-text-fill: " + textColor + ";" +
-                        "-fx-padding: 8 16;" +
+                        "-fx-padding: 6 14;" +
                         "-fx-background-radius: 20;" +
                         "-fx-font-weight: bold;" +
-                        "-fx-font-size: 13px;"
+                        "-fx-font-size: 12px;"
         );
         return badge;
     }
@@ -302,40 +484,69 @@ public class SuiviMentaleAdminController {
     }
 
     private void ouvrirPopupModification(SuiviMentale s) {
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Modifier suivi mental");
-        dialog.setHeaderText("Modification du suivi #" + s.getId());
+        Dialog<ButtonType> dialog = new Dialog<ButtonType>();
+        dialog.setTitle("Modifier suivi");
+        dialog.setHeaderText("Modification du suivi de l'utilisateur");
+
+        dialog.getDialogPane().setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-padding: 20;"
+        );
 
         ButtonType okButtonType = new ButtonType("Enregistrer", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
 
-        VBox content = new VBox(10);
+        VBox content = new VBox(12);
+        content.setStyle("-fx-padding: 10;");
 
-        TextField humeurField = new TextField(s.getHumeur());
-        TextField dateField = new TextField(String.valueOf(s.getDateDeSuivi()));
+        TextField humeurField = createStyledField(s.getHumeur());
+        TextField dateField = createStyledField(String.valueOf(s.getDateDeSuivi()));
         TextArea journalField = new TextArea(s.getJournalEmotionnelle());
-        TextField scoreField = new TextField(String.valueOf(s.getScoreMentale()));
-        TextField stressField = new TextField(String.valueOf(s.getTauxDeStress()));
-        TextField stressGlobalField = new TextField(String.valueOf(s.getTauxDeStressGlobale()));
-        TextField sommeilField = new TextField(s.getQualiteDuSommeil());
-        TextField energieField = new TextField(String.valueOf(s.getNiveauDenergie()));
-        TextField heureSommeilField = new TextField(String.valueOf(s.getHeureDeSommeil()));
+        TextField stressField = createStyledField(String.valueOf(s.getTauxDeStress()));
+        TextField sommeilField = createStyledField(s.getQualiteDuSommeil());
+        TextField energieField = createStyledField(String.valueOf(s.getNiveauDenergie()));
+        TextField heureSommeilField = createStyledField(String.valueOf(s.getHeureDeSommeil()));
 
-        journalField.setPrefHeight(100);
+        journalField.setPrefHeight(80);
+        journalField.setStyle(
+                "-fx-background-radius: 12;" +
+                        "-fx-border-radius: 12;" +
+                        "-fx-border-color: #DCE3EA;" +
+                        "-fx-padding: 10;"
+        );
 
         content.getChildren().addAll(
-                new Label("Humeur"), humeurField,
-                new Label("Date de suivi (yyyy-mm-dd)"), dateField,
-                new Label("Journal émotionnel"), journalField,
-                new Label("Score mental"), scoreField,
-                new Label("Taux de stress"), stressField,
-                new Label("Taux de stress globale"), stressGlobalField,
-                new Label("Qualité du sommeil"), sommeilField,
-                new Label("Niveau d'énergie"), energieField,
-                new Label("Heures de sommeil"), heureSommeilField
+                createPopupLabel("Humeur"), humeurField,
+                createPopupLabel("Date (yyyy-mm-dd)"), dateField,
+                createPopupLabel("Journal émotionnel"), journalField,
+                createPopupLabel("Taux de stress"), stressField,
+                createPopupLabel("Qualité du sommeil"), sommeilField,
+                createPopupLabel("Niveau d'énergie"), energieField,
+                createPopupLabel("Heures de sommeil"), heureSommeilField
         );
 
         dialog.getDialogPane().setContent(content);
+
+        Button okButton = (Button) dialog.getDialogPane().lookupButton(okButtonType);
+        okButton.setStyle(
+                "-fx-background-color: linear-gradient(to right, #8E9AAF, #7D8CA3);" +
+                        "-fx-text-fill: white;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-padding: 10 20;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-cursor: hand;"
+        );
+
+        Button cancelButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL);
+        cancelButton.setStyle(
+                "-fx-background-color: #E8EDF2;" +
+                        "-fx-text-fill: #4B5563;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-padding: 10 20;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-cursor: hand;"
+        );
 
         Optional<ButtonType> result = dialog.showAndWait();
 
@@ -344,9 +555,7 @@ public class SuiviMentaleAdminController {
                 s.setHumeur(humeurField.getText().trim());
                 s.setDateDeSuivi(Date.valueOf(dateField.getText().trim()));
                 s.setJournalEmotionnelle(journalField.getText().trim());
-                s.setScoreMentale(Integer.parseInt(scoreField.getText().trim()));
                 s.setTauxDeStress(Integer.parseInt(stressField.getText().trim()));
-                s.setTauxDeStressGlobale(Integer.parseInt(stressGlobalField.getText().trim()));
                 s.setQualiteDuSommeil(sommeilField.getText().trim());
                 s.setNiveauDenergie(Integer.parseInt(energieField.getText().trim()));
                 s.setHeureDeSommeil(Double.parseDouble(heureSommeilField.getText().trim()));
@@ -354,7 +563,8 @@ public class SuiviMentaleAdminController {
                 service.modifier(s);
                 rechercherSuivis();
                 chargerStatistiques();
-                showInfo("Succès", "Le suivi a été modifié avec succès.");
+                chargerCharts();
+                showSuccess("Le suivi a été modifié avec succès.");
 
             } catch (IllegalArgumentException ex) {
                 showError("Erreur", "Vérifie la date et les champs numériques.");
@@ -366,9 +576,38 @@ public class SuiviMentaleAdminController {
 
     private void supprimerSuivi(SuiviMentale s) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+
         confirm.setTitle("Confirmation");
-        confirm.setHeaderText(null);
-        confirm.setContentText("Supprimer ce suivi mental ?");
+        confirm.setHeaderText("Supprimer ce suivi ?");
+        confirm.setContentText("Cette action est irréversible.");
+
+        confirm.getDialogPane().setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-background-radius: 18;" +
+                        "-fx-padding: 20;"
+        );
+
+        Button ok = (Button) confirm.getDialogPane().lookupButton(ButtonType.OK);
+        ok.setText("Supprimer");
+        ok.setStyle(
+                "-fx-background-color: #B98C8C;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-padding: 10 20;" +
+                        "-fx-cursor: hand;"
+        );
+
+        Button cancel = (Button) confirm.getDialogPane().lookupButton(ButtonType.CANCEL);
+        cancel.setText("Annuler");
+        cancel.setStyle(
+                "-fx-background-color: #E8EDF2;" +
+                        "-fx-text-fill: #4B5563;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-padding: 10 20;" +
+                        "-fx-cursor: hand;"
+        );
 
         Optional<ButtonType> result = confirm.showAndWait();
 
@@ -377,18 +616,52 @@ public class SuiviMentaleAdminController {
                 service.supprimer(s);
                 rechercherSuivis();
                 chargerStatistiques();
-                showInfo("Succès", "Le suivi a été supprimé avec succès.");
+                chargerCharts();
+                showSuccess("Le suivi a été supprimé avec succès.");
             } catch (Exception e) {
                 showError("Erreur", "Erreur lors de la suppression : " + e.getMessage());
             }
         }
     }
 
-    private void showInfo(String title, String msg) {
+    private TextField createStyledField(String value) {
+        TextField field = new TextField(value);
+        field.setStyle(
+                "-fx-background-radius: 12;" +
+                        "-fx-border-radius: 12;" +
+                        "-fx-border-color: #DCE3EA;" +
+                        "-fx-padding: 10;"
+        );
+        return field;
+    }
+
+    private Label createPopupLabel(String text) {
+        Label label = new Label(text);
+        label.setStyle("-fx-font-size: 13px; -fx-text-fill: #6B7280; -fx-font-weight: bold;");
+        return label;
+    }
+
+    private void showSuccess(String msg) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
+        alert.setTitle("Succès");
         alert.setHeaderText(null);
         alert.setContentText(msg);
+        alert.getDialogPane().setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-background-radius: 18;" +
+                        "-fx-padding: 20;"
+        );
+
+        Button ok = (Button) alert.getDialogPane().lookupButton(ButtonType.OK);
+        ok.setStyle(
+                "-fx-background-color: linear-gradient(to right, #9BB7A5, #89A393);" +
+                        "-fx-text-fill: white;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-padding: 10 20;" +
+                        "-fx-cursor: hand;"
+        );
+
         alert.showAndWait();
     }
 
@@ -397,6 +670,22 @@ public class SuiviMentaleAdminController {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(msg);
+        alert.getDialogPane().setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-background-radius: 18;" +
+                        "-fx-padding: 20;"
+        );
+
+        Button ok = (Button) alert.getDialogPane().lookupButton(ButtonType.OK);
+        ok.setStyle(
+                "-fx-background-color: #B98C8C;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-padding: 10 20;" +
+                        "-fx-cursor: hand;"
+        );
+
         alert.showAndWait();
     }
 

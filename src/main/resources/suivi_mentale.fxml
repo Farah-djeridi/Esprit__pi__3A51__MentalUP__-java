@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -273,6 +274,24 @@
                                                  -fx-padding: 8 10;"/>
                             </VBox>
 
+                            <VBox spacing="6">
+                                <Label text="🎯 Objectif lié"
+                                       style="-fx-text-fill: #1e3a5f;
+                                              -fx-font-size: 13px;
+                                              -fx-font-weight: 800;"/>
+                                <Label fx:id="objectifLieLabel"
+                                       text="Aucun objectif en cours."
+                                       wrapText="true"
+                                       style="-fx-background-color: #f8fbff;
+                                              -fx-background-radius: 12;
+                                              -fx-border-color: #dbe7f5;
+                                              -fx-border-radius: 12;
+                                              -fx-padding: 10 12;
+                                              -fx-text-fill: #64748b;
+                                              -fx-font-size: 13px;
+                                              -fx-font-weight: 600;"/>
+                            </VBox>
+
                             <HBox spacing="10" alignment="CENTER_RIGHT">
                                 <Label fx:id="messageLabel" text="" HBox.hgrow="ALWAYS"
                                        style="-fx-font-size: 12px; -fx-font-weight: bold;"/>
@@ -414,7 +433,7 @@
                                -fx-background: transparent;
                                -fx-border-color: transparent;">
                 <content>
-                    <VBox fx:id="statistiquesSection" spacing="4" style="-fx-padding: 0;">
+                    <VBox fx:id="statistiquesSection" spacing="8" style="-fx-padding: 0;">
 
                         <VBox spacing="6"
                               style="-fx-background-color: white;
@@ -484,40 +503,110 @@
                             </VBox>
                         </GridPane>
 
-                        <HBox spacing="6">
-                            <VBox spacing="6" HBox.hgrow="ALWAYS"
+                        <HBox spacing="8">
+                            <VBox HBox.hgrow="ALWAYS"
                                   style="-fx-background-color: white;
-                                         -fx-background-radius: 16;
+                                         -fx-background-radius: 18;
+                                         -fx-effect: dropshadow(gaussian, rgba(30,58,95,0.05), 8, 0, 0, 2);
                                          -fx-padding: 14;">
-                                <Label text="😊 Humeur dominante"
-                                       style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: 700;"/>
+                                <Label text="Humeur dominante"
+                                       style="-fx-text-fill: #64748b; -fx-font-size: 12px; -fx-font-weight: 800;"/>
                                 <Label fx:id="humeurDominanteLabel" text="-"
-                                       style="-fx-text-fill: #1e3a5f; -fx-font-size: 16px; -fx-font-weight: 900;"/>
+                                       style="-fx-text-fill: #1e3a5f; -fx-font-size: 20px; -fx-font-weight: 900;"/>
                             </VBox>
 
-                            <VBox spacing="6" HBox.hgrow="ALWAYS"
+                            <VBox HBox.hgrow="ALWAYS"
                                   style="-fx-background-color: white;
-                                         -fx-background-radius: 16;
+                                         -fx-background-radius: 18;
+                                         -fx-effect: dropshadow(gaussian, rgba(30,58,95,0.05), 8, 0, 0, 2);
                                          -fx-padding: 14;">
-                                <Label text="🧠 Score mental moyen"
-                                       style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: 700;"/>
-                                <Label fx:id="scoreMentalMoyenLabel" text="-"
-                                       style="-fx-text-fill: #1e3a5f; -fx-font-size: 16px; -fx-font-weight: 900;"/>
+                                <Label text="Score mental moyen"
+                                       style="-fx-text-fill: #64748b; -fx-font-size: 12px; -fx-font-weight: 800;"/>
+                                <Label fx:id="scoreMentalMoyenLabel" text="0"
+                                       style="-fx-text-fill: #1e3a5f; -fx-font-size: 20px; -fx-font-weight: 900;"/>
                             </VBox>
                         </HBox>
 
-                        <VBox spacing="6"
+                        <HBox spacing="8">
+                            <VBox HBox.hgrow="ALWAYS"
+                                  style="-fx-background-color: white;
+                                         -fx-background-radius: 18;
+                                         -fx-effect: dropshadow(gaussian, rgba(30,58,95,0.05), 8, 0, 0, 2);
+                                         -fx-padding: 14;">
+                                <Label text="Répartition des humeurs"
+                                       style="-fx-text-fill: #1e3a5f;
+                                              -fx-font-size: 15px;
+                                              -fx-font-weight: 900;"/>
+                                <PieChart fx:id="pieChartHumeursStats"
+                                          prefHeight="260"
+                                          legendVisible="false"
+                                          labelsVisible="true"
+                                          style="-fx-background-color: transparent;"/>
+                            </VBox>
+
+                            <VBox HBox.hgrow="ALWAYS"
+                                  style="-fx-background-color: white;
+                                         -fx-background-radius: 18;
+                                         -fx-effect: dropshadow(gaussian, rgba(30,58,95,0.05), 8, 0, 0, 2);
+                                         -fx-padding: 14;">
+                                <Label text="Comparaison des moyennes"
+                                       style="-fx-text-fill: #1e3a5f;
+                                              -fx-font-size: 15px;
+                                              -fx-font-weight: 900;"/>
+                                <BarChart fx:id="barChartMoyennes"
+                                          prefHeight="260"
+                                          animated="false"
+                                          legendVisible="false"
+                                          style="-fx-background-color: transparent;">
+                                    <xAxis>
+                                        <CategoryAxis fx:id="xAxisMoyennes"
+                                                      label="Indicateurs"
+                                                      tickLabelFill="#4B5563"/>
+                                    </xAxis>
+                                    <yAxis>
+                                        <NumberAxis fx:id="yAxisMoyennes"
+                                                    label="Valeurs moyennes"
+                                                    tickLabelFill="#4B5563"/>
+                                    </yAxis>
+                                </BarChart>
+                            </VBox>
+                        </HBox>
+
+                        <VBox spacing="10"
                               style="-fx-background-color: white;
-                                     -fx-background-radius: 16;
+                                     -fx-background-radius: 18;
+                                     -fx-effect: dropshadow(gaussian, rgba(30,58,95,0.05), 8, 0, 0, 2);
                                      -fx-padding: 14;">
-                            <Label text="📈 Progression globale"
+                            <Label text="Évolution du score mental"
                                    style="-fx-text-fill: #1e3a5f;
+                                          -fx-font-size: 15px;
+                                          -fx-font-weight: 900;"/>
+
+                            <LineChart fx:id="lineChartEvolutionScore"
+                                       prefHeight="280"
+                                       animated="false"
+                                       legendVisible="false"
+                                       createSymbols="true"
+                                       style="-fx-background-color: transparent;">
+                                <xAxis>
+                                    <CategoryAxis fx:id="xAxisEvolution"
+                                                  label="Dates"
+                                                  tickLabelRotation="-20"
+                                                  tickLabelFill="#4B5563"/>
+                                </xAxis>
+                                <yAxis>
+                                    <NumberAxis fx:id="yAxisEvolution"
+                                                label="Score mental moyen"
+                                                tickLabelFill="#4B5563"/>
+                                </yAxis>
+                            </LineChart>
+
+                            <Label fx:id="conseilLabel"
+                                   text=""
+                                   wrapText="true"
+                                   style="-fx-text-fill: #64748b;
                                           -fx-font-size: 13px;
-                                          -fx-font-weight: 800;"/>
-                            <ProgressBar fx:id="scoreProgressBar"
-                                         progress="0"
-                                         prefWidth="600"
-                                         style="-fx-accent: #2f5d97;"/>
+                                          -fx-font-weight: 600;"/>
                         </VBox>
                     </VBox>
                 </content>
@@ -527,54 +616,23 @@
             <VBox fx:id="chatSection"
                   visible="false"
                   managed="false"
-                  spacing="10"
-                  style="-fx-background-color: white;
-                         -fx-background-radius: 18;
-                         -fx-effect: dropshadow(gaussian, rgba(30,58,95,0.05), 8, 0, 0, 2);
-                         -fx-padding: 12;">
+                  spacing="12"
+                  style="-fx-padding: 0;">
 
-                <HBox spacing="10" alignment="CENTER_LEFT">
-                    <Label text="💬" style="-fx-font-size: 22px;"/>
-                    <Label text="Chat &amp; Conseils"
+                <VBox spacing="8"
+                      style="-fx-background-color: white;
+                             -fx-background-radius: 18;
+                             -fx-effect: dropshadow(gaussian, rgba(30,58,95,0.05), 8, 0, 0, 2);
+                             -fx-padding: 14;">
+                    <Label text="💬 Chat"
                            style="-fx-text-fill: #1e3a5f;
                                   -fx-font-size: 18px;
                                   -fx-font-weight: 900;"/>
-                    <Region HBox.hgrow="ALWAYS"/>
-                    <Label text="Assistant IA"
-                           style="-fx-text-fill: #1e3a5f;
-                                  -fx-font-size: 10px;
-                                  -fx-font-weight: 800;
-                                  -fx-background-color: #eaf3ff;
-                                  -fx-background-radius: 14;
-                                  -fx-padding: 4 11;"/>
-                </HBox>
-
-                <VBox spacing="10"
-                      style="-fx-background-color: #f8fbff;
-                             -fx-background-radius: 16;
-                             -fx-padding: 12;
-                             -fx-border-color: #dbe7f5;
-                             -fx-border-radius: 16;">
-
-                    <HBox spacing="10" alignment="CENTER_LEFT">
-                        <Label text="🤖" style="-fx-font-size: 18px;"/>
-                        <Label text="Conseil du jour :"
-                               style="-fx-text-fill: #1e3a5f;
-                                      -fx-font-size: 13px;
-                                      -fx-font-weight: 800;"/>
-                    </HBox>
-
-                    <Label fx:id="conseilLabel"
-                           text="Prenez quelques minutes pour respirer profondément aujourd'hui. La méditation peut réduire votre stress de 30%."
-                           wrapText="true"
-                           style="-fx-text-fill: #475569;
-                                  -fx-font-size: 12px;"/>
+                    <Label text="Section chat en cours de connexion."
+                           style="-fx-text-fill: #64748b;
+                                  -fx-font-size: 13px;
+                                  -fx-font-weight: 600;"/>
                 </VBox>
-
-                <Label text="✨ Bientôt : Chatbot intelligent avec IA"
-                       style="-fx-text-fill: #94a3b8;
-                              -fx-font-size: 11px;
-                              -fx-font-style: italic;"/>
             </VBox>
 
         </StackPane>

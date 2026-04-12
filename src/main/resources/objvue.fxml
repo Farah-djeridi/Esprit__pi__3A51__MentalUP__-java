@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -11,7 +12,6 @@
     <top>
         <VBox spacing="0" style="-fx-padding: 4 10 0 10;">
 
-            <!-- HEADER -->
             <VBox spacing="8"
                   style="-fx-background-color: white;
                          -fx-background-radius: 18;
@@ -35,7 +35,6 @@
                                   -fx-font-weight: 600;"/>
                 </HBox>
 
-                <!-- BANNIÈRE -->
                 <VBox spacing="10"
                       style="-fx-background-color: linear-gradient(to right, #7BA6C9, #2C5F8A);
                              -fx-background-radius: 22;
@@ -53,7 +52,6 @@
                                   -fx-font-weight: 500;"/>
                 </VBox>
 
-                <!-- BOUTONS ONGLETS -->
                 <HBox spacing="8">
                     <Button fx:id="ajouterTabButton"
                             text="➕ Ajouter"
@@ -94,7 +92,6 @@
                 </HBox>
             </VBox>
 
-            <!-- MESSAGE GLOBAL -->
             <Label fx:id="globalMessageLabel"
                    text=""
                    style="-fx-padding: 0;
@@ -106,7 +103,7 @@
     <center>
         <StackPane style="-fx-padding: 0 10 8 10;">
 
-            <!-- ==================== AJOUT SECTION ==================== -->
+            <!-- AJOUT -->
             <ScrollPane fx:id="ajouterSectionScroll"
                         fitToWidth="true"
                         visible="true"
@@ -118,7 +115,6 @@
                 <content>
                     <VBox fx:id="ajouterSection" spacing="4" style="-fx-padding: 0;">
 
-                        <!-- INTRO -->
                         <VBox spacing="8"
                               style="-fx-background-color: white;
                                      -fx-background-radius: 18;
@@ -146,7 +142,6 @@
                                           -fx-font-size: 12px;"/>
                         </VBox>
 
-                        <!-- FORMULAIRE -->
                         <VBox spacing="14"
                               style="-fx-background-color: white;
                                      -fx-background-radius: 18;
@@ -159,7 +154,6 @@
                                     <ColumnConstraints percentWidth="50"/>
                                 </columnConstraints>
 
-                                <!-- Titre -->
                                 <VBox spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="0">
                                     <Label text="📝 Titre"
                                            style="-fx-text-fill: #1e3a5f;
@@ -175,7 +169,6 @@
                                                       -fx-padding: 0 12;"/>
                                 </VBox>
 
-                                <!-- Statut -->
                                 <VBox spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="1">
                                     <Label text="📌 Statut"
                                            style="-fx-text-fill: #1e3a5f;
@@ -190,7 +183,6 @@
                                 </VBox>
                             </GridPane>
 
-                            <!-- Description -->
                             <VBox spacing="6">
                                 <Label text="📖 Description"
                                        style="-fx-text-fill: #1e3a5f;
@@ -214,7 +206,6 @@
                                     <ColumnConstraints percentWidth="34"/>
                                 </columnConstraints>
 
-                                <!-- Date début -->
                                 <VBox spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="0">
                                     <Label text="📅 Date début"
                                            style="-fx-text-fill: #1e3a5f;
@@ -228,7 +219,6 @@
                                                        -fx-pref-height: 38px;"/>
                                 </VBox>
 
-                                <!-- Date fin -->
                                 <VBox spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="1">
                                     <Label text="🏁 Date fin"
                                            style="-fx-text-fill: #1e3a5f;
@@ -242,7 +232,6 @@
                                                        -fx-pref-height: 38px;"/>
                                 </VBox>
 
-                                <!-- Activité -->
                                 <VBox spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="2">
                                     <Label text="🎯 Activité"
                                            style="-fx-text-fill: #1e3a5f;
@@ -263,7 +252,6 @@
                                     <ColumnConstraints percentWidth="50"/>
                                 </columnConstraints>
 
-                                <!-- Type objectif -->
                                 <VBox spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="0">
                                     <Label text="🏷️ Type d'objectif"
                                            style="-fx-text-fill: #1e3a5f;
@@ -277,7 +265,6 @@
                                                      -fx-pref-height: 38px;"/>
                                 </VBox>
 
-                                <!-- Valeur cible -->
                                 <VBox spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="1">
                                     <Label text="🎯 Valeur cible"
                                            style="-fx-text-fill: #1e3a5f;
@@ -294,11 +281,9 @@
                                 </VBox>
                             </GridPane>
 
-                            <!-- Message -->
                             <Label fx:id="messageLabel" text=""
                                    style="-fx-font-size: 12px; -fx-font-weight: bold;"/>
 
-                            <!-- Boutons -->
                             <HBox spacing="10" alignment="CENTER_RIGHT">
                                 <Button text="🗑️ Annuler"
                                         onAction="#annulerFormulaire"
@@ -326,7 +311,7 @@
                 </content>
             </ScrollPane>
 
-            <!-- ==================== HISTORIQUE SECTION ==================== -->
+            <!-- HISTORIQUE -->
             <VBox fx:id="historiqueSection"
                   spacing="4"
                   visible="false"
@@ -358,7 +343,6 @@
                            style="-fx-text-fill: #7f8c9f;
                                   -fx-font-size: 12px;"/>
 
-                    <!-- Filtres -->
                     <HBox spacing="10" style="-fx-padding: 4 0 0 0;">
                         <TextField fx:id="searchTitreField"
                                    promptText="🔍 Rechercher par titre..."
@@ -403,7 +387,6 @@
                     </HBox>
                 </VBox>
 
-                <!-- Container historique scrollable -->
                 <ScrollPane fitToWidth="true"
                             style="-fx-background-color: transparent;
                                    -fx-background: transparent;
@@ -416,9 +399,9 @@
                 </ScrollPane>
             </VBox>
 
-            <!-- ==================== RÉSUMÉ SECTION ==================== -->
+            <!-- RÉSUMÉ -->
             <VBox fx:id="resumeSection"
-                  spacing="4"
+                  spacing="8"
                   visible="false"
                   managed="false">
 
@@ -449,9 +432,7 @@
                                   -fx-font-size: 12px;"/>
                 </VBox>
 
-                <!-- Cartes statistiques -->
                 <HBox spacing="8">
-                    <!-- Carte 1 -->
                     <VBox spacing="6" HBox.hgrow="ALWAYS"
                           style="-fx-background-color: linear-gradient(to bottom right, #234b7d, #2f5d97);
                                  -fx-background-radius: 16;
@@ -466,7 +447,6 @@
                                       -fx-font-weight: 900;"/>
                     </VBox>
 
-                    <!-- Carte 2 -->
                     <VBox spacing="6" HBox.hgrow="ALWAYS"
                           style="-fx-background-color: linear-gradient(to bottom right, #315f97, #3f75b8);
                                  -fx-background-radius: 16;
@@ -481,7 +461,6 @@
                                       -fx-font-weight: 900;"/>
                     </VBox>
 
-                    <!-- Carte 3 -->
                     <VBox spacing="6" HBox.hgrow="ALWAYS"
                           style="-fx-background-color: linear-gradient(to bottom right, #3f75b8, #4d87c8);
                                  -fx-background-radius: 16;
@@ -494,6 +473,52 @@
                                style="-fx-text-fill: white;
                                       -fx-font-size: 24px;
                                       -fx-font-weight: 900;"/>
+                    </VBox>
+                </HBox>
+
+                <HBox spacing="8">
+                    <VBox HBox.hgrow="ALWAYS"
+                          style="-fx-background-color: white;
+                                 -fx-background-radius: 18;
+                                 -fx-effect: dropshadow(gaussian, rgba(30,58,95,0.05), 8, 0, 0, 2);
+                                 -fx-padding: 14;">
+                        <Label text="Répartition des statuts"
+                               style="-fx-text-fill: #1e3a5f;
+                                      -fx-font-size: 15px;
+                                      -fx-font-weight: 900;"/>
+                        <PieChart fx:id="pieChartStatuts"
+                                  prefHeight="280"
+                                  legendVisible="false"
+                                  labelsVisible="true"
+                                  style="-fx-background-color: transparent;"/>
+                    </VBox>
+
+                    <VBox HBox.hgrow="ALWAYS"
+                          style="-fx-background-color: white;
+                                 -fx-background-radius: 18;
+                                 -fx-effect: dropshadow(gaussian, rgba(30,58,95,0.05), 8, 0, 0, 2);
+                                 -fx-padding: 14;">
+                        <Label text="Progression moyenne par type"
+                               style="-fx-text-fill: #1e3a5f;
+                                      -fx-font-size: 15px;
+                                      -fx-font-weight: 900;"/>
+                        <BarChart fx:id="barChartProgressionType"
+                                  prefHeight="280"
+                                  animated="false"
+                                  legendVisible="false"
+                                  style="-fx-background-color: transparent;">
+                            <xAxis>
+                                <CategoryAxis fx:id="xAxisProgressionType"
+                                              label="Types"
+                                              tickLabelRotation="-15"
+                                              tickLabelFill="#4B5563"/>
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis fx:id="yAxisProgressionType"
+                                            label="Progression moyenne"
+                                            tickLabelFill="#4B5563"/>
+                            </yAxis>
+                        </BarChart>
                     </VBox>
                 </HBox>
             </VBox>

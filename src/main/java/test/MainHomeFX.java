@@ -9,7 +9,7 @@ public class MainHomeFX extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/HomeAdmin.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Home.fxml"));
         Scene scene = new Scene(loader.load(), 1500, 920);
 
         stage.setTitle("MentalUp");

@@ -1,8 +1,12 @@
 package controllers;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.FlowPane;
@@ -10,6 +14,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.util.Callback;
 import models.Objectif;
 import models.SuiviMentale;
 import services.ServiceObjectif;
@@ -17,8 +22,12 @@ import services.ServiceSuiviMentale;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 
 public class SuiviMentaleController {
 
@@ -51,6 +60,7 @@ public class SuiviMentaleController {
     @FXML private Label messageLabel;
     @FXML private Label globalMessageLabel;
     @FXML private Label conseilLabel;
+    @FXML private Label objectifLieLabel;
 
     @FXML private FlowPane historiqueContainer;
 
@@ -65,7 +75,14 @@ public class SuiviMentaleController {
     @FXML private Label sommeilMoyenLabel;
     @FXML private Label humeurDominanteLabel;
     @FXML private Label scoreMentalMoyenLabel;
-    @FXML private ProgressBar scoreProgressBar;
+
+    @FXML private PieChart pieChartHumeursStats;
+    @FXML private BarChart<String, Number> barChartMoyennes;
+    @FXML private CategoryAxis xAxisMoyennes;
+    @FXML private NumberAxis yAxisMoyennes;
+    @FXML private LineChart<String, Number> lineChartEvolutionScore;
+    @FXML private CategoryAxis xAxisEvolution;
+    @FXML private NumberAxis yAxisEvolution;
 
     private final ServiceSuiviMentale suiviService = new ServiceSuiviMentale();
     private final ServiceObjectif objectifService = new ServiceObjectif();
@@ -101,12 +118,61 @@ public class SuiviMentaleController {
 
         dateSuiviPicker.setValue(LocalDate.now());
 
+        dateSuiviPicker.setDayCellFactory(new Callback<DatePicker, DateCell>() {
+            @Override
+            public DateCell call(DatePicker param) {
+                return new DateCell() {
+                    @Override
+                    public void updateItem(LocalDate item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setDisable(false);
+                        } else {
+                            setDisable(item.isAfter(LocalDate.now()));
+                        }
+                    }
+                };
+            }
+        });
+
+        if (xAxisMoyennes != null) {
+            xAxisMoyennes.setAnimated(false);
+        }
+        if (yAxisMoyennes != null) {
+            yAxisMoyennes.setAnimated(false);
+            yAxisMoyennes.setAutoRanging(true);
+            yAxisMoyennes.setForceZeroInRange(true);
+        }
+        if (xAxisEvolution != null) {
+            xAxisEvolution.setAnimated(false);
+            xAxisEvolution.setTickLabelRotation(-20);
+        }
+        if (yAxisEvolution != null) {
+            yAxisEvolution.setAnimated(false);
+            yAxisEvolution.setAutoRanging(true);
+            yAxisEvolution.setForceZeroInRange(true);
+        }
+        if (barChartMoyennes != null) {
+            barChartMoyennes.setAnimated(false);
+            barChartMoyennes.setLegendVisible(false);
+        }
+        if (lineChartEvolutionScore != null) {
+            lineChartEvolutionScore.setAnimated(false);
+            lineChartEvolutionScore.setLegendVisible(false);
+            lineChartEvolutionScore.setCreateSymbols(true);
+        }
+        if (pieChartHumeursStats != null) {
+            pieChartHumeursStats.setLegendVisible(false);
+            pieChartHumeursStats.setLabelsVisible(true);
+        }
+
         if (conseilLabel != null) {
             conseilLabel.setText("Prenez quelques minutes pour respirer profondément aujourd’hui.");
         }
 
         refreshAll();
         verifierAjoutAutorise();
+        afficherObjectifLie();
         showAjouterSection();
     }
 
@@ -230,6 +296,11 @@ public class SuiviMentaleController {
                 return;
             }
 
+            if (dateSuiviPicker.getValue().isAfter(LocalDate.now())) {
+                afficherMessage("La date du suivi ne doit pas être au futur.", true);
+                return;
+            }
+
             if (humeurCombo.getValue() == null || humeurCombo.getValue().trim().isEmpty()) {
                 afficherMessage("Veuillez choisir une humeur.", true);
                 return;
@@ -252,6 +323,11 @@ public class SuiviMentaleController {
 
             if (energieField.getText() == null || energieField.getText().trim().isEmpty()) {
                 afficherMessage("Veuillez saisir l'énergie.", true);
+                return;
+            }
+
+            if (journalArea.getText() == null || journalArea.getText().trim().isEmpty()) {
+                afficherMessage("Veuillez saisir le journal émotionnel.", true);
                 return;
             }
 
@@ -295,6 +371,23 @@ public class SuiviMentaleController {
                 return;
             }
 
+            Objectif objectifLie = objectifService.getObjectifEnCoursByUser(currentUserId);
+
+            Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmation.setTitle("Confirmation");
+            confirmation.setHeaderText("Confirmer l'enregistrement du suivi");
+            confirmation.setContentText(
+                    "Ce suivi sera lié à l'objectif : " + safeTexte(objectifLie.getTitre()) +
+                            "\nType : " + safeTexte(objectifLie.getTypeObjectif()) +
+                            "\nValeur cible : " + objectifLie.getValeurCible() +
+                            "\n\nVoulez-vous continuer ?"
+            );
+
+            Optional<ButtonType> choix = confirmation.showAndWait();
+            if (choix.isEmpty() || choix.get() != ButtonType.OK) {
+                return;
+            }
+
             SuiviMentale s = new SuiviMentale();
             s.setDateDeSuivi(Date.valueOf(dateSuiviPicker.getValue()));
             s.setHumeur(humeurCombo.getValue());
@@ -303,9 +396,9 @@ public class SuiviMentaleController {
             s.setTauxDeStress(stress);
             s.setTauxDeStressGlobale(stress);
             s.setNiveauDenergie(energie);
-            s.setJournalEmotionnelle(journalArea.getText() == null ? "" : journalArea.getText().trim());
+            s.setJournalEmotionnelle(journalArea.getText().trim());
             s.setUserId(currentUserId);
-            s.setObjectifId(objectifEnCours.getId());
+            s.setObjectifId(objectifLie.getId());
             s.setScoreMentale(calculerScoreMental(
                     s.getHumeur(),
                     s.getQualiteDuSommeil(),
@@ -324,9 +417,10 @@ public class SuiviMentaleController {
             }
 
             clearForm();
-            mettreAJourProgressionObjectif(objectifEnCours.getId());
+            mettreAJourProgressionObjectif(objectifLie.getId());
             refreshAll();
             verifierAjoutAutorise();
+            afficherObjectifLie();
             showHistoriqueSection();
 
         } catch (Exception e) {
@@ -346,6 +440,7 @@ public class SuiviMentaleController {
         journalArea.clear();
         saveButton.setText("💾 Enregistrer");
         afficherMessage("", false);
+        afficherObjectifLie();
     }
 
     private void refreshAll() {
@@ -502,7 +597,7 @@ public class SuiviMentaleController {
     private void refreshStatistiques() {
         List<SuiviMentale> liste = suiviService.getByUser(currentUserId);
         if (liste == null) {
-            liste = List.of();
+            liste = new ArrayList<SuiviMentale>();
         }
 
         totalSuivisLabel.setText(String.valueOf(liste.size()));
@@ -513,7 +608,7 @@ public class SuiviMentaleController {
             sommeilMoyenLabel.setText("0");
             if (humeurDominanteLabel != null) humeurDominanteLabel.setText("-");
             if (scoreMentalMoyenLabel != null) scoreMentalMoyenLabel.setText("0");
-            if (scoreProgressBar != null) scoreProgressBar.setProgress(0);
+            viderCharts();
             return;
         }
 
@@ -558,9 +653,127 @@ public class SuiviMentaleController {
             scoreMentalMoyenLabel.setText(String.format("%.2f", moyenneScore));
         }
 
-        if (scoreProgressBar != null) {
-            scoreProgressBar.setProgress(Math.max(0, Math.min(1, moyenneScore / 100.0)));
+        chargerPieChartHumeurs(tresMal, neutre, bien, tresBien);
+        chargerBarChartMoyennes(moyenneStress, moyenneEnergie, moyenneSommeil, moyenneScore);
+        chargerLineChartEvolution(liste);
+    }
+
+    private void viderCharts() {
+        if (pieChartHumeursStats != null) {
+            pieChartHumeursStats.setData(FXCollections.observableArrayList());
         }
+        if (barChartMoyennes != null) {
+            barChartMoyennes.getData().clear();
+        }
+        if (lineChartEvolutionScore != null) {
+            lineChartEvolutionScore.getData().clear();
+        }
+    }
+
+    private void chargerPieChartHumeurs(int tresMal, int neutre, int bien, int tresBien) {
+        if (pieChartHumeursStats == null) {
+            return;
+        }
+
+        ObservableList<PieChart.Data> data = FXCollections.observableArrayList();
+
+        if (tresMal > 0) data.add(new PieChart.Data("Très mal", tresMal));
+        if (neutre > 0) data.add(new PieChart.Data("Neutre", neutre));
+        if (bien > 0) data.add(new PieChart.Data("Bien", bien));
+        if (tresBien > 0) data.add(new PieChart.Data("Très bien", tresBien));
+
+        pieChartHumeursStats.setData(data);
+        pieChartHumeursStats.setLegendVisible(false);
+        pieChartHumeursStats.setLabelsVisible(true);
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                String[] colors = {"#D6C6E1", "#CBBBAF", "#B7C9E2", "#C7D7C0"};
+                int i = 0;
+                for (PieChart.Data item : pieChartHumeursStats.getData()) {
+                    Node node = item.getNode();
+                    if (node != null) {
+                        node.setStyle("-fx-pie-color: " + colors[i % colors.length] + ";");
+                    }
+                    i++;
+                }
+            }
+        });
+    }
+
+    private void chargerBarChartMoyennes(double stress, double energie, double sommeil, double score) {
+        if (barChartMoyennes == null) {
+            return;
+        }
+
+        barChartMoyennes.getData().clear();
+
+        XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
+        series.getData().add(new XYChart.Data<String, Number>("Stress", stress));
+        series.getData().add(new XYChart.Data<String, Number>("Énergie", energie));
+        series.getData().add(new XYChart.Data<String, Number>("Sommeil", sommeil));
+        series.getData().add(new XYChart.Data<String, Number>("Score", score));
+
+        barChartMoyennes.getData().add(series);
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                for (Node node : barChartMoyennes.lookupAll(".default-color0.chart-bar")) {
+                    node.setStyle("-fx-bar-fill: #AAB8C7;");
+                }
+            }
+        });
+    }
+
+    private void chargerLineChartEvolution(List<SuiviMentale> liste) {
+        if (lineChartEvolutionScore == null) {
+            return;
+        }
+
+        lineChartEvolutionScore.getData().clear();
+
+        TreeMap<LocalDate, List<Integer>> grouped = new TreeMap<LocalDate, List<Integer>>();
+
+        for (SuiviMentale s : liste) {
+            if (s.getDateDeSuivi() == null) {
+                continue;
+            }
+
+            LocalDate date = s.getDateDeSuivi().toLocalDate();
+            if (!grouped.containsKey(date)) {
+                grouped.put(date, new ArrayList<Integer>());
+            }
+            grouped.get(date).add(s.getScoreMentale());
+        }
+
+        XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
+
+        for (Map.Entry<LocalDate, List<Integer>> entry : grouped.entrySet()) {
+            double somme = 0;
+            for (Integer val : entry.getValue()) {
+                somme += val;
+            }
+            double moyenne = somme / entry.getValue().size();
+            series.getData().add(new XYChart.Data<String, Number>(entry.getKey().toString(), moyenne));
+        }
+
+        lineChartEvolutionScore.getData().add(series);
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                Node line = lineChartEvolutionScore.lookup(".chart-series-line");
+                if (line != null) {
+                    line.setStyle("-fx-stroke: #8FA6B8; -fx-stroke-width: 2px;");
+                }
+
+                for (Node node : lineChartEvolutionScore.lookupAll(".chart-line-symbol")) {
+                    node.setStyle("-fx-background-color: #8FA6B8, white;");
+                }
+            }
+        });
     }
 
     private void chargerSuiviDansFormulaire(SuiviMentale s) {
@@ -613,9 +826,36 @@ public class SuiviMentaleController {
         if (!autorise) {
             afficherGlobalMessage("Ajout désactivé : aucun objectif en cours pour cet utilisateur.", true);
         }
+
+        afficherObjectifLie();
+    }
+
+    private void afficherObjectifLie() {
+        if (objectifLieLabel == null) {
+            return;
+        }
+
+        Objectif objectifEnCours = objectifService.getObjectifEnCoursByUser(currentUserId);
+
+        if (objectifEnCours == null) {
+            objectifLieLabel.setText("Aucun objectif en cours.");
+            return;
+        }
+
+        objectifLieLabel.setText(
+                "Ce suivi sera lié à l'objectif : " + safeTexte(objectifEnCours.getTitre()) +
+                        " | Type : " + safeTexte(objectifEnCours.getTypeObjectif()) +
+                        " | Cible : " + objectifEnCours.getValeurCible()
+        );
     }
 
     private void mettreAJourProgressionObjectif(int objectifId) {
+        Objectif objectif = objectifService.getById(objectifId);
+
+        if (objectif == null) {
+            return;
+        }
+
         List<SuiviMentale> suivis = suiviService.getByObjectif(objectifId);
 
         if (suivis == null || suivis.isEmpty()) {
@@ -623,12 +863,53 @@ public class SuiviMentaleController {
             return;
         }
 
-        double somme = 0;
-        for (SuiviMentale s : suivis) {
-            somme += s.getScoreMentale();
+        String type = objectif.getTypeObjectif() == null ? "" : objectif.getTypeObjectif().trim().toLowerCase();
+        double cible = objectif.getValeurCible();
+
+        if (cible <= 0) {
+            objectifService.updateProgression(objectifId, 0);
+            return;
         }
 
-        int progression = (int) Math.round(somme / suivis.size());
+        double somme = 0;
+
+        for (SuiviMentale s : suivis) {
+            switch (type) {
+                case "stress":
+                    somme += s.getTauxDeStress();
+                    break;
+                case "stress_global":
+                    somme += s.getTauxDeStressGlobale();
+                    break;
+                case "sommeil":
+                    somme += s.getHeureDeSommeil();
+                    break;
+                case "energie":
+                    somme += s.getNiveauDenergie();
+                    break;
+                case "score_mentale":
+                    somme += s.getScoreMentale();
+                    break;
+                default:
+                    somme += s.getScoreMentale();
+                    break;
+            }
+        }
+
+        double moyenne = somme / suivis.size();
+        int progression;
+
+        if ("stress".equals(type) || "stress_global".equals(type)) {
+            if (moyenne <= cible) {
+                progression = 100;
+            } else {
+                progression = (int) Math.round((cible / moyenne) * 100.0);
+            }
+        } else {
+            progression = (int) Math.round((moyenne / cible) * 100.0);
+        }
+
+        progression = Math.max(0, Math.min(100, progression));
         objectifService.updateProgression(objectifId, progression);
     }
 
@@ -663,11 +944,23 @@ public class SuiviMentaleController {
     }
 
     private String getHumeurDominante(int tresMal, int neutre, int bien, int tresBien) {
-        int max = Math.max(Math.max(tresMal, neutre), Math.max(bien, tresBien));
-        if (max == tresMal) return "Très mal";
-        if (max == neutre) return "Neutre";
-        if (max == bien) return "Bien";
-        return "Très bien";
+        LinkedHashMap<String, Integer> map = new LinkedHashMap<String, Integer>();
+        map.put("Très mal", tresMal);
+        map.put("Neutre", neutre);
+        map.put("Bien", bien);
+        map.put("Très bien", tresBien);
+
+        String best = "-";
+        int max = -1;
+
+        for (Map.Entry<String, Integer> entry : map.entrySet()) {
+            if (entry.getValue() > max) {
+                max = entry.getValue();
+                best = entry.getKey();
+            }
+        }
+
+        return best;
     }
 
     @FXML
@@ -715,5 +1008,9 @@ public class SuiviMentaleController {
                             "-fx-padding: 8 16;"
             );
         }
+    }
+
+    private String safeTexte(String valeur) {
+        return valeur == null ? "" : valeur;
     }
 }

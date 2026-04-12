@@ -1,7 +1,15 @@
 package controllers;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.PieChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -14,7 +22,9 @@ import services.ServiceObjectif;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class ObjectifController {
@@ -51,6 +61,11 @@ public class ObjectifController {
     @FXML private Label objectifsAtteintsLabel;
     @FXML private Label objectifsEnCoursLabel;
 
+    @FXML private PieChart pieChartStatuts;
+    @FXML private BarChart<String, Number> barChartProgressionType;
+    @FXML private CategoryAxis xAxisProgressionType;
+    @FXML private NumberAxis yAxisProgressionType;
+
     private final ServiceObjectif service = new ServiceObjectif();
     private Integer editingObjectifId = null;
 
@@ -79,6 +94,27 @@ public class ObjectifController {
                 "", "en cours", "terminé", "annulé"
         ));
         searchStatutCombo.setValue("");
+
+        if (xAxisProgressionType != null) {
+            xAxisProgressionType.setAnimated(false);
+            xAxisProgressionType.setTickLabelRotation(-15);
+        }
+
+        if (yAxisProgressionType != null) {
+            yAxisProgressionType.setAnimated(false);
+            yAxisProgressionType.setAutoRanging(true);
+            yAxisProgressionType.setForceZeroInRange(true);
+        }
+
+        if (barChartProgressionType != null) {
+            barChartProgressionType.setAnimated(false);
+            barChartProgressionType.setLegendVisible(false);
+        }
+
+        if (pieChartStatuts != null) {
+            pieChartStatuts.setLegendVisible(false);
+            pieChartStatuts.setLabelsVisible(true);
+        }
 
         afficherGlobalMessage("", false);
         refreshAll();
@@ -144,10 +180,12 @@ public class ObjectifController {
         historiqueTabButton.setStyle(normalStyle);
         resumeTabButton.setStyle(normalStyle);
 
-        switch (activeTab) {
-            case "ajouter" -> ajouterTabButton.setStyle(activeStyle);
-            case "historique" -> historiqueTabButton.setStyle(activeStyle);
-            case "resume" -> resumeTabButton.setStyle(activeStyle);
+        if ("ajouter".equals(activeTab)) {
+            ajouterTabButton.setStyle(activeStyle);
+        } else if ("historique".equals(activeTab)) {
+            historiqueTabButton.setStyle(activeStyle);
+        } else if ("resume".equals(activeTab)) {
+            resumeTabButton.setStyle(activeStyle);
         }
     }
 
@@ -292,7 +330,7 @@ public class ObjectifController {
         historiqueContainer.getChildren().clear();
 
         List<Objectif> objectifs = service.getByUser(currentUserId);
-        List<Objectif> filtres = new ArrayList<>();
+        List<Objectif> filtres = new ArrayList<Objectif>();
 
         String titreRecherche = searchTitreField != null ? searchTitreField.getText().trim().toLowerCase() : "";
         LocalDate dateRecherche = searchDateCreationPicker != null ? searchDateCreationPicker.getValue() : null;
@@ -415,13 +453,28 @@ public class ObjectifController {
         int total = objectifs.size();
         int atteints = 0;
         int enCours = 0;
+        int annules = 0;
+
+        Map<String, Integer> countsByType = new LinkedHashMap<String, Integer>();
+        Map<String, Integer> progressSumsByType = new LinkedHashMap<String, Integer>();
 
         for (Objectif o : objectifs) {
             if (isTermine(o.getStatutObjectif())) {
                 atteints++;
             } else if ("en cours".equalsIgnoreCase(o.getStatutObjectif())) {
                 enCours++;
+            } else if ("annulé".equalsIgnoreCase(o.getStatutObjectif()) || "annule".equalsIgnoreCase(o.getStatutObjectif())) {
+                annules++;
             }
+
+            String type = safe(o.getTypeObjectif());
+            if (!countsByType.containsKey(type)) {
+                countsByType.put(type, 0);
+                progressSumsByType.put(type, 0);
+            }
+
+            countsByType.put(type, countsByType.get(type) + 1);
+            progressSumsByType.put(type, progressSumsByType.get(type) + o.getProgression());
         }
 
         totalObjectifsLabel.setText(String.valueOf(total));
@@ -433,6 +486,74 @@ public class ObjectifController {
         if (objectifsEnCoursLabel != null) {
             objectifsEnCoursLabel.setText(String.valueOf(enCours));
         }
+
+        chargerPieChartStatuts(atteints, enCours, annules);
+        chargerBarChartProgressionType(countsByType, progressSumsByType);
+    }
+
+    private void chargerPieChartStatuts(int atteints, int enCours, int annules) {
+        if (pieChartStatuts == null) {
+            return;
+        }
+
+        ObservableList<PieChart.Data> data = FXCollections.observableArrayList();
+
+        if (atteints > 0) {
+            data.add(new PieChart.Data("Terminés", atteints));
+        }
+        if (enCours > 0) {
+            data.add(new PieChart.Data("En cours", enCours));
+        }
+        if (annules > 0) {
+            data.add(new PieChart.Data("Annulés", annules));
+        }
+
+        pieChartStatuts.setData(data);
+        pieChartStatuts.setLegendVisible(false);
+        pieChartStatuts.setLabelsVisible(true);
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                String[] colors = {"#C7D7C0", "#B7C9E2", "#D6C6E1"};
+                int i = 0;
+                for (PieChart.Data item : pieChartStatuts.getData()) {
+                    Node node = item.getNode();
+                    if (node != null) {
+                        node.setStyle("-fx-pie-color: " + colors[i % colors.length] + ";");
+                    }
+                    i++;
+                }
+            }
+        });
+    }
+
+    private void chargerBarChartProgressionType(Map<String, Integer> countsByType, Map<String, Integer> progressSumsByType) {
+        if (barChartProgressionType == null) {
+            return;
+        }
+
+        barChartProgressionType.getData().clear();
+
+        XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
+
+        for (String type : countsByType.keySet()) {
+            int count = countsByType.get(type);
+            int sum = progressSumsByType.get(type);
+            double moyenne = count == 0 ? 0 : (double) sum / count;
+            series.getData().add(new XYChart.Data<String, Number>(type, moyenne));
+        }
+
+        barChartProgressionType.getData().add(series);
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                for (Node node : barChartProgressionType.lookupAll(".default-color0.chart-bar")) {
+                    node.setStyle("-fx-bar-fill: #AAB8C7;");
+                }
+            }
+        });
     }
 
     private void confirmerModification(Objectif o) {

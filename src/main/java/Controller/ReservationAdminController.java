@@ -1,16 +1,14 @@
 package Controller;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import models.Reservation;
 import services.ServiceReservation;
@@ -24,199 +22,139 @@ import java.util.ResourceBundle;
 
 public class ReservationAdminController implements Initializable {
 
-    @FXML private TableView<Reservation> reservationTable;
-    @FXML private TableColumn<Reservation, Integer> colId;
-    @FXML private TableColumn<Reservation, String>  colActivite;
-    @FXML private TableColumn<Reservation, String>  colEtudiant;
-    @FXML private TableColumn<Reservation, String>  colPlace;
-    @FXML private TableColumn<Reservation, String>  colDate;
-    @FXML private TableColumn<Reservation, Void>    colActions;
+    @FXML private VBox reservationsVBox;
     @FXML private Label lblTotal;
-    @FXML private Label lblTotalHeader;
 
     private ServiceReservation serviceReservation;
-    private ObservableList<Reservation> reservationsList;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         serviceReservation = new ServiceReservation();
-        reservationsList = FXCollections.observableArrayList();
-
-        configurerColonnes();
         chargerReservations();
     }
 
-    private void configurerColonnes() {
-        colId.setCellValueFactory(new PropertyValueFactory<>("idReservation"));
-        colId.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(Integer item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) { setGraphic(null); }
-                else {
-                    Label lbl = new Label("#" + item);
-                    lbl.setStyle("-fx-background-color: #4a5568; -fx-text-fill: white; " +
-                                 "-fx-padding: 4 10; -fx-background-radius: 12; -fx-font-weight: bold; -fx-font-size: 12px;");
-                    setGraphic(lbl);
-                    setAlignment(Pos.CENTER);
-                }
-            }
-        });
-
-        // Colonne Activité avec titre + dates
-        colActivite.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) { setGraphic(null); return; }
-                Reservation r = getTableView().getItems().get(getIndex());
-                if (r == null) { setGraphic(null); return; }
-                javafx.scene.layout.VBox vb = new javafx.scene.layout.VBox(2);
-                Label titre = new Label(r.getTitreActivite() != null ? r.getTitreActivite() : "—");
-                titre.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #2d3748;");
-                setGraphic(vb);
-                vb.getChildren().add(titre);
-            }
-        });
-
-        colEtudiant.setCellValueFactory(new PropertyValueFactory<>("nomEtudiant"));
-        colEtudiant.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) { setGraphic(null); return; }
-                Label lbl = new Label("👤 " + item);
-                lbl.setStyle("-fx-font-size: 13px; -fx-text-fill: #2d3748;");
-                setGraphic(lbl);
-            }
-        });
-
-        colPlace.setCellValueFactory(new PropertyValueFactory<>("place"));
-        colPlace.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) { setGraphic(null); return; }
-                Label lbl = new Label(item);
-                lbl.setStyle("-fx-background-color: #e8f4f8; -fx-text-fill: #2d3748; " +
-                             "-fx-padding: 4 10; -fx-background-radius: 8; -fx-font-weight: bold;");
-                setGraphic(lbl);
-                setAlignment(Pos.CENTER);
-            }
-        });
-
-        colDate.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) { setGraphic(null); return; }
-                Reservation r = getTableView().getItems().get(getIndex());
-                if (r == null || r.getDateReservation() == null) { setGraphic(null); return; }
-                DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                Label lbl = new Label("📅 " + r.getDateReservation().format(fmt));
-                lbl.setStyle("-fx-font-size: 12px; -fx-text-fill: #4a5568;");
-                setGraphic(lbl);
-            }
-        });
-
-        // Colonne Actions (modifier + supprimer)
-        colActions.setCellFactory(col -> new TableCell<>() {
-            private final Button btnEdit = new Button("Modifier");
-            private final Button btnSupp = new Button("Supprimer");
-
-            {
-                btnEdit.setStyle(
-                    "-fx-background-color: #2d3748; -fx-text-fill: white; " +
-                    "-fx-font-size: 12px; -fx-font-weight: bold; " +
-                    "-fx-padding: 7 14; -fx-background-radius: 20; -fx-cursor: hand;" +
-                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 4, 0, 0, 2);");
-                btnEdit.setOnMouseEntered(e -> btnEdit.setStyle(
-                    "-fx-background-color: #4a5568; -fx-text-fill: white; " +
-                    "-fx-font-size: 12px; -fx-font-weight: bold; " +
-                    "-fx-padding: 7 14; -fx-background-radius: 20; -fx-cursor: hand;" +
-                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0, 0, 3);"));
-                btnEdit.setOnMouseExited(e -> btnEdit.setStyle(
-                    "-fx-background-color: #2d3748; -fx-text-fill: white; " +
-                    "-fx-font-size: 12px; -fx-font-weight: bold; " +
-                    "-fx-padding: 7 14; -fx-background-radius: 20; -fx-cursor: hand;" +
-                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 4, 0, 0, 2);"));
-                btnEdit.setOnAction(e -> {
-                    Reservation r = getTableView().getItems().get(getIndex());
-                    ouvrirModification(r);
-                });
-
-                btnSupp.setStyle(
-                    "-fx-background-color: #e53e3e; -fx-text-fill: white; " +
-                    "-fx-font-size: 12px; -fx-font-weight: bold; " +
-                    "-fx-padding: 7 14; -fx-background-radius: 20; -fx-cursor: hand;" +
-                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 4, 0, 0, 2);");
-                btnSupp.setOnMouseEntered(e -> btnSupp.setStyle(
-                    "-fx-background-color: #c53030; -fx-text-fill: white; " +
-                    "-fx-font-size: 12px; -fx-font-weight: bold; " +
-                    "-fx-padding: 7 14; -fx-background-radius: 20; -fx-cursor: hand;" +
-                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0, 0, 3);"));
-                btnSupp.setOnMouseExited(e -> btnSupp.setStyle(
-                    "-fx-background-color: #e53e3e; -fx-text-fill: white; " +
-                    "-fx-font-size: 12px; -fx-font-weight: bold; " +
-                    "-fx-padding: 7 14; -fx-background-radius: 20; -fx-cursor: hand;" +
-                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 4, 0, 0, 2);"));
-                btnSupp.setOnAction(e -> {
-                    Reservation r = getTableView().getItems().get(getIndex());
-                    Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                            "Supprimer la réservation #" + r.getIdReservation() + " ?", ButtonType.YES, ButtonType.NO);
-                    confirm.setHeaderText(null);
-                    confirm.showAndWait().ifPresent(bt -> {
-                        if (bt == ButtonType.YES) {
-                            try {
-                                serviceReservation.supprimerReservation(r.getIdReservation());
-                                chargerReservations();
-                            } catch (SQLException ex) {
-                                new Alert(Alert.AlertType.ERROR, "Erreur: " + ex.getMessage()).showAndWait();
-                            }
-                        }
-                    });
-                });
-            }
-
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) { setGraphic(null); }
-                else {
-                    HBox box = new HBox(8, btnEdit, btnSupp);
-                    box.setAlignment(Pos.CENTER);
-                    setGraphic(box);
-                }
-            }
-        });
-    }
+    // ─── Chargement ──────────────────────────────────────────────────────────
 
     private void chargerReservations() {
         try {
             List<Reservation> list = serviceReservation.getAllReservations();
-            reservationsList.setAll(list);
-            reservationTable.setItems(reservationsList);
+            reservationsVBox.getChildren().clear();
             lblTotal.setText(String.valueOf(list.size()));
-            lblTotalHeader.setText(list.size() + " réservation(s)");
 
-            // Hauteur dynamique: header (35px) + chaque ligne (50px) + min 100px
-            double rowHeight = 50;
-            double headerHeight = 35;
-            double minHeight = 100;
-            double newHeight = Math.max(minHeight, headerHeight + list.size() * rowHeight);
-            reservationTable.setPrefHeight(newHeight);
-            reservationTable.setMinHeight(newHeight);
-            reservationTable.setMaxHeight(newHeight);
+            if (list.isEmpty()) {
+                Label vide = new Label("Aucune réservation trouvée");
+                vide.setStyle("-fx-font-size: 14px; -fx-text-fill: #a0aec0; -fx-padding: 40;");
+                vide.setMaxWidth(Double.MAX_VALUE);
+                vide.setAlignment(Pos.CENTER);
+                reservationsVBox.getChildren().add(vide);
+            } else {
+                for (Reservation r : list) {
+                    reservationsVBox.getChildren().add(creerCarte(r));
+                }
+            }
         } catch (SQLException e) {
-            new Alert(Alert.AlertType.ERROR, "Erreur chargement: " + e.getMessage()).showAndWait();
+            afficherToast("Erreur chargement: " + e.getMessage(), "#e53e3e", "❌");
         }
     }
+
+    // ─── Carte réservation ───────────────────────────────────────────────────
+
+    private HBox creerCarte(Reservation r) {
+        HBox card = new HBox(20);
+        card.setAlignment(Pos.CENTER_LEFT);
+        card.setPadding(new Insets(18, 22, 18, 22));
+        card.setStyle("-fx-background-color: white; -fx-background-radius: 14; " +
+                      "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);");
+
+        // Badge ID
+        Label idLbl = new Label("#" + r.getIdReservation());
+        idLbl.setMinWidth(50);
+        idLbl.setAlignment(Pos.CENTER);
+        idLbl.setStyle("-fx-background-color: #2d3748; -fx-text-fill: white; " +
+                       "-fx-font-size: 13px; -fx-font-weight: bold; " +
+                       "-fx-padding: 6 12; -fx-background-radius: 20;");
+
+        // Activité
+        VBox vbActivite = new VBox(3);
+        vbActivite.setMinWidth(180);
+        Label lblActiviteTitre = new Label(r.getTitreActivite() != null ? r.getTitreActivite() : "—");
+        lblActiviteTitre.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2d3748;");
+        Label lblActiviteSub = new Label("Activité");
+        lblActiviteSub.setStyle("-fx-font-size: 11px; -fx-text-fill: #a0aec0;");
+        vbActivite.getChildren().addAll(lblActiviteSub, lblActiviteTitre);
+
+        // Étudiant
+        VBox vbEtudiant = new VBox(3);
+        vbEtudiant.setMinWidth(150);
+        Label lblEtudiantSub = new Label("Étudiant");
+        lblEtudiantSub.setStyle("-fx-font-size: 11px; -fx-text-fill: #a0aec0;");
+        Label lblEtudiantVal = new Label("👤 " + (r.getNomEtudiant() != null ? r.getNomEtudiant() : "—"));
+        lblEtudiantVal.setStyle("-fx-font-size: 13px; -fx-text-fill: #2d3748;");
+        vbEtudiant.getChildren().addAll(lblEtudiantSub, lblEtudiantVal);
+
+        // Place
+        VBox vbPlace = new VBox(3);
+        vbPlace.setMinWidth(80);
+        Label lblPlaceSub = new Label("Place");
+        lblPlaceSub.setStyle("-fx-font-size: 11px; -fx-text-fill: #a0aec0;");
+        Label lblPlaceVal = new Label(r.getPlace() != null ? r.getPlace() : "—");
+        lblPlaceVal.setStyle("-fx-background-color: #e8f4f8; -fx-text-fill: #2d3748; " +
+                             "-fx-font-size: 14px; -fx-font-weight: bold; " +
+                             "-fx-padding: 4 12; -fx-background-radius: 8;");
+        vbPlace.getChildren().addAll(lblPlaceSub, lblPlaceVal);
+
+        // Date
+        VBox vbDate = new VBox(3);
+        vbDate.setMinWidth(130);
+        Label lblDateSub = new Label("Date réservation");
+        lblDateSub.setStyle("-fx-font-size: 11px; -fx-text-fill: #a0aec0;");
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        Label lblDateVal = new Label(r.getDateReservation() != null ? "📅 " + r.getDateReservation().format(fmt) : "—");
+        lblDateVal.setStyle("-fx-font-size: 13px; -fx-text-fill: #4a5568;");
+        vbDate.getChildren().addAll(lblDateSub, lblDateVal);
+
+        // Spacer
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        // Boutons
+        Button btnEdit = new Button("✏ Modifier");
+        btnEdit.setStyle("-fx-background-color: #2d3748; -fx-text-fill: white; -fx-font-size: 12px; " +
+                         "-fx-font-weight: bold; -fx-padding: 9 18; -fx-background-radius: 20; -fx-cursor: hand;");
+        btnEdit.setOnMouseEntered(e -> btnEdit.setStyle("-fx-background-color: #4a5568; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 9 18; -fx-background-radius: 20; -fx-cursor: hand;"));
+        btnEdit.setOnMouseExited(e  -> btnEdit.setStyle("-fx-background-color: #2d3748; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 9 18; -fx-background-radius: 20; -fx-cursor: hand;"));
+        btnEdit.setOnAction(e -> ouvrirModification(r));
+        btnEdit.setMinWidth(110);
+
+        Button btnDel = new Button("🗑 Supprimer");
+        btnDel.setStyle("-fx-background-color: #e53e3e; -fx-text-fill: white; -fx-font-size: 12px; " +
+                        "-fx-font-weight: bold; -fx-padding: 9 18; -fx-background-radius: 20; -fx-cursor: hand;");
+        btnDel.setOnMouseEntered(e -> btnDel.setStyle("-fx-background-color: #c53030; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 9 18; -fx-background-radius: 20; -fx-cursor: hand;"));
+        btnDel.setOnMouseExited(e  -> btnDel.setStyle("-fx-background-color: #e53e3e; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 9 18; -fx-background-radius: 20; -fx-cursor: hand;"));
+        btnDel.setOnAction(e -> afficherConfirmationSuppression(r));
+        btnDel.setMinWidth(110);
+
+        HBox actions = new HBox(10, btnEdit, btnDel);
+        actions.setAlignment(Pos.CENTER_RIGHT);
+
+        card.getChildren().addAll(idLbl, vbActivite, vbEtudiant, vbPlace, vbDate, spacer, actions);
+
+        // Hover
+        card.setOnMouseEntered(e -> card.setStyle("-fx-background-color: #f8fafc; -fx-background-radius: 14; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.13), 12, 0, 0, 4);"));
+        card.setOnMouseExited(e  -> card.setStyle("-fx-background-color: white; -fx-background-radius: 14; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);"));
+
+        return card;
+    }
+
+    // ─── Navigation ──────────────────────────────────────────────────────────
 
     @FXML
     private void ouvrirActivites() {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/GestionActivite.fxml"));
-            Stage stage = (Stage) reservationTable.getScene().getWindow();
+            Stage stage = (Stage) reservationsVBox.getScene().getWindow();
             stage.setScene(new Scene(root, 1200, 800));
             stage.setTitle("Gestion des Activités - MentalUp");
         } catch (IOException e) {
@@ -224,52 +162,70 @@ public class ReservationAdminController implements Initializable {
         }
     }
 
+    // ─── Popup Modification ──────────────────────────────────────────────────
+
     private void ouvrirModification(Reservation r) {
         Stage popup = new Stage();
         popup.initModality(javafx.stage.Modality.APPLICATION_MODAL);
         popup.setTitle("Modifier la réservation #" + r.getIdReservation());
+        popup.setResizable(false);
 
-        javafx.scene.layout.VBox root = new javafx.scene.layout.VBox(20);
-        root.setStyle("-fx-background-color: white; -fx-padding: 30;");
+        final String nomInitial   = r.getNomEtudiant();
+        final String placeInitial = r.getPlace();
+        final java.time.LocalDate dateInitiale = r.getDateReservation();
 
-        Label titre = new Label("✏️ Modifier la réservation #" + r.getIdReservation());
-        titre.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3748;");
+        VBox root = new VBox(18);
+        root.setPadding(new Insets(30));
+        root.setStyle("-fx-background-color: #f5f7fa;");
 
-        // Champ nom étudiant
-        Label lblNom = new Label("Nom de l'étudiant:");
-        lblNom.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #4a5568;");
-        TextField tfNom = new TextField(r.getNomEtudiant());
-        tfNom.setStyle("-fx-padding: 10; -fx-font-size: 13px; -fx-border-color: #e2e8f0; " +
-                       "-fx-border-width: 2; -fx-border-radius: 8; -fx-background-radius: 8;");
+        // Header
+        HBox header = new HBox();
+        header.setAlignment(Pos.CENTER_LEFT);
+        Label titreLabel = new Label("✏  Modifier la réservation  #" + r.getIdReservation());
+        titreLabel.setStyle("-fx-font-size: 17px; -fx-font-weight: bold; -fx-text-fill: #2d3748;");
+        root.getChildren().add(titreLabel);
 
-        // Champ place
-        Label lblPlace = new Label("Place (ex: A1, H8):");
-        lblPlace.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #4a5568;");
-        TextField tfPlace = new TextField(r.getPlace());
-        tfPlace.setStyle("-fx-padding: 10; -fx-font-size: 13px; -fx-border-color: #e2e8f0; " +
-                         "-fx-border-width: 2; -fx-border-radius: 8; -fx-background-radius: 8;");
+        // Carte blanche
+        VBox card = new VBox(16);
+        card.setPadding(new Insets(25));
+        card.setStyle("-fx-background-color: white; -fx-background-radius: 14; " +
+                      "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 3);");
 
-        // Champ date
-        Label lblDate = new Label("Date de réservation:");
-        lblDate.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #4a5568;");
+        VBox boxNom   = fieldBox("👤  Nom de l'étudiant", r.getNomEtudiant());
+        VBox boxPlace = fieldBox("🪑  Place (ex: A1, H8)", r.getPlace());
+        TextField tfNom   = (TextField) boxNom.getChildren().get(1);
+        TextField tfPlace = (TextField) boxPlace.getChildren().get(1);
+
+        VBox boxDate = new VBox(6);
+        Label lblDate = new Label("📅  Date de réservation");
+        lblDate.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #4a5568;");
         DatePicker dpDate = new DatePicker(r.getDateReservation());
-        dpDate.setStyle("-fx-font-size: 13px;");
         dpDate.setMaxWidth(Double.MAX_VALUE);
+        dpDate.setStyle("-fx-font-size: 13px; -fx-background-color: white;");
+        boxDate.getChildren().addAll(lblDate, dpDate);
+
+        card.getChildren().addAll(boxNom, boxPlace, boxDate);
+        root.getChildren().add(card);
 
         // Boutons
         Button btnAnnuler = new Button("Annuler");
+        btnAnnuler.setMaxWidth(Double.MAX_VALUE);
         btnAnnuler.setStyle("-fx-background-color: #e2e8f0; -fx-text-fill: #4a5568; -fx-font-size: 13px; " +
-                            "-fx-font-weight: bold; -fx-padding: 10 25; -fx-cursor: hand; -fx-background-radius: 8;");
+                            "-fx-font-weight: bold; -fx-padding: 13; -fx-cursor: hand; -fx-background-radius: 10;");
         btnAnnuler.setOnAction(e -> popup.close());
 
-        Button btnSauvegarder = new Button("✅ Sauvegarder");
-        btnSauvegarder.setStyle("-fx-background-color: #4a5568; -fx-text-fill: white; -fx-font-size: 13px; " +
-                                "-fx-font-weight: bold; -fx-padding: 10 25; -fx-cursor: hand; -fx-background-radius: 8;");
-        btnSauvegarder.setOnAction(e -> {
+        Button btnModifier = new Button("✅  Modifier");
+        btnModifier.setMaxWidth(Double.MAX_VALUE);
+        btnModifier.setStyle("-fx-background-color: #2d3748; -fx-text-fill: white; -fx-font-size: 13px; " +
+                             "-fx-font-weight: bold; -fx-padding: 13; -fx-cursor: hand; -fx-background-radius: 10;");
+        btnModifier.setOnAction(e -> {
             if (tfNom.getText().trim().isEmpty() || tfPlace.getText().trim().isEmpty() || dpDate.getValue() == null) {
-                new Alert(Alert.AlertType.WARNING, "Tous les champs sont obligatoires!", ButtonType.OK).showAndWait();
-                return;
+                afficherToast("Tous les champs sont obligatoires!", "#ed8936", "⚠️"); return;
             }
+            boolean aucun = tfNom.getText().trim().equals(nomInitial)
+                    && tfPlace.getText().trim().toUpperCase().equals(placeInitial)
+                    && dpDate.getValue().equals(dateInitiale);
+            if (aucun) { afficherToast("Aucune modification détectée!", "#ed8936", "⚠️"); return; }
             try {
                 r.setNomEtudiant(tfNom.getText().trim());
                 r.setPlace(tfPlace.getText().trim().toUpperCase());
@@ -277,18 +233,121 @@ public class ReservationAdminController implements Initializable {
                 serviceReservation.modifierReservation(r);
                 popup.close();
                 chargerReservations();
-                new Alert(Alert.AlertType.INFORMATION, "✅ Réservation modifiée avec succès!", ButtonType.OK).showAndWait();
+                afficherToast("Réservation modifiée avec succès!", "#27ae60", "✅");
             } catch (SQLException ex) {
-                new Alert(Alert.AlertType.ERROR, "Erreur: " + ex.getMessage(), ButtonType.OK).showAndWait();
+                afficherToast("Erreur: " + ex.getMessage(), "#e53e3e", "❌");
             }
         });
 
-        HBox footerBtns = new HBox(15, btnAnnuler, btnSauvegarder);
-        footerBtns.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+        HBox btns = new HBox(12, btnAnnuler, btnModifier);
+        HBox.setHgrow(btnAnnuler, Priority.ALWAYS);
+        HBox.setHgrow(btnModifier, Priority.ALWAYS);
+        root.getChildren().add(btns);
 
-        root.getChildren().addAll(titre, lblNom, tfNom, lblPlace, tfPlace, lblDate, dpDate, footerBtns);
-
-        popup.setScene(new Scene(root, 420, 380));
+        popup.setScene(new Scene(root, 440, 420));
         popup.showAndWait();
+    }
+
+    // ─── Popup Suppression ───────────────────────────────────────────────────
+
+    private void afficherConfirmationSuppression(Reservation r) {
+        Stage popup = new Stage();
+        popup.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+        popup.setTitle("Confirmer la suppression");
+        popup.setResizable(false);
+
+        VBox root = new VBox(20);
+        root.setAlignment(Pos.CENTER);
+        root.setPadding(new Insets(35));
+        root.setStyle("-fx-background-color: #f5f7fa;");
+
+        VBox card = new VBox(18);
+        card.setAlignment(Pos.CENTER);
+        card.setPadding(new Insets(30));
+        card.setStyle("-fx-background-color: white; -fx-background-radius: 14; " +
+                      "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 3);");
+
+        Label icone = new Label("🗑");
+        icone.setStyle("-fx-font-size: 42px;");
+        Label titre = new Label("Supprimer la réservation");
+        titre.setStyle("-fx-font-size: 17px; -fx-font-weight: bold; -fx-text-fill: #2d3748;");
+        Label msg = new Label("Voulez-vous vraiment supprimer\nla réservation #" + r.getIdReservation() + " ?");
+        msg.setStyle("-fx-font-size: 13px; -fx-text-fill: #718096; -fx-text-alignment: center;");
+        msg.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+
+        Button btnAnnuler = new Button("Annuler");
+        btnAnnuler.setStyle("-fx-background-color: #e2e8f0; -fx-text-fill: #4a5568; -fx-font-size: 13px; " +
+                            "-fx-font-weight: bold; -fx-padding: 11 35; -fx-cursor: hand; -fx-background-radius: 10;");
+        btnAnnuler.setOnAction(e -> popup.close());
+
+        Button btnSupp = new Button("🗑  Supprimer");
+        btnSupp.setStyle("-fx-background-color: #e53e3e; -fx-text-fill: white; -fx-font-size: 13px; " +
+                         "-fx-font-weight: bold; -fx-padding: 11 35; -fx-cursor: hand; -fx-background-radius: 10;");
+        btnSupp.setOnAction(e -> {
+            try {
+                serviceReservation.supprimerReservation(r.getIdReservation());
+                popup.close();
+                chargerReservations();
+                afficherToast("Réservation #" + r.getIdReservation() + " supprimée!", "#e53e3e", "🗑");
+            } catch (SQLException ex) {
+                popup.close();
+                afficherToast("Erreur: " + ex.getMessage(), "#e53e3e", "❌");
+            }
+        });
+
+        HBox btns = new HBox(15, btnAnnuler, btnSupp);
+        btns.setAlignment(Pos.CENTER);
+        card.getChildren().addAll(icone, titre, msg, btns);
+        root.getChildren().add(card);
+
+        popup.setScene(new Scene(root, 400, 300));
+        popup.showAndWait();
+    }
+
+    // ─── Toast ───────────────────────────────────────────────────────────────
+
+    private void afficherToast(String message, String couleur, String icone) {
+        Stage toast = new Stage();
+        toast.initStyle(javafx.stage.StageStyle.TRANSPARENT);
+        toast.setAlwaysOnTop(true);
+
+        HBox box = new HBox(12);
+        box.setAlignment(Pos.CENTER_LEFT);
+        box.setPadding(new Insets(16, 20, 16, 20));
+        box.setStyle("-fx-background-color: " + couleur + "; -fx-background-radius: 12; " +
+                     "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 15, 0, 0, 5);");
+        Label ico = new Label(icone); ico.setStyle("-fx-font-size: 18px;");
+        Label lbl = new Label(message);
+        lbl.setStyle("-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;");
+        lbl.setMaxWidth(300); lbl.setWrapText(true);
+        box.getChildren().addAll(ico, lbl);
+
+        Scene scene = new Scene(box);
+        scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+        toast.setScene(scene);
+        javafx.geometry.Rectangle2D screen = javafx.stage.Screen.getPrimary().getVisualBounds();
+        toast.setX(screen.getMaxX() - 380);
+        toast.setY(screen.getMaxY() - 100);
+        toast.show();
+
+        javafx.animation.FadeTransition fade = new javafx.animation.FadeTransition(javafx.util.Duration.millis(500), box);
+        fade.setDelay(javafx.util.Duration.millis(2000));
+        fade.setFromValue(1.0); fade.setToValue(0.0);
+        fade.setOnFinished(e -> toast.close());
+        fade.play();
+    }
+
+    // ─── Utilitaires ─────────────────────────────────────────────────────────
+
+    private VBox fieldBox(String labelText, String value) {
+        VBox box = new VBox(6);
+        Label lbl = new Label(labelText);
+        lbl.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #4a5568;");
+        TextField tf = new TextField(value == null ? "" : value);
+        tf.setStyle("-fx-padding: 11; -fx-font-size: 13px; -fx-border-color: #e2e8f0; " +
+                    "-fx-border-width: 2; -fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: white;");
+        tf.setMaxWidth(Double.MAX_VALUE);
+        box.getChildren().addAll(lbl, tf);
+        return box;
     }
 }

@@ -8,220 +8,95 @@
             fx:controller="Controller.ActiviteController"
             style="-fx-background-color: #f5f7fa;">
 
-    <!-- Sidebar Dark -->
+    <!-- Sidebar -->
     <left>
-        <VBox style="-fx-background-color: #2d3748; -fx-pref-width: 260;">
-            <padding>
-                <Insets top="20" right="0" bottom="20" left="0"/>
-            </padding>
+        <VBox style="-fx-background-color: #2d3748; -fx-pref-width: 220;">
+            <padding><Insets top="20" right="0" bottom="20" left="0"/></padding>
 
-            <!-- Header avec logo et titre -->
             <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 20;">
-                <Label text="🧠" style="-fx-font-size: 32px;"/>
+                <Label text="🧠" style="-fx-font-size: 28px;"/>
                 <VBox spacing="2">
-                    <Label text="MentalUp Admin" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;"/>
-                    <Label text="Espace d'administration" style="-fx-text-fill: #a0aec0; -fx-font-size: 11px;"/>
+                    <Label text="MentalUp Admin" style="-fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;"/>
+                    <Label text="Espace d'administration" style="-fx-text-fill: #a0aec0; -fx-font-size: 10px;"/>
                 </VBox>
             </HBox>
 
-            <!-- Séparateur -->
             <Region style="-fx-background-color: #4a5568; -fx-pref-height: 1;">
-                <VBox.margin>
-                    <Insets top="10" bottom="10"/>
-                </VBox.margin>
+                <VBox.margin><Insets top="5" bottom="10"/></VBox.margin>
             </Region>
 
-            <!-- Menu Items -->
             <VBox spacing="2" style="-fx-padding: 10 15;">
-
                 <Button text="🏠  Accueil" alignment="CENTER_LEFT" maxWidth="Infinity"
-                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e0; -fx-font-size: 14px; -fx-padding: 12 15; -fx-background-radius: 8; -fx-cursor: hand;">
-                    <VBox.margin>
-                        <Insets bottom="5"/>
-                    </VBox.margin>
-                </Button>
-
+                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e0; -fx-font-size: 13px; -fx-padding: 11 15; -fx-background-radius: 8; -fx-cursor: hand;"><VBox.margin><Insets bottom="3"/></VBox.margin></Button>
                 <Button text="📊  Suivi Mental" alignment="CENTER_LEFT" maxWidth="Infinity"
-                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e0; -fx-font-size: 14px; -fx-padding: 12 15; -fx-background-radius: 8; -fx-cursor: hand;">
-                    <VBox.margin>
-                        <Insets bottom="5"/>
-                    </VBox.margin>
-                </Button>
-
+                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e0; -fx-font-size: 13px; -fx-padding: 11 15; -fx-background-radius: 8; -fx-cursor: hand;"><VBox.margin><Insets bottom="3"/></VBox.margin></Button>
                 <Button text="💬  Forum" alignment="CENTER_LEFT" maxWidth="Infinity"
-                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e0; -fx-font-size: 14px; -fx-padding: 12 15; -fx-background-radius: 8; -fx-cursor: hand;">
-                    <VBox.margin>
-                        <Insets bottom="5"/>
-                    </VBox.margin>
-                </Button>
-
+                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e0; -fx-font-size: 13px; -fx-padding: 11 15; -fx-background-radius: 8; -fx-cursor: hand;"><VBox.margin><Insets bottom="3"/></VBox.margin></Button>
                 <Button text="📅  Rendez-vous" alignment="CENTER_LEFT" maxWidth="Infinity"
-                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e0; -fx-font-size: 14px; -fx-padding: 12 15; -fx-background-radius: 8; -fx-cursor: hand;">
-                    <VBox.margin>
-                        <Insets bottom="5"/>
-                    </VBox.margin>
-                </Button>
-
+                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e0; -fx-font-size: 13px; -fx-padding: 11 15; -fx-background-radius: 8; -fx-cursor: hand;"><VBox.margin><Insets bottom="3"/></VBox.margin></Button>
                 <Button text="👥  Utilisateurs" alignment="CENTER_LEFT" maxWidth="Infinity"
-                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e0; -fx-font-size: 14px; -fx-padding: 12 15; -fx-background-radius: 8; -fx-cursor: hand;">
-                    <VBox.margin>
-                        <Insets bottom="5"/>
-                    </VBox.margin>
-                </Button>
-
+                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e0; -fx-font-size: 13px; -fx-padding: 11 15; -fx-background-radius: 8; -fx-cursor: hand;"><VBox.margin><Insets bottom="3"/></VBox.margin></Button>
                 <Button text="📋  Dossiers médicaux" alignment="CENTER_LEFT" maxWidth="Infinity"
-                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e0; -fx-font-size: 14px; -fx-padding: 12 15; -fx-background-radius: 8; -fx-cursor: hand;">
-                    <VBox.margin>
-                        <Insets bottom="5"/>
-                    </VBox.margin>
-                </Button>
-
+                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e0; -fx-font-size: 13px; -fx-padding: 11 15; -fx-background-radius: 8; -fx-cursor: hand;"><VBox.margin><Insets bottom="3"/></VBox.margin></Button>
                 <Button text="📝  Contenus" alignment="CENTER_LEFT" maxWidth="Infinity"
-                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e0; -fx-font-size: 14px; -fx-padding: 12 15; -fx-background-radius: 8; -fx-cursor: hand;">
-                    <VBox.margin>
-                        <Insets bottom="5"/>
-                    </VBox.margin>
-                </Button>
-
-                <!-- Activités SÉLECTIONNÉ -->
+                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e0; -fx-font-size: 13px; -fx-padding: 11 15; -fx-background-radius: 8; -fx-cursor: hand;"><VBox.margin><Insets bottom="3"/></VBox.margin></Button>
                 <Button text="⚡  Activités" alignment="CENTER_LEFT" maxWidth="Infinity"
-                        style="-fx-background-color: #4a5568; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 12 15; -fx-background-radius: 8; -fx-cursor: hand;">
-                    <VBox.margin>
-                        <Insets bottom="5"/>
-                    </VBox.margin>
-                </Button>
-
+                        style="-fx-background-color: #4a5568; -fx-text-fill: white; -fx-font-size: 13px; -fx-padding: 11 15; -fx-background-radius: 8; -fx-cursor: hand;"><VBox.margin><Insets bottom="3"/></VBox.margin></Button>
                 <Button text="🎟  Réservations" alignment="CENTER_LEFT" maxWidth="Infinity"
                         onAction="#ouvrirReservations"
-                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e0; -fx-font-size: 14px; -fx-padding: 12 15; -fx-background-radius: 8; -fx-cursor: hand;">
-                    <VBox.margin>
-                        <Insets bottom="5"/>
-                    </VBox.margin>
-                </Button>
-
+                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e0; -fx-font-size: 13px; -fx-padding: 11 15; -fx-background-radius: 8; -fx-cursor: hand;"><VBox.margin><Insets bottom="3"/></VBox.margin></Button>
             </VBox>
 
-            <!-- Spacer pour pousser le footer en bas -->
             <Region VBox.vgrow="ALWAYS"/>
 
-            <!-- Footer User Info -->
             <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 15; -fx-background-color: #1a202c; -fx-background-radius: 10;">
-                <VBox.margin>
-                    <Insets top="10" right="15" bottom="10" left="15"/>
-                </VBox.margin>
-
-                <Label text="👤" style="-fx-font-size: 24px; -fx-background-color: #4a5568; -fx-padding: 8; -fx-background-radius: 50%;"/>
+                <VBox.margin><Insets top="10" right="15" bottom="10" left="15"/></VBox.margin>
+                <Label text="👤" style="-fx-font-size: 22px; -fx-background-color: #4a5568; -fx-padding: 7; -fx-background-radius: 50%;"/>
                 <VBox spacing="2">
-                    <Label text="Admin MentalUp" style="-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                    <Label text="Admin MentalUp" style="-fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold;"/>
                     <Label text="Super Administrateur" style="-fx-text-fill: #a0aec0; -fx-font-size: 10px;"/>
                 </VBox>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Label text="⋮" style="-fx-text-fill: #cbd5e0; -fx-font-size: 20px; -fx-cursor: hand;"/>
+                <Label text="⋮" style="-fx-text-fill: #cbd5e0; -fx-font-size: 18px; -fx-cursor: hand;"/>
             </HBox>
-
         </VBox>
     </left>
 
-    <!-- Main Content Area -->
+    <!-- Main Content -->
     <center>
-        <VBox spacing="15" style="-fx-padding: 20; -fx-background-color: #f5f7fa;">
+        <VBox spacing="15" style="-fx-padding: 25; -fx-background-color: #f5f7fa;">
 
-            <!-- Header avec titre et date -->
-            <VBox spacing="5">
-                <HBox alignment="CENTER_LEFT" spacing="15">
+            <!-- Header -->
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <VBox spacing="3">
                     <Label text="Gestion des Activités 📋" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2d3748;"/>
-                    <Region HBox.hgrow="ALWAYS"/>
-                    <Button fx:id="btnVuePublique" text="👁 Vue Publique" onAction="#ouvrirVuePublique"
-                            style="-fx-background-color: #6b9fb5; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-cursor: hand; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);"/>
-                    <Label text="🔔" style="-fx-font-size: 20px; -fx-background-color: white; -fx-padding: 8; -fx-background-radius: 50%; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);"/>
-                </HBox>
-                <Label text="mercredi 8 avril 2026" style="-fx-font-size: 12px; -fx-text-fill: #718096;"/>
-            </VBox>
+                    <Label text="mercredi 8 avril 2026" style="-fx-font-size: 12px; -fx-text-fill: #718096;"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="btnAjouter" text="＋ Ajouter une activité" onAction="#ouvrirPopupAjout"
+                        style="-fx-background-color: #4a5568; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-cursor: hand; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 5, 0, 0, 2);"/>
+                <Button fx:id="btnVuePublique" text="👁 Vue Publique" onAction="#ouvrirVuePublique"
+                        style="-fx-background-color: #6b9fb5; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-cursor: hand; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);"/>
+                <Label text="🔔" style="-fx-font-size: 18px; -fx-background-color: white; -fx-padding: 8; -fx-background-radius: 50%; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);"/>
+            </HBox>
 
-            <!-- Form Card -->
-            <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);">
+            <!-- Barre recherche + tri -->
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <Label fx:id="lblCount" text="0 activité(s)"
+                       style="-fx-background-color: #4a5568; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 4 12; -fx-background-radius: 12;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <TextField fx:id="searchField" promptText="🔍  Rechercher..."
+                           style="-fx-pref-width: 220; -fx-padding: 9; -fx-font-size: 13px; -fx-border-color: #e2e8f0; -fx-border-width: 2; -fx-border-radius: 20; -fx-background-radius: 20; -fx-background-color: white;"/>
+                <ComboBox fx:id="sortCombo" promptText="Trier par..."
+                          style="-fx-pref-width: 160; -fx-font-size: 13px; -fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-width: 2; -fx-border-radius: 8; -fx-background-radius: 8;"/>
+            </HBox>
 
-                <Label text="📝 Informations de l'activité" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3748;"/>
-
-                <GridPane hgap="15" vgap="12">
-                    <Label text="Titre:" GridPane.columnIndex="0" GridPane.rowIndex="0"
-                           style="-fx-font-size: 13px; -fx-text-fill: #4a5568; -fx-font-weight: bold;"/>
-                    <TextField fx:id="nomField" promptText="Entrez le titre de l'activité" GridPane.columnIndex="1" GridPane.rowIndex="0"
-                               style="-fx-pref-width: 300; -fx-padding: 8; -fx-font-size: 13px; -fx-border-color: #e2e8f0; -fx-border-width: 2; -fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: white;"/>
-
-                    <Label text="Description:" GridPane.columnIndex="0" GridPane.rowIndex="1"
-                           style="-fx-font-size: 13px; -fx-text-fill: #4a5568; -fx-font-weight: bold;"/>
-                    <TextArea fx:id="descriptionField" promptText="Décrivez l'activité en détail" GridPane.columnIndex="1" GridPane.rowIndex="1"
-                              prefRowCount="2" wrapText="true"
-                              style="-fx-pref-width: 300; -fx-padding: 8; -fx-font-size: 13px; -fx-border-color: #e2e8f0; -fx-border-width: 2; -fx-border-radius: 8; -fx-background-radius: 8; -fx-control-inner-background: white; -fx-background-color: white;"/>
-
-                    <Label text="Type:" GridPane.columnIndex="0" GridPane.rowIndex="2"
-                           style="-fx-font-size: 13px; -fx-text-fill: #4a5568; -fx-font-weight: bold;"/>
-                    <TextField fx:id="typeField" promptText="Ex: sport, culturel, créatif" GridPane.columnIndex="1" GridPane.rowIndex="2"
-                               style="-fx-pref-width: 300; -fx-padding: 8; -fx-font-size: 13px; -fx-border-color: #e2e8f0; -fx-border-width: 2; -fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: white;"/>
-
-                    <Label text="Adresse:" GridPane.columnIndex="0" GridPane.rowIndex="3"
-                           style="-fx-font-size: 13px; -fx-text-fill: #4a5568; -fx-font-weight: bold;"/>
-                    <TextField fx:id="adresseField" promptText="Lieu de l'activité" GridPane.columnIndex="1" GridPane.rowIndex="3"
-                               style="-fx-pref-width: 300; -fx-padding: 8; -fx-font-size: 13px; -fx-border-color: #e2e8f0; -fx-border-width: 2; -fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: white;"/>
-
-                    <Label text="Date Début:" GridPane.columnIndex="0" GridPane.rowIndex="4"
-                           style="-fx-font-size: 13px; -fx-text-fill: #4a5568; -fx-font-weight: bold;"/>
-                    <DatePicker fx:id="dateDebutField" promptText="Sélectionnez la date" GridPane.columnIndex="1" GridPane.rowIndex="4"
-                                style="-fx-pref-width: 300; -fx-padding: 6; -fx-font-size: 13px; -fx-background-color: white;"/>
-
-                    <Label text="Date Fin:" GridPane.columnIndex="0" GridPane.rowIndex="5"
-                           style="-fx-font-size: 13px; -fx-text-fill: #4a5568; -fx-font-weight: bold;"/>
-                    <DatePicker fx:id="dateFinField" promptText="Sélectionnez la date" GridPane.columnIndex="1" GridPane.rowIndex="5"
-                                style="-fx-pref-width: 300; -fx-padding: 6; -fx-font-size: 13px; -fx-background-color: white;"/>
-                </GridPane>
-
-                <!-- Action Buttons CRUD -->
-                <HBox spacing="10" alignment="CENTER_LEFT">
-                    <VBox.margin>
-                        <Insets top="5"/>
-                    </VBox.margin>
-
-                    <Button fx:id="btnAjouter" text="Ajouter" onAction="#ajouterActivite"
-                            style="-fx-background-color: #4a5568; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-cursor: hand; -fx-background-radius: 8;"/>
-
-                    <Button text="Modifier" onAction="#modifierActivite"
-                            style="-fx-background-color: #2d3748; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-cursor: hand; -fx-background-radius: 8;"/>
-
-                    <Button text="Supprimer" onAction="#supprimerActivite"
-                            style="-fx-background-color: #1a202c; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-cursor: hand; -fx-background-radius: 8;"/>
-
-                    <Button text="Réinitialiser" onAction="#reinitialiserChamps"
-                            style="-fx-background-color: #718096; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-cursor: hand; -fx-background-radius: 8;"/>
-                </HBox>
-            </VBox>
-
-            <!-- Table Card -->
-            <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);" VBox.vgrow="ALWAYS">
-
-                <HBox alignment="CENTER_LEFT" spacing="15">
-                    <Label text="📋 Liste des Activités" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3748;"/>
-                    <Region HBox.hgrow="ALWAYS"/>
-                    <!-- Recherche -->
-                    <TextField fx:id="searchField" promptText="🔍  Rechercher..."
-                               style="-fx-pref-width: 200; -fx-padding: 8; -fx-font-size: 13px; -fx-border-color: #e2e8f0; -fx-border-width: 2; -fx-border-radius: 20; -fx-background-radius: 20; -fx-background-color: white;"/>
-                    <!-- Tri -->
-                    <ComboBox fx:id="sortCombo" promptText="Trier par..."
-                              style="-fx-pref-width: 160; -fx-font-size: 13px; -fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-width: 2; -fx-border-radius: 8; -fx-background-radius: 8;"/>
-                </HBox>
-
-                <TableView fx:id="activiteTable" VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 8;">
-                    <columns>
-                        <TableColumn fx:id="idColumn" text="ID" prefWidth="50" style="-fx-alignment: CENTER;"/>
-                        <TableColumn fx:id="titreColumn" text="Titre" prefWidth="150"/>
-                        <TableColumn fx:id="descriptionColumn" text="Description" prefWidth="250"/>
-                        <TableColumn fx:id="typeColumn" text="Type" prefWidth="100"/>
-                        <TableColumn fx:id="adresseColumn" text="Adresse" prefWidth="150"/>
-                        <TableColumn fx:id="dateDebutColumn" text="Date Début" prefWidth="110"/>
-                        <TableColumn fx:id="dateFinColumn" text="Date Fin" prefWidth="110"/>
-                    </columns>
-                </TableView>
-            </VBox>
+            <!-- Cartes activités -->
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                        style="-fx-background: transparent; -fx-background-color: transparent; -fx-border-color: transparent;">
+                <FlowPane fx:id="activitesFlow" hgap="18" vgap="18"
+                          style="-fx-padding: 5; -fx-background-color: transparent;"/>
+            </ScrollPane>
 
         </VBox>
     </center>

@@ -246,21 +246,17 @@ public class EtudiantActivitesController implements Initializable {
         btnConfirmer.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 25; -fx-cursor: hand; -fx-background-radius: 8;");
         btnConfirmer.setOnAction(e -> {
             if (placeSelectionnee[0] == null) {
-                new Alert(Alert.AlertType.WARNING, "Veuillez sélectionner une place!", ButtonType.OK).showAndWait();
+                afficherToast("Veuillez sélectionner une place!", "#ed8936", "⚠️");
                 return;
             }
             try {
                 Reservation res = new Reservation(activite.getIdActivite(), "Sophie Am.", placeSelectionnee[0], LocalDate.now());
                 serviceReservation.ajouterReservation(res);
                 popup.close();
-                Alert ok = new Alert(Alert.AlertType.INFORMATION);
-                ok.setTitle("Réservation confirmée");
-                ok.setHeaderText(null);
-                ok.setContentText("✅ Place " + placeSelectionnee[0] + " réservée pour \"" + activite.getTitre() + "\" !");
-                ok.showAndWait();
-                chargerActivites(); // Rafraîchir les cartes
+                afficherToast("Place " + placeSelectionnee[0] + " réservée pour \"" + activite.getTitre() + "\" !", "#27ae60", "✅");
+                chargerActivites();
             } catch (SQLException ex) {
-                new Alert(Alert.AlertType.ERROR, "Erreur: " + ex.getMessage(), ButtonType.OK).showAndWait();
+                afficherToast("Erreur: " + ex.getMessage(), "#e53e3e", "❌");
             }
         });
 
@@ -296,8 +292,7 @@ public class EtudiantActivitesController implements Initializable {
         }
 
         if (res == null) {
-            new Alert(Alert.AlertType.INFORMATION,
-                    "Vous n'avez pas de réservation pour cette activité.", ButtonType.OK).showAndWait();
+            afficherToast("Vous n'avez pas de réservation pour cette activité.", "#ed8936", "⚠️");
             return;
         }
 
@@ -387,13 +382,13 @@ public class EtudiantActivitesController implements Initializable {
                     ticket.getTransforms().remove(scale);
                     if (printed) {
                         job.endJob();
-                        new Alert(Alert.AlertType.INFORMATION, "✅ Ticket imprimé avec succès!", ButtonType.OK).showAndWait();
+                        afficherToast("Ticket imprimé avec succès!", "#27ae60", "✅");
                     } else {
-                        new Alert(Alert.AlertType.ERROR, "❌ Échec de l'impression.", ButtonType.OK).showAndWait();
+                        afficherToast("Échec de l'impression.", "#e53e3e", "❌");
                     }
                 }
             } else {
-                new Alert(Alert.AlertType.ERROR, "Aucune imprimante disponible.", ButtonType.OK).showAndWait();
+                afficherToast("Aucune imprimante disponible.", "#e53e3e", "❌");
             }
         });
 
@@ -404,6 +399,43 @@ public class EtudiantActivitesController implements Initializable {
 
         popup.setScene(new Scene(outer, 460, 580));
         popup.showAndWait();
+    }
+
+    private void afficherToast(String message, String couleur, String icone) {
+        Stage toast = new Stage();
+        toast.initStyle(javafx.stage.StageStyle.TRANSPARENT);
+        toast.setAlwaysOnTop(true);
+
+        HBox box = new HBox(12);
+        box.setAlignment(Pos.CENTER_LEFT);
+        box.setPadding(new Insets(16, 20, 16, 20));
+        box.setStyle("-fx-background-color: " + couleur + "; -fx-background-radius: 12; " +
+                     "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 15, 0, 0, 5);");
+
+        Label ico = new Label(icone);
+        ico.setStyle("-fx-font-size: 18px;");
+        Label lbl = new Label(message);
+        lbl.setStyle("-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;");
+        lbl.setMaxWidth(300);
+        lbl.setWrapText(true);
+        box.getChildren().addAll(ico, lbl);
+
+        javafx.scene.Scene scene = new javafx.scene.Scene(box);
+        scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+        toast.setScene(scene);
+
+        javafx.geometry.Rectangle2D screen = javafx.stage.Screen.getPrimary().getVisualBounds();
+        toast.setX(screen.getMaxX() - 380);
+        toast.setY(screen.getMaxY() - 100);
+        toast.show();
+
+        javafx.animation.FadeTransition fade = new javafx.animation.FadeTransition(
+                javafx.util.Duration.millis(500), box);
+        fade.setDelay(javafx.util.Duration.millis(2000));
+        fade.setFromValue(1.0);
+        fade.setToValue(0.0);
+        fade.setOnFinished(e -> toast.close());
+        fade.play();
     }
 
     private VBox creerInfoBox(String label, String valeur) {

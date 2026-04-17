@@ -98,7 +98,7 @@ public class CalendrierController {
         }
 
         // Rows heures
-        List<RendezVous> rdvs = service.getByPsychologueId(2);
+        List<RendezVous> rdvs = service.getByPsychologueId(6);
         for (int h = 0; h < (HOUR_END - HOUR_START); h++) {
             int hour = HOUR_START + h;
             int row  = h + 1;
@@ -344,7 +344,7 @@ public class CalendrierController {
 
         dialog.setResultConverter(btn -> {
             if (btn.getButtonData() == ButtonBar.ButtonData.OK_DONE)
-                return buildRdv(dp, tfS, tfE, cbStat, cbType, 0);
+                return buildRdv(dp, tfS, tfE, cbStat, cbType, -1);
             return null;
         });
 
@@ -356,14 +356,17 @@ public class CalendrierController {
                                 ComboBox cbStat, ComboBox cbType, int id) {
         try {
             RendezVous r = new RendezVous();
-            buildCalendar(); // ✔️ refresh
             r.setId(id);
             r.setDate(Date.valueOf(dp.getValue()));
             r.setHeureDebut(Time.valueOf(tfS.getText().trim() + ":00"));
             r.setHeureFin(Time.valueOf(tfE.getText().trim() + ":00"));
             r.setStatut((String) cbStat.getValue());
             r.setTypeRdv((String) cbType.getValue());
-            r.setPsychologueId(2);
+            if (id == -1) {
+                r.setPsychologueId(6);
+            } else {
+                r.setPsychologueId(6);
+            }
 
             return r;
         } catch (Exception ex) {
@@ -387,7 +390,7 @@ public class CalendrierController {
 
     private void updateSidebarStats() {
         long count = service.getAll().stream()
-                .filter(r -> r.getDate().toLocalDate().equals(LocalDate.now())).count();
+                .filter(r -> r.getDate() != null && r.getDate().toLocalDate().equals(LocalDate.now())).count();
         sidebarRdvToday.setText(String.valueOf(count));
     }
 

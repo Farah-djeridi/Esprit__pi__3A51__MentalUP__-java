@@ -14,12 +14,11 @@ import javafx.scene.image.ImageView;
 import javafx.event.ActionEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-import javafx.stage.Screen;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 
-import java.io.IOException;
+import Services.ServiceRendezVous;
+
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 
 public class DashboardPsyController {
@@ -36,7 +35,7 @@ public class DashboardPsyController {
     @FXML private HBox navConsulterDossiers, navNouveauDossier;
 
     // ===== LABELS =====
-    @FXML private Label pageTitle, currentDate;
+    @FXML private Label currentDate;
     @FXML private Label rdvCount, dossierCount, activiteCount;
     @FXML private Label sidebarPatientsCount, sidebarRdvToday, sidebarDossiersTotal;
 
@@ -49,8 +48,9 @@ public class DashboardPsyController {
 
     // ===== COMPOSANTS PRINCIPAUX =====
     @FXML private BorderPane rootPane;
-    @FXML private VBox sidebarVBox;
+
     @FXML private ScrollPane mainScrollPane;
+    private ServiceRendezVous serviceRdv = new ServiceRendezVous();
 
     // ===== INITIALIZE =====
     @FXML
@@ -61,13 +61,16 @@ public class DashboardPsyController {
                 new SimpleDateFormat("EEEE d MMMM yyyy").format(new Date())
         );
 
-        // Valeurs par défaut
-        rdvCount.setText("5");
-        dossierCount.setText("20");
+        // Valeurs dynamiques pour les RDV (ID statique 6)
+        int psyId = 6;
+        var allRdvs = serviceRdv.getByPsychologueId(psyId);
+
+        rdvCount.setText(String.valueOf(allRdvs.stream().filter(r -> "en attente".equalsIgnoreCase(r.getStatut()) || "réservé".equalsIgnoreCase(r.getStatut())).count()));
+        dossierCount.setText("24"); // À dynamiser plus tard
         activiteCount.setText("8");
 
         sidebarPatientsCount.setText("24");
-        sidebarRdvToday.setText("5");
+        sidebarRdvToday.setText(String.valueOf(allRdvs.stream().filter(r -> r.getDate() != null && r.getDate().toLocalDate().equals(LocalDate.now())).count()));
         sidebarDossiersTotal.setText("42");
 
         // Sous-menus cachés
@@ -117,22 +120,6 @@ public class DashboardPsyController {
     }
 
     private void adjustLayoutForWidth(double width) {
-        if (sidebarVBox != null) {
-            // Ajuster la largeur de la sidebar selon la taille de l'écran
-            if (width < 900) {
-                sidebarVBox.setPrefWidth(240);
-                sidebarVBox.setMinWidth(200);
-                sidebarVBox.setMaxWidth(280);
-            } else if (width < 1200) {
-                sidebarVBox.setPrefWidth(260);
-                sidebarVBox.setMinWidth(240);
-                sidebarVBox.setMaxWidth(300);
-            } else {
-                sidebarVBox.setPrefWidth(280);
-                sidebarVBox.setMinWidth(260);
-                sidebarVBox.setMaxWidth(320);
-            }
-        }
 
         // Ajuster le padding du contenu principal
         if (mainScrollPane != null && mainScrollPane.getContent() != null) {
@@ -189,21 +176,21 @@ public class DashboardPsyController {
     @FXML
     void goActivites(MouseEvent event) {
         setActive(navActivites);
-        pageTitle.setText("Activités");
+
         System.out.println("Activités");
     }
 
     @FXML
     void goRessources(MouseEvent event) {
         setActive(navRessources);
-        pageTitle.setText("Ressources");
+
         System.out.println("Ressources");
     }
 
     @FXML
     void goStats(MouseEvent event) {
         setActive(navStats);
-        pageTitle.setText("Statistiques");
+
         System.out.println("Statistiques");
     }
 

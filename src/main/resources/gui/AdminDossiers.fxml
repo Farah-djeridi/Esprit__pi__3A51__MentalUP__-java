@@ -14,9 +14,7 @@
 
     <!-- ═══════════════ SIDEBAR ADMIN ═══════════════ -->
     <left>
-        <VBox prefWidth="260" maxWidth="260"
-              VBox.vgrow="ALWAYS"
-              style="-fx-background-color: #2C3E50;">
+        <VBox prefWidth="260" maxWidth="260" VBox.vgrow="ALWAYS" style="-fx-background-color: #2C3E50;">
 
             <HBox alignment="CENTER_LEFT" spacing="10"
                   style="-fx-padding: 24 18 20 18;
@@ -123,17 +121,12 @@
                   style="-fx-background-color: white; -fx-padding: 14 24;
                          -fx-border-color: transparent transparent #E8EEF4 transparent; -fx-border-width: 0 0 1 0;">
                 <VBox spacing="2">
-                    <Label text="📋  Gestion des Dossiers Médicaux"
+                    <Label text="📋  Aperçu et Statistiques des Dossiers Médicaux"
                            style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;"/>
-                    <Label text="CRUD complet · Recherche · Tri · Notes confidentielles masquées"
+                    <Label text="Statistiques globales · Recherche · Tri"
                            style="-fx-font-size: 12px; -fx-text-fill: #5A6C7D;"/>
                 </VBox>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button text="➕  Nouveau dossier" onAction="#onAjouterDossier"
-                        style="-fx-background-color: #2C3E50; -fx-text-fill: white;
-                               -fx-font-weight: bold; -fx-font-size: 13px;
-                               -fx-background-radius: 10; -fx-padding: 9 20; -fx-cursor: hand;
-                               -fx-effect: dropshadow(gaussian, rgba(44,62,80,0.3), 8, 0, 0, 2);"/>
             </HBox>
 
             <ScrollPane fitToWidth="true" fitToHeight="true"
@@ -144,9 +137,10 @@
                     <!-- ── Statistiques dossiers ── -->
                     <HBox spacing="14">
 
-                        <VBox spacing="6" HBox.hgrow="ALWAYS"
+                        <VBox spacing="6" HBox.hgrow="ALWAYS" onMouseClicked="#onFilterTotalDossiers"
                               style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 18 20;
                                      -fx-border-color: rgba(44,62,80,0.06); -fx-border-radius: 14; -fx-border-width: 1;
+                                     -fx-cursor: hand;
                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
                             <Label text="📋  Total dossiers" style="-fx-font-size: 12px; -fx-text-fill: #5A6C7D; -fx-font-weight: 600;"/>
                             <Label fx:id="statTotalDossiers" text="—"
@@ -154,9 +148,10 @@
                             <Label text="enregistrés" style="-fx-font-size: 11px; -fx-text-fill: #94A3B8;"/>
                         </VBox>
 
-                        <VBox spacing="6" HBox.hgrow="ALWAYS"
+                        <VBox spacing="6" HBox.hgrow="ALWAYS" onMouseClicked="#onFilterRisqueEleve"
                               style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 18 20;
                                      -fx-border-color: rgba(231,76,60,0.15); -fx-border-radius: 14; -fx-border-width: 1;
+                                     -fx-cursor: hand;
                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
                             <Label text="🔴  Risque élevé" style="-fx-font-size: 12px; -fx-text-fill: #5A6C7D; -fx-font-weight: 600;"/>
                             <Label fx:id="statRisqueEleve" text="—"
@@ -164,9 +159,10 @@
                             <Label text="patients" style="-fx-font-size: 11px; -fx-text-fill: #94A3B8;"/>
                         </VBox>
 
-                        <VBox spacing="6" HBox.hgrow="ALWAYS"
+                        <VBox spacing="6" HBox.hgrow="ALWAYS" onMouseClicked="#onFilterRisqueMoyen"
                               style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 18 20;
                                      -fx-border-color: rgba(230,126,34,0.15); -fx-border-radius: 14; -fx-border-width: 1;
+                                     -fx-cursor: hand;
                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
                             <Label text="🟠  Risque moyen" style="-fx-font-size: 12px; -fx-text-fill: #5A6C7D; -fx-font-weight: 600;"/>
                             <Label fx:id="statRisqueMoyen" text="—"
@@ -174,9 +170,10 @@
                             <Label text="patients" style="-fx-font-size: 11px; -fx-text-fill: #94A3B8;"/>
                         </VBox>
 
-                        <VBox spacing="6" HBox.hgrow="ALWAYS"
+                        <VBox spacing="6" HBox.hgrow="ALWAYS" onMouseClicked="#onFilterRisqueFaible"
                               style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 18 20;
                                      -fx-border-color: rgba(39,174,96,0.15); -fx-border-radius: 14; -fx-border-width: 1;
+                                     -fx-cursor: hand;
                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
                             <Label text="🟢  Risque faible" style="-fx-font-size: 12px; -fx-text-fill: #5A6C7D; -fx-font-weight: 600;"/>
                             <Label fx:id="statRisqueFaible" text="—"

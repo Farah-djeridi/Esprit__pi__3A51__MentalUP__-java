@@ -63,9 +63,9 @@ public class ServiceDossier implements IService<Dossier> {
 
     public Dossier find(int id) {
         String query ="SELECT d.*, u.nom, u.prenom " +
-                        "FROM dossier_patient d " +
-                        "JOIN user u ON d.patient_id = u.id " +
-                        "WHERE d.id=?";
+                "FROM dossier_patient d " +
+                "JOIN user u ON d.patient_id = u.id " +
+                "WHERE d.id=?";
         try (PreparedStatement ps = cnx.prepareStatement(query)) {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();

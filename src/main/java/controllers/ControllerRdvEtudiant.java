@@ -37,8 +37,8 @@ public class ControllerRdvEtudiant {
     private final ServiceRendezVous serviceRdv = new ServiceRendezVous();
 
 
-    private final int etudiantId  = 1;
-    private final int psyIdDefaut = 2;
+    private final int etudiantId  = 2;
+    private final int psyIdDefaut = 6;
 
 
     @FXML
@@ -56,7 +56,7 @@ public class ControllerRdvEtudiant {
         psychologuesContainer.getChildren().clear();
         boolean found = false;
 
-        Connection conn = MyDataBase.getInstance().getCnx(); // ✅ dehors
+        Connection conn = MyDataBase.getInstance().getCnx();
 
         try (Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(
@@ -68,6 +68,7 @@ public class ControllerRdvEtudiant {
                 int id = rs.getInt("id");
                 String prenom = rs.getString("prenom");
                 String nom = rs.getString("nom");
+                System.out.println("[chargerPsychologues] Psy trouvé: id=" + id + ", nom=Dr. " + prenom + " " + nom);
 
                 psychologuesContainer.getChildren().add(
                         createPsyCard(id, "Dr. " + prenom + " " + nom, "Psychologue")
@@ -76,6 +77,9 @@ public class ControllerRdvEtudiant {
 
         } catch (SQLException e) {
             System.err.println("[chargerPsychologues] " + e.getMessage());
+        }
+        if (!found) {
+            System.out.println("[chargerPsychologues] Aucun psychologue trouvé dans la table user !");
         }
     }
 
@@ -202,7 +206,7 @@ public class ControllerRdvEtudiant {
 
         card.getChildren().addAll(barre, icone, infos, spacer, badge);
 
-        if (canCancel && "réservé".equalsIgnoreCase(r.getStatut())) {
+        if (canCancel && ("réservé".equalsIgnoreCase(r.getStatut()) || "en attente".equalsIgnoreCase(r.getStatut()))) {
             Button btnAnnuler = new Button("Annuler");
             btnAnnuler.setStyle(
                     "-fx-background-color: #FFF0F0; -fx-text-fill: #E74C3C; -fx-font-weight: bold;" +
@@ -224,6 +228,7 @@ public class ControllerRdvEtudiant {
     // ══════════════════════════════════════════════════════
     private void ouvrirCalendrier(int psyId, String psyNom) {
         try {
+            System.out.println("[ouvrirCalendrier] psyId=" + psyId + ", psyNom=" + psyNom + ", etudiantId=" + etudiantId);
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/gui/RendezVous_Calendrier.fxml")
             );
@@ -255,7 +260,7 @@ public class ControllerRdvEtudiant {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    @FXML private void onNavHomeClicked(MouseEvent e)  { loadPage("/Home.fxml", e); }
+    @FXML private void onNavHomeClicked(MouseEvent e)  { loadPage("/gui/Home.fxml", e); }
     @FXML private void onNavSuiviClicked(MouseEvent e) {}
     @FXML private void onNavForumClicked(MouseEvent e) { loadPage("/forum.fxml", e); }
 
@@ -286,7 +291,7 @@ public class ControllerRdvEtudiant {
         return switch (statut.toLowerCase()) {
             case "libre", "disponible" -> "#27AE60";
             case "confirmé"            -> "#2980B9";
-            case "réservé"             -> "#E67E22";
+            case "en attente", "réservé" -> "#E67E22";
             default                    -> "#95A5A6";
         };
     }

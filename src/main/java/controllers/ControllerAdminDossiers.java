@@ -194,26 +194,7 @@ public class ControllerAdminDossiers {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // Actions
-        HBox actions = new HBox(8);
-        actions.setAlignment(Pos.CENTER_RIGHT);
-
-        Button btnEdit = new Button("✏");
-        btnEdit.setStyle(
-            "-fx-background-color: rgba(44,62,80,0.08); -fx-text-fill: #2C3E50;" +
-            "-fx-background-radius: 8; -fx-padding: 7 12; -fx-cursor: hand; -fx-font-size: 13px;"
-        );
-        btnEdit.setOnAction(e -> ouvrirDialogEdition(d));
-
-        Button btnDelete = new Button("🗑");
-        btnDelete.setStyle(
-            "-fx-background-color: rgba(231,76,60,0.1); -fx-text-fill: #E74C3C;" +
-            "-fx-background-radius: 8; -fx-padding: 7 12; -fx-cursor: hand; -fx-font-size: 13px;"
-        );
-        btnDelete.setOnAction(e -> supprimerDossier(d));
-
-        actions.getChildren().addAll(btnEdit, btnDelete);
-        contenu.getChildren().addAll(icone, infos, spacer, badge, actions);
+        contenu.getChildren().addAll(icone, infos, spacer, badge);
         card.getChildren().addAll(barre, contenu);
 
         // Hover
@@ -367,6 +348,30 @@ public class ControllerAdminDossiers {
     @FXML private void onSearch(KeyEvent e)         { appliquerFiltresEtTri(); }
     @FXML private void onFiltreChange(ActionEvent e){ appliquerFiltresEtTri(); }
     @FXML private void onTriChange(ActionEvent e)   { appliquerFiltresEtTri(); }
+
+    @FXML
+    private void onFilterTotalDossiers(MouseEvent e) {
+        filtreRisque.setValue("Tous");
+        appliquerFiltresEtTri();
+    }
+
+    @FXML
+    private void onFilterRisqueEleve(MouseEvent e) {
+        filtreRisque.setValue("élevé");
+        appliquerFiltresEtTri();
+    }
+
+    @FXML
+    private void onFilterRisqueMoyen(MouseEvent e) {
+        filtreRisque.setValue("moyen");
+        appliquerFiltresEtTri();
+    }
+
+    @FXML
+    private void onFilterRisqueFaible(MouseEvent e) {
+        filtreRisque.setValue("faible");
+        appliquerFiltresEtTri();
+    }
 
     @FXML
     private void onReset(ActionEvent e) {

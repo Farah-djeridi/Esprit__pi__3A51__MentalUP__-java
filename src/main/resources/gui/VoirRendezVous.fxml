@@ -2,97 +2,90 @@
 
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
-
 <?import javafx.scene.shape.*?>
-
 <?import javafx.scene.image.ImageView?>
-
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="controllers.RendezVousController"
-            prefWidth="1100" prefHeight="700">
+            minWidth="900" minHeight="600">
 
-    <!-- ================= SIDEBAR ================= -->
     <left>
-        <VBox prefWidth="280" style="-fx-background-color: #1a4a5f;">
+        <VBox prefWidth="270" style="-fx-background-color: #1a4a5f;">
 
             <!-- LOGO + BRAND -->
-            <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 28 22 24 22;">
+            <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 26 20 22 20;">
                 <StackPane>
                     <ImageView fx:id="logoImage" fitWidth="40" fitHeight="40" preserveRatio="true"/>
                 </StackPane>
                 <VBox spacing="3">
                     <Label text="MentalUp" textFill="white" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
                     <Label text="Espace Psychologue" textFill="#8ca3b3" style="-fx-font-size: 12px;"/>
-                    <Label fx:id="currentDate" style="-fx-font-size:14px; -fx-text-fill:gray;"/>
+                    <Label fx:id="currentDate" textFill="#8ca3b3" style="-fx-font-size: 11px;"/>
                 </VBox>
-            </HBox>
-
-            <HBox spacing="10" style="-fx-padding:10;">
-                <Label text="Page : " textFill="white"/>
-                <Label fx:id="pageTitle" text="Rendez-vous" textFill="white" style="-fx-font-size:18px; -fx-font-weight:bold;"/>
             </HBox>
 
             <Separator style="-fx-background-color: #2a5a6f;"/>
 
-            <!-- MENU NAVIGATION AVEC SOUS-MENUS -->
-            <VBox spacing="6" style="-fx-padding: 20 16 0 16;" VBox.vgrow="ALWAYS">
-                <Label text="MENU PRINCIPAL" textFill="#6a8a9a" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 8 12;"/>
+            <!-- MENU -->
+            <VBox spacing="4" style="-fx-padding: 16 14 0 14;" VBox.vgrow="ALWAYS">
+
+                <Label text="MENU PRINCIPAL" textFill="#6a8a9a"
+                       style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 0 0 8 8;"/>
 
                 <!-- Accueil -->
                 <HBox fx:id="navHome" onMouseClicked="#goHome"
-                      alignment="CENTER_LEFT" spacing="12"
-                      style="-fx-padding: 12 14; -fx-background-radius: 10; -fx-cursor: hand;">
-                    <Label text="Accueil" textFill="white" style="-fx-font-size: 15px;"/>
-                    <Region HBox.hgrow="ALWAYS"/>
+                      alignment="CENTER_LEFT" spacing="10"
+                      style="-fx-padding: 11 14; -fx-background-radius: 10; -fx-cursor: hand;">
+                    <Label text="🏠" style="-fx-font-size: 14px;"/>
+                    <Label text="Accueil" textFill="white" style="-fx-font-size: 14px;"/>
                 </HBox>
 
-                <!-- ===== GESTION RENDEZ-VOUS ===== -->
+                <!-- Rendez-vous (ACTIVE) -->
                 <VBox spacing="2">
                     <HBox fx:id="navRdv" onMouseClicked="#toggleRdvMenu"
-                          alignment="CENTER_LEFT" spacing="12"
-                          style="-fx-padding: 12 14; -fx-background-radius: 10; -fx-cursor: hand;">
-                        <Label text="📅 Rendez-vous" textFill="white" style="-fx-font-size: 15px;"/>
+                          alignment="CENTER_LEFT" spacing="10"
+                          style="-fx-padding: 11 14; -fx-background-radius: 10; -fx-cursor: hand;
+                                 -fx-background-color: rgba(255,255,255,0.12);">
+                        <Label text="📅" style="-fx-font-size: 14px;"/>
+                        <Label text="Rendez-vous" textFill="white" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
                         <Region HBox.hgrow="ALWAYS"/>
-                        <Label fx:id="arrowRdv" text="▼" textFill="#6a8a9a" style="-fx-font-size: 10px;"/>
+                        <Label fx:id="arrowRdv" text="▼" textFill="#6a8a9a" style="-fx-font-size: 9px;"/>
                     </HBox>
-
-                    <!-- Sous-menu Rendez-vous -->
-                    <VBox fx:id="submenuRdv" spacing="2" style="-fx-padding: 4 0 4 20;" visible="true" managed="true">
+                    <VBox fx:id="submenuRdv" spacing="2" style="-fx-padding: 4 0 4 24;">
                         <HBox fx:id="navVoirRdv" onMouseClicked="#goVoirRendezVous"
-                              alignment="CENTER_LEFT" spacing="10"
-                              style="-fx-padding: 10 12; -fx-background-radius: 8; -fx-cursor: hand;">
-                            <Label text="• Voir les rendez-vous" textFill="#b0c4d4" style="-fx-font-size: 13px;"/>
+                              alignment="CENTER_LEFT"
+                              style="-fx-padding: 9 12; -fx-background-radius: 8; -fx-cursor: hand;
+                                     -fx-background-color: rgba(255,255,255,0.08);">
+                            <Label text="• Voir les rendez-vous" textFill="white" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
                         </HBox>
                         <HBox fx:id="navCalendrier" onMouseClicked="#goCalendrier"
-                              alignment="CENTER_LEFT" spacing="10"
-                              style="-fx-padding: 10 12; -fx-background-radius: 8; -fx-cursor: hand;">
+                              alignment="CENTER_LEFT"
+                              style="-fx-padding: 9 12; -fx-background-radius: 8; -fx-cursor: hand;">
                             <Label text="• Mon calendrier" textFill="#b0c4d4" style="-fx-font-size: 13px;"/>
                         </HBox>
                     </VBox>
                 </VBox>
 
-                <!-- ===== GESTION DOSSIERS ===== -->
+                <!-- Dossiers médicaux -->
                 <VBox spacing="2">
                     <HBox fx:id="navDossiers" onMouseClicked="#toggleDossiersMenu"
-                          alignment="CENTER_LEFT" spacing="12"
-                          style="-fx-padding: 12 14; -fx-background-radius: 10; -fx-cursor: hand;">
-                        <Label text="📁 Dossiers médicaux" textFill="white" style="-fx-font-size: 15px;"/>
+                          alignment="CENTER_LEFT" spacing="10"
+                          style="-fx-padding: 11 14; -fx-background-radius: 10; -fx-cursor: hand;">
+                        <Label text="📁" style="-fx-font-size: 14px;"/>
+                        <Label text="Dossiers médicaux" textFill="white" style="-fx-font-size: 14px;"/>
                         <Region HBox.hgrow="ALWAYS"/>
-                        <Label fx:id="arrowDossiers" text="▶" textFill="#6a8a9a" style="-fx-font-size: 10px;"/>
+                        <Label fx:id="arrowDossiers" text="▶" textFill="#6a8a9a" style="-fx-font-size: 9px;"/>
                     </HBox>
-
-                    <!-- Sous-menu Dossiers -->
-                    <VBox fx:id="submenuDossiers" spacing="2" style="-fx-padding: 4 0 4 20;" visible="false" managed="false">
+                    <VBox fx:id="submenuDossiers" spacing="2" style="-fx-padding: 4 0 4 24;">
                         <HBox fx:id="navConsulterDossiers" onMouseClicked="#goConsulterDossiers"
-                              alignment="CENTER_LEFT" spacing="10"
-                              style="-fx-padding: 10 12; -fx-background-radius: 8; -fx-cursor: hand;">
+                              alignment="CENTER_LEFT"
+                              style="-fx-padding: 9 12; -fx-background-radius: 8; -fx-cursor: hand;">
                             <Label text="• Consulter dossiers" textFill="#b0c4d4" style="-fx-font-size: 13px;"/>
                         </HBox>
                         <HBox fx:id="navNouveauDossier" onMouseClicked="#goNouveauDossier"
-                              alignment="CENTER_LEFT" spacing="10"
-                              style="-fx-padding: 10 12; -fx-background-radius: 8; -fx-cursor: hand;">
+                              alignment="CENTER_LEFT"
+                              style="-fx-padding: 9 12; -fx-background-radius: 8; -fx-cursor: hand;">
                             <Label text="• Nouveau dossier" textFill="#b0c4d4" style="-fx-font-size: 13px;"/>
                         </HBox>
                     </VBox>
@@ -100,151 +93,210 @@
 
                 <!-- Activités -->
                 <HBox fx:id="navActivites" onMouseClicked="#goActivites"
-                      alignment="CENTER_LEFT" spacing="12"
-                      style="-fx-padding: 12 14; -fx-background-radius: 10; -fx-cursor: hand;">
-                    <Label text="🎯 Activités" textFill="white" style="-fx-font-size: 15px;"/>
-                    <Region HBox.hgrow="ALWAYS"/>
+                      alignment="CENTER_LEFT" spacing="10"
+                      style="-fx-padding: 11 14; -fx-background-radius: 10; -fx-cursor: hand;">
+                    <Label text="🎯" style="-fx-font-size: 14px;"/>
+                    <Label text="Activités" textFill="white" style="-fx-font-size: 14px;"/>
                 </HBox>
 
                 <!-- Ressources -->
                 <HBox fx:id="navRessources" onMouseClicked="#goRessources"
-                      alignment="CENTER_LEFT" spacing="12"
-                      style="-fx-padding: 12 14; -fx-background-radius: 10; -fx-cursor: hand;">
-                    <Label text="📚 Ressources" textFill="white" style="-fx-font-size: 15px;"/>
-                    <Region HBox.hgrow="ALWAYS"/>
+                      alignment="CENTER_LEFT" spacing="10"
+                      style="-fx-padding: 11 14; -fx-background-radius: 10; -fx-cursor: hand;">
+                    <Label text="📚" style="-fx-font-size: 14px;"/>
+                    <Label text="Ressources" textFill="white" style="-fx-font-size: 14px;"/>
                 </HBox>
 
                 <!-- Statistiques -->
                 <HBox fx:id="navStats" onMouseClicked="#goStats"
-                      alignment="CENTER_LEFT" spacing="12"
-                      style="-fx-padding: 12 14; -fx-background-radius: 10; -fx-cursor: hand;">
-                    <Label text="📊 Statistiques" textFill="white" style="-fx-font-size: 15px;"/>
-                    <Region HBox.hgrow="ALWAYS"/>
+                      alignment="CENTER_LEFT" spacing="10"
+                      style="-fx-padding: 11 14; -fx-background-radius: 10; -fx-cursor: hand;">
+                    <Label text="📊" style="-fx-font-size: 14px;"/>
+                    <Label text="Statistiques" textFill="white" style="-fx-font-size: 14px;"/>
                 </HBox>
-
             </VBox>
 
             <Region VBox.vgrow="ALWAYS"/>
 
-            <!-- SECTION STATS RAPIDES -->
-            <VBox spacing="14" style="-fx-padding: 20 20 20 20; -fx-background-color: #154a5f;">
-
-                <Label text="APERÇU RAPIDE" textFill="#6a8a9a" style="-fx-font-size: 11px; -fx-font-weight: bold;"/>
-
-                <HBox alignment="CENTER_LEFT" spacing="10">
-                    <Label text="Patients actifs" textFill="#b0c4d4" style="-fx-font-size: 13px;"/>
+            <!-- APERÇU RAPIDE -->
+            <VBox spacing="12" style="-fx-padding: 18 18 18 18; -fx-background-color: #154a5f;">
+                <Label text="APERÇU RAPIDE" textFill="#6a8a9a"
+                       style="-fx-font-size: 10px; -fx-font-weight: bold;"/>
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Patients actifs" textFill="#b0c4d4" style="-fx-font-size: 12px;"/>
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="sidebarPatientsCount" text="0" textFill="#50C878" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                    <Label fx:id="sidebarPatientsCount" text="24" textFill="#50C878"
+                           style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
                 </HBox>
-
-                <HBox alignment="CENTER_LEFT" spacing="10">
-                    <Label text="RDV aujourd'hui" textFill="#b0c4d4" style="-fx-font-size: 13px;"/>
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="RDV aujourd'hui" textFill="#b0c4d4" style="-fx-font-size: 12px;"/>
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="sidebarRdvToday" text="0" textFill="#97BBE4" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                    <Label fx:id="sidebarRdvToday" text="0" textFill="#97BBE4"
+                           style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
                 </HBox>
-
-                <HBox alignment="CENTER_LEFT" spacing="10">
-                    <Label text="Dossiers total" textFill="#b0c4d4" style="-fx-font-size: 13px;"/>
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Dossiers total" textFill="#b0c4d4" style="-fx-font-size: 12px;"/>
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="sidebarDossiersTotal" text="0" textFill="#F39C12" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                    <Label fx:id="sidebarDossiersTotal" text="42" textFill="#F39C12"
+                           style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
                 </HBox>
             </VBox>
 
             <!-- PROFIL + LOGOUT -->
-            <VBox spacing="14" style="-fx-padding: 20 20 25 20; -fx-border-color: #2a5a6f; -fx-border-width: 1 0 0 0;">
-
-                <HBox alignment="CENTER_LEFT" spacing="12">
-                    <Circle radius="22" fill="#2a5a6f"/>
+            <VBox spacing="12" style="-fx-padding: 16 18 20 18; -fx-border-color: #2a5a6f; -fx-border-width: 1 0 0 0;">
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Circle radius="20" fill="#2a5a6f"/>
                     <VBox spacing="2">
-                        <Label text="Psychologue" textFill="white" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
-                        <Label text="Compte professionnel" textFill="#6a8a9a" style="-fx-font-size: 11px;"/>
+                        <Label text="Psychologue" textFill="white"
+                               style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
+                        <Label text="Compte professionnel" textFill="#6a8a9a"
+                               style="-fx-font-size: 10px;"/>
                     </VBox>
                 </HBox>
-
                 <Button fx:id="logoutBtn" text="Déconnexion" onAction="#logout"
-                        style="-fx-background-color: transparent; -fx-text-fill: #b0c4d4; -fx-border-color: #e74c3c; -fx-border-width: 1.5; -fx-background-radius: 8; -fx-border-radius: 8; -fx-padding: 10; -fx-cursor: hand; -fx-font-size: 13px;"/>
+                        maxWidth="Infinity"
+                        style="-fx-background-color: transparent; -fx-text-fill: #b0c4d4;
+                               -fx-border-color: #e74c3c; -fx-border-width: 1.5;
+                               -fx-background-radius: 8; -fx-border-radius: 8;
+                               -fx-padding: 9; -fx-cursor: hand; -fx-font-size: 12px;"/>
             </VBox>
-
         </VBox>
     </left>
 
-    <!-- ================= CONTENU PRINCIPAL ================= -->
+    <!-- MAIN CONTENT -->
     <center>
-        <VBox spacing="0" style="-fx-background-color: #F0F4F8;">
+        <VBox style="-fx-background-color: #f0f4f8;" VBox.vgrow="ALWAYS">
 
-            <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;"
-                        VBox.vgrow="ALWAYS">
+            <!-- TOP BAR -->
+            <HBox alignment="CENTER_LEFT" spacing="16"
+                  style="-fx-padding: 16 28 14 28; -fx-background-color: white;
+                         -fx-border-color: #e2e8f0; -fx-border-width: 0 0 1 0;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 6, 0, 0, 2);">
+                <VBox spacing="2">
+                    <Label text="Gestion des rendez-vous" textFill="#0f2942"
+                           style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
+                    <Label text="Consultez, confirmez et gérez tous vos rendez-vous"
+                           textFill="#94a3b8"
+                           style="-fx-font-size: 12px; -fx-font-family: 'Segoe UI';"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="+ Nouveau RDV" onAction="#nouveauRendezVous"
+                        style="-fx-background-color: #0f2942; -fx-text-fill: white;
+                               -fx-background-radius: 8; -fx-padding: 10 20;
+                               -fx-cursor: hand; -fx-font-size: 13px; -fx-font-family: 'Segoe UI';
+                               -fx-font-weight: bold;"/>
+            </HBox>
 
-                <VBox spacing="25" style="-fx-padding: 28 32 32 32;">
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                        style="-fx-background-color: transparent; -fx-background: transparent;">
+                <VBox spacing="18" style="-fx-padding: 22 28 28 28;">
 
-                    <!-- EN-TÊTE -->
-                    <HBox alignment="CENTER_LEFT" spacing="15">
-                        <VBox spacing="8">
-                            <Label text="Gestion des rendez-vous" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1a4a5f;"/>
-                            <Label text="Consultez et gérez tous vos rendez-vous en un seul endroit" style="-fx-font-size: 14px; -fx-text-fill: #6a8a9a;"/>
-                        </VBox>
-                        <Region HBox.hgrow="ALWAYS"/>
-                        <Button text="+ Nouveau rendez-vous" onAction="#nouveauRendezVous"
-                                style="-fx-background-color: #1a4a5f; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 10 22; -fx-cursor: hand; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                    <!-- STAT PILLS -->
+                    <HBox spacing="14">
+                        <HBox spacing="12" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS"
+                              style="-fx-background-color: white; -fx-background-radius: 12;
+                                     -fx-padding: 14 20; -fx-border-color: #e2e8f0; -fx-border-width: 1;
+                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 6, 0, 0, 1);">
+                            <VBox spacing="2">
+                                <Label text="TOTAL" textFill="#94a3b8"
+                                       style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
+                                <Label fx:id="totalRdv" text="0" textFill="#0f2942"
+                                       style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
+                            </VBox>
+                        </HBox>
+                        <HBox spacing="12" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS"
+                              style="-fx-background-color: white; -fx-background-radius: 12;
+                                     -fx-padding: 14 20; -fx-border-color: #e2e8f0; -fx-border-width: 1;
+                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 6, 0, 0, 1);">
+                            <VBox spacing="2">
+                                <Label text="À VENIR" textFill="#94a3b8"
+                                       style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
+                                <Label fx:id="rdvAVenir" text="0" textFill="#4caf50"
+                                       style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
+                            </VBox>
+                        </HBox>
+                        <HBox spacing="12" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS"
+                              style="-fx-background-color: white; -fx-background-radius: 12;
+                                     -fx-padding: 14 20; -fx-border-color: #e2e8f0; -fx-border-width: 1;
+                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 6, 0, 0, 1);">
+                            <VBox spacing="2">
+                                <Label text="CE MOIS" textFill="#94a3b8"
+                                       style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
+                                <Label fx:id="rdvCeMois" text="0" textFill="#ff9800"
+                                       style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
+                            </VBox>
+                        </HBox>
                     </HBox>
 
-                    <!-- FILTRES ET RECHERCHE -->
-                    <HBox spacing="15" alignment="CENTER_LEFT">
-                        <HBox spacing="10" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 8 15; -fx-border-color: #E8ECF0; -fx-border-width: 1; -fx-border-radius: 12;">
-                            <Label text="🔍" style="-fx-font-size: 14px;"/>
-                            <TextField fx:id="searchField" promptText="Rechercher un patient..."
-                                       style="-fx-background-color: transparent; -fx-font-size: 13px;"
-                                       onKeyReleased="#rechercherRendezVous"/>
+                    <!-- SEARCH + FILTERS -->
+                    <VBox spacing="10"
+                          style="-fx-background-color: white; -fx-background-radius: 12;
+                                 -fx-padding: 16 20; -fx-border-color: #e2e8f0; -fx-border-width: 1;
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 6, 0, 0, 1);">
+
+                        <!-- Search row -->
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <HBox spacing="10" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS"
+                                  style="-fx-background-color: #f8fafc; -fx-background-radius: 8;
+                                         -fx-padding: 10 14; -fx-border-color: #e2e8f0;
+                                         -fx-border-width: 1; -fx-border-radius: 8;">
+                                <Label text="⚲" textFill="#94a3b8" style="-fx-font-size: 15px;"/>
+                                <TextField fx:id="searchField"
+                                           promptText="Rechercher par type, statut, patient..."
+                                           onKeyReleased="#rechercherRendezVous"
+                                           style="-fx-background-color: transparent; -fx-font-size: 13px;
+                                                  -fx-font-family: 'Segoe UI'; -fx-text-fill: #0f2942;"
+                                           HBox.hgrow="ALWAYS"/>
+                            </HBox>
+                            <Button text="✕ Réinitialiser" onAction="#reinitialiserFiltres"
+                                    style="-fx-background-color: #fff0f0; -fx-text-fill: #c62828;
+                                           -fx-border-color: #ffcdd2; -fx-border-width: 1;
+                                           -fx-background-radius: 8; -fx-border-radius: 8;
+                                           -fx-padding: 10 16; -fx-cursor: hand; -fx-font-size: 12px;
+                                           -fx-font-family: 'Segoe UI';"/>
                         </HBox>
 
-                        <ComboBox fx:id="filtreStatut" promptText="Tous les statuts"
-                                  style="-fx-background-color: white; -fx-background-radius: 12; -fx-font-size: 13px;"
-                                  onAction="#filtrerParStatut"/>
+                        <!-- Filter row -->
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label text="Filtres :" textFill="#64748b"
+                                   style="-fx-font-size: 12px; -fx-font-family: 'Segoe UI';"/>
+                            <ComboBox fx:id="filtreStatut" promptText="Statut"
+                                      onAction="#filtrerParStatut"
+                                      style="-fx-background-color: #f8fafc;
+                                             -fx-border-color: #e2e8f0; -fx-border-radius: 8;
+                                             -fx-background-radius: 8; -fx-font-size: 12px;
+                                             -fx-font-family: 'Segoe UI';"/>
+                            <ComboBox fx:id="filtreType" promptText="Type"
+                                      onAction="#filtrerParType"
+                                      style="-fx-background-color: #f8fafc;
+                                             -fx-border-color: #e2e8f0; -fx-border-radius: 8;
+                                             -fx-background-radius: 8; -fx-font-size: 12px;
+                                             -fx-font-family: 'Segoe UI';"/>
+                            <DatePicker fx:id="filtreDate" promptText="Date"
+                                        onAction="#filtrerParDate"
+                                        style="-fx-background-color: #f8fafc;
+                                               -fx-border-color: #e2e8f0; -fx-border-radius: 8;
+                                               -fx-background-radius: 8;"/>
+                        </HBox>
+                    </VBox>
 
-                        <ComboBox fx:id="filtreType" promptText="Tous les types"
-                                  style="-fx-background-color: white; -fx-background-radius: 12; -fx-font-size: 13px;"
-                                  onAction="#filtrerParType"/>
+                    <!-- CARDS LIST -->
+                    <VBox spacing="0"
+                          style="-fx-background-color: white; -fx-background-radius: 14;
+                                 -fx-border-color: #e2e8f0; -fx-border-width: 1;
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 8, 0, 0, 2);">
 
-                        <DatePicker fx:id="filtreDate" promptText="Filtrer par date"
-                                    style="-fx-background-color: white; -fx-background-radius: 12;"
-                                    onAction="#filtrerParDate"/>
+                        <HBox alignment="CENTER_LEFT"
+                              style="-fx-padding: 16 22 14 22; -fx-border-color: #f1f5f9; -fx-border-width: 0 0 1 0;">
+                            <Label text="Liste des rendez-vous" textFill="#0f2942"
+                                   style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
+                        </HBox>
 
-                        <Button text="Réinitialiser" onAction="#reinitialiserFiltres"
-                                style="-fx-background-color: transparent; -fx-text-fill: #1a4a5f; -fx-border-color: #1a4a5f; -fx-border-radius: 12; -fx-padding: 8 15; -fx-cursor: hand; -fx-font-size: 13px;"/>
-                    </HBox>
-
-                    <!-- STATISTIQUES RAPIDES DES RDV -->
-                    <HBox spacing="20">
-                        <VBox spacing="8" HBox.hgrow="ALWAYS"
-                              style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 15; -fx-border-color: #E8ECF0; -fx-border-width: 1;">
-                            <Label text="Total RDV" style="-fx-font-size: 12px; -fx-text-fill: #5A6C7D;"/>
-                            <Label fx:id="totalRdv" text="0" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1a4a5f;"/>
-                        </VBox>
-
-                        <VBox spacing="8" HBox.hgrow="ALWAYS"
-                              style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 15; -fx-border-color: #E8ECF0; -fx-border-width: 1;">
-                            <Label text="À venir" style="-fx-font-size: 12px; -fx-text-fill: #5A6C7D;"/>
-                            <Label fx:id="rdvAVenir" text="0" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #50C878;"/>
-                        </VBox>
-
-                        <VBox spacing="8" HBox.hgrow="ALWAYS"
-                              style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 15; -fx-border-color: #E8ECF0; -fx-border-width: 1;">
-                            <Label text="Ce mois" style="-fx-font-size: 12px; -fx-text-fill: #5A6C7D;"/>
-                            <Label fx:id="rdvCeMois" text="0" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #F39C12;"/>
-                        </VBox>
-                    </HBox>
-
-                    <!-- LISTE DES RENDEZ-VOUS EN CARTES -->
-                    <VBox spacing="15"
-                          style="-fx-background-color: white; -fx-background-radius: 18; -fx-padding: 22; -fx-border-color: #E8ECF0; -fx-border-width: 1;">
-
-                        <Label text="📅 Liste des rendez-vous" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1a4a5f;"/>
-                        <Separator style="-fx-background-color: #E8ECF0;"/>
-
-                        <VBox fx:id="cardsContainer" spacing="15" style="-fx-padding: 10 0;"/>
+                        <VBox fx:id="cardsContainer" spacing="0" style="-fx-padding: 8 16 16 16;"/>
 
                         <Label fx:id="noResultsLabel" text="Aucun rendez-vous trouvé"
-                               style="-fx-font-size: 14px; -fx-text-fill: #95A5A6; -fx-padding: 40;"
+                               textFill="#94a3b8"
+                               style="-fx-font-size: 14px; -fx-padding: 40; -fx-font-family: 'Segoe UI';"
                                visible="false" managed="false" alignment="CENTER" maxWidth="Infinity"/>
                     </VBox>
 

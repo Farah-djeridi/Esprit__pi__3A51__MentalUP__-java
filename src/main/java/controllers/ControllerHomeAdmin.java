@@ -13,6 +13,14 @@ import javafx.scene.layout.VBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
+import javafx.scene.chart.PieChart;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import Services.ServiceRendezVous;
+import Services.ServiceDossier;
+import Models.RendezVous;
+import Models.Dossier;
+import java.util.List;
 
 public class ControllerHomeAdmin {
 
@@ -23,13 +31,16 @@ public class ControllerHomeAdmin {
     @FXML private Label arrowSuivi, arrowForum;
 
 
-    @FXML private Label statUsers, statRdvs, statTopics, statMood;
+    @FXML private Label statPatients, statPsychologues, statDossiers, statRdvs;
     @FXML private Label labelDate, labelUserName, avatarInitials;
     @FXML private Button notifButton, logoutButton;
 
     @FXML private ImageView logoImage;
+    @FXML private PieChart pieChartRdvs;
+    @FXML private PieChart pieChartDossiers;
 
-
+    private ServiceRendezVous serviceRdv = new ServiceRendezVous();
+    private ServiceDossier serviceDossier = new ServiceDossier();
     private boolean suiviOpen = false;
     private boolean forumOpen = false;
 
@@ -48,6 +59,44 @@ public class ControllerHomeAdmin {
         arrowForum.setText("▶");
 
         logoImage.setImage(new Image(getClass().getResourceAsStream("/Images/logo.png")));
+
+        chargerDonneesStatistiques();
+    }
+
+    private void chargerDonneesStatistiques() {
+        // Load Dossiers
+        List<Dossier> dossiers = serviceDossier.getAll();
+        statDossiers.setText(String.valueOf(dossiers.size()));
+
+        long eleve = dossiers.stream().filter(d -> "élevé".equalsIgnoreCase(d.getNiveauRisque())).count();
+        long moyen = dossiers.stream().filter(d -> "moyen".equalsIgnoreCase(d.getNiveauRisque())).count();
+        long faible = dossiers.stream().filter(d -> "faible".equalsIgnoreCase(d.getNiveauRisque())).count();
+
+        ObservableList<PieChart.Data> dossierData = FXCollections.observableArrayList(
+            new PieChart.Data("Élevé (" + eleve + ")", eleve),
+            new PieChart.Data("Moyen (" + moyen + ")", moyen),
+            new PieChart.Data("Faible (" + faible + ")", faible)
+        );
+        pieChartDossiers.setData(dossierData);
+
+        // Load RDVs
+        List<RendezVous> rdvs = serviceRdv.getAll();
+        statRdvs.setText(String.valueOf(rdvs.size()));
+
+        long libres = rdvs.stream().filter(r -> "libre".equalsIgnoreCase(r.getStatut())).count();
+        long reserves = rdvs.stream().filter(r -> "réservé".equalsIgnoreCase(r.getStatut()) || "en attente".equalsIgnoreCase(r.getStatut())).count();
+        long confirmes = rdvs.stream().filter(r -> "confirmé".equalsIgnoreCase(r.getStatut())).count();
+
+        ObservableList<PieChart.Data> rdvData = FXCollections.observableArrayList(
+            new PieChart.Data("Libres (" + libres + ")", libres),
+            new PieChart.Data("Réservés (" + reserves + ")", reserves),
+            new PieChart.Data("Confirmés (" + confirmes + ")", confirmes)
+        );
+        pieChartRdvs.setData(rdvData);
+
+        // Mock for missing services (Patients / Psychologues)
+        statPatients.setText("1,234");
+        statPsychologues.setText("45");
     }
 
 
@@ -169,17 +218,7 @@ public class ControllerHomeAdmin {
     @FXML
     private void onLogout(ActionEvent event) { System.out.println("Déconnexion"); }
 
-    @FXML
-    private void onAddUser(ActionEvent event) { System.out.println("Ajouter un utilisateur"); }
 
-    @FXML
-    private void onCreateRdv(ActionEvent event) { System.out.println("Créer un rendez-vous"); }
-
-    @FXML
-    private void onModerateForum(ActionEvent event) { System.out.println("Modérer le forum"); }
-
-    @FXML
-    private void onExportData(ActionEvent event) { System.out.println("Exporter les données"); }
 
 
 

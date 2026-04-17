@@ -96,7 +96,7 @@ public class ServiceRendezVous {
     // ── Créneaux d'un psychologue (pour le calendrier étudiant) ──
     public List<RendezVous> getByPsychologueId(int psychologueId) {
         List<RendezVous> list = new ArrayList<>();
-        String sql = "SELECT * FROM rendez_vous WHERE psychologue_id = ? ORDER BY date, heure_debut";
+        String sql = "SELECT * FROM rendez_vous WHERE psychologue_id = ? AND date IS NOT NULL AND date != '0000-00-00' ORDER BY date, heure_debut";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, psychologueId);
             ResultSet rs = ps.executeQuery();
@@ -106,12 +106,13 @@ public class ServiceRendezVous {
         } catch (SQLException e) {
             System.err.println("[getByPsychologueId] " + e.getMessage());
         }
+        System.out.println("[getByPsychologueId] psyId=" + psychologueId + " → " + list.size() + " créneaux trouvés");
         return list;
     }
 
     public boolean reserverCreneau(int rdvId, int etudiantId) {
         // Accepte "libre" ET "disponible" comme statuts réservables
-        String sql = "UPDATE rendez_vous SET etudiant_id = ?, statut = 'réservé' " +
+        String sql = "UPDATE rendez_vous SET etudiant_id = ?, statut = 'en attente' " +
                 "WHERE id = ? AND (statut = 'libre' OR statut = 'disponible')";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, etudiantId);
@@ -142,7 +143,7 @@ public class ServiceRendezVous {
     // ── Tous les RDV d'un étudiant ──
     public List<RendezVous> getByEtudiantId(int etudiantId) {
         List<RendezVous> list = new ArrayList<>();
-        String sql = "SELECT * FROM rendez_vous WHERE etudiant_id = ? ORDER BY date DESC, heure_debut DESC";
+        String sql = "SELECT * FROM rendez_vous WHERE etudiant_id = ? AND date IS NOT NULL AND date != '0000-00-00' ORDER BY date DESC, heure_debut DESC";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, etudiantId);
             ResultSet rs = ps.executeQuery();
@@ -158,7 +159,7 @@ public class ServiceRendezVous {
     // ── RDV d'aujourd'hui pour un étudiant ──
     public List<RendezVous> getRdvAujourdhui(int etudiantId) {
         List<RendezVous> list = new ArrayList<>();
-        String sql = "SELECT * FROM rendez_vous WHERE etudiant_id = ? AND date = CURDATE() ORDER BY heure_debut";
+        String sql = "SELECT * FROM rendez_vous WHERE etudiant_id = ? AND date IS NOT NULL AND date != '0000-00-00' AND date = CURDATE() ORDER BY heure_debut";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, etudiantId);
             ResultSet rs = ps.executeQuery();
@@ -174,7 +175,7 @@ public class ServiceRendezVous {
     // ── RDV à venir (après aujourd'hui) ──
     public List<RendezVous> getRdvAvenir(int etudiantId) {
         List<RendezVous> list = new ArrayList<>();
-        String sql = "SELECT * FROM rendez_vous WHERE etudiant_id = ? AND date > CURDATE() ORDER BY date, heure_debut";
+        String sql = "SELECT * FROM rendez_vous WHERE etudiant_id = ? AND date IS NOT NULL AND date != '0000-00-00' AND date > CURDATE() ORDER BY date, heure_debut";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, etudiantId);
             ResultSet rs = ps.executeQuery();
@@ -190,7 +191,7 @@ public class ServiceRendezVous {
     // ── RDV anciens (avant aujourd'hui) ──
     public List<RendezVous> getRdvAnciens(int etudiantId) {
         List<RendezVous> list = new ArrayList<>();
-        String sql = "SELECT * FROM rendez_vous WHERE etudiant_id = ? AND date < CURDATE() ORDER BY date DESC, heure_debut DESC";
+        String sql = "SELECT * FROM rendez_vous WHERE etudiant_id = ? AND date IS NOT NULL AND date != '0000-00-00' AND date < CURDATE() ORDER BY date DESC, heure_debut DESC";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, etudiantId);
             ResultSet rs = ps.executeQuery();
@@ -236,10 +237,9 @@ public class ServiceRendezVous {
         return r;
     }
 
-    // RDV en attente (réservés)
     public List<RendezVous> getRdvEnAttente(int psyId) {
         List<RendezVous> list = new ArrayList<>();
-        String sql = "SELECT * FROM rendez_vous WHERE psychologue_id = ? AND statut = 'réservé'";
+        String sql = "SELECT * FROM rendez_vous WHERE psychologue_id = ? AND (statut = 'réservé' OR statut = 'en attente')";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, psyId);
@@ -265,4 +265,15 @@ public class ServiceRendezVous {
         }
     }
 
+    // Refuser RDV
+    public void refuserRdv(int id) {
+        String sql = "UPDATE rendez_vous SET statut='libre', etudiant_id=NULL WHERE id=?";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+    }
 }

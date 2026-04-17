@@ -4,6 +4,7 @@
 <?import javafx.scene.control.*?>
 
 <?import javafx.scene.shape.*?>
+<?import javafx.scene.chart.*?>
 
 
 <?import javafx.scene.image.ImageView?>
@@ -305,114 +306,94 @@
                 <!-- Statistiques rapides (4 cartes) -->
                 <HBox spacing="16">
 
-                    <VBox spacing="8" HBox.hgrow="ALWAYS"
+                    <!-- Patients Actifs -->
+                    <VBox spacing="8" HBox.hgrow="ALWAYS" onMouseClicked="#onNavUtilisateursClicked"
                           style="-fx-background-color: white;
                                  -fx-background-radius: 14;
                                  -fx-padding: 18;
+                                 -fx-cursor: hand;
                                  -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
                         <Label text="👥" style="-fx-font-size: 32px;"/>
-                        <Label text="Utilisateurs"
+                        <Label text="Patients Actifs"
                                style="-fx-font-size: 14px; -fx-text-fill: #5A6C7D; -fx-font-weight: 600;"/>
-                        <Label fx:id="statUsers" text="1,234"
+                        <Label fx:id="statPatients" text="1,234"
                                style="-fx-font-size: 28px; -fx-font-weight: bold;
                                       -fx-text-fill: #2C3E50;"/>
-                        <Label text="+12 cette semaine"
-                               style="-fx-font-size: 12px; -fx-text-fill: #50C878; -fx-font-weight: 500;"/>
+                        <Label text="Voir les détails →"
+                               style="-fx-font-size: 12px; -fx-text-fill: #3498DB; -fx-font-weight: bold;"/>
                     </VBox>
 
-                    <VBox spacing="8" HBox.hgrow="ALWAYS"
+                    <!-- Psychologues -->
+                    <VBox spacing="8" HBox.hgrow="ALWAYS" onMouseClicked="#onNavUtilisateursClicked"
                           style="-fx-background-color: white;
                                  -fx-background-radius: 14;
                                  -fx-padding: 18;
+                                 -fx-cursor: hand;
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
+                        <Label text="⚕️" style="-fx-font-size: 32px;"/>
+                        <Label text="Psychologues"
+                               style="-fx-font-size: 14px; -fx-text-fill: #5A6C7D; -fx-font-weight: 600;"/>
+                        <Label fx:id="statPsychologues" text="45"
+                               style="-fx-font-size: 28px; -fx-font-weight: bold;
+                                      -fx-text-fill: #2C3E50;"/>
+                        <Label text="Voir les détails →"
+                               style="-fx-font-size: 12px; -fx-text-fill: #3498DB; -fx-font-weight: bold;"/>
+                    </VBox>
+
+                    <!-- Dossiers Médicaux -->
+                    <VBox spacing="8" HBox.hgrow="ALWAYS" onMouseClicked="#onNavDossiersClicked"
+                          style="-fx-background-color: white;
+                                 -fx-background-radius: 14;
+                                 -fx-padding: 18;
+                                 -fx-cursor: hand;
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
+                        <Label text="📋" style="-fx-font-size: 32px;"/>
+                        <Label text="Dossiers Médicaux"
+                               style="-fx-font-size: 14px; -fx-text-fill: #5A6C7D; -fx-font-weight: 600;"/>
+                        <Label fx:id="statDossiers" text="856"
+                               style="-fx-font-size: 28px; -fx-font-weight: bold;
+                                      -fx-text-fill: #2C3E50;"/>
+                        <Label text="Voir les détails →"
+                               style="-fx-font-size: 12px; -fx-text-fill: #3498DB; -fx-font-weight: bold;"/>
+                    </VBox>
+
+                    <!-- Rendez-vous -->
+                    <VBox spacing="8" HBox.hgrow="ALWAYS" onMouseClicked="#onNavRdvClicked"
+                          style="-fx-background-color: white;
+                                 -fx-background-radius: 14;
+                                 -fx-padding: 18;
+                                 -fx-cursor: hand;
                                  -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
                         <Label text="📅" style="-fx-font-size: 32px;"/>
                         <Label text="Rendez-vous"
                                style="-fx-font-size: 14px; -fx-text-fill: #5A6C7D; -fx-font-weight: 600;"/>
-                        <Label fx:id="statRdvs" text="48"
+                        <Label fx:id="statRdvs" text="312"
                                style="-fx-font-size: 28px; -fx-font-weight: bold;
                                       -fx-text-fill: #2C3E50;"/>
-                        <Label text="8 cette semaine"
-                               style="-fx-font-size: 12px; -fx-text-fill: #97BBE4; -fx-font-weight: 500;"/>
-                    </VBox>
-
-                    <VBox spacing="8" HBox.hgrow="ALWAYS"
-                          style="-fx-background-color: white;
-                                 -fx-background-radius: 14;
-                                 -fx-padding: 18;
-                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
-                        <Label text="💬" style="-fx-font-size: 32px;"/>
-                        <Label text="Sujets forum"
-                               style="-fx-font-size: 14px; -fx-text-fill: #5A6C7D; -fx-font-weight: 600;"/>
-                        <Label fx:id="statTopics" text="156"
-                               style="-fx-font-size: 28px; -fx-font-weight: bold;
-                                      -fx-text-fill: #2C3E50;"/>
-                        <Label text="+23 ce mois"
-                               style="-fx-font-size: 12px; -fx-text-fill: #97BBE4; -fx-font-weight: 500;"/>
-                    </VBox>
-
-                    <VBox spacing="8" HBox.hgrow="ALWAYS"
-                          style="-fx-background-color: white;
-                                 -fx-background-radius: 14;
-                                 -fx-padding: 18;
-                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
-                        <Label text="📊" style="-fx-font-size: 32px;"/>
-                        <Label text="Moyenne humeur"
-                               style="-fx-font-size: 14px; -fx-text-fill: #5A6C7D; -fx-font-weight: 600;"/>
-                        <Label fx:id="statMood" text="7.2/10"
-                               style="-fx-font-size: 28px; -fx-font-weight: bold;
-                                      -fx-text-fill: #2C3E50;"/>
-                        <Label text="+0.3 vs mois dernier"
-                               style="-fx-font-size: 12px; -fx-text-fill: #50C878; -fx-font-weight: 500;"/>
+                        <Label text="Voir les détails →"
+                               style="-fx-font-size: 12px; -fx-text-fill: #3498DB; -fx-font-weight: bold;"/>
                     </VBox>
 
                 </HBox>
 
-                <!-- Actions rapides -->
-                <VBox spacing="12"
-                      style="-fx-background-color: white;
-                             -fx-background-radius: 16;
-                             -fx-padding: 22 25;
-                             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
+                <!-- Charts -->
+                <HBox spacing="16" VBox.vgrow="ALWAYS">
+                    <VBox spacing="12" HBox.hgrow="ALWAYS"
+                          style="-fx-background-color: white; -fx-background-radius: 16;
+                                 -fx-padding: 22 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
+                        <Label text="📊 Répartition des Rendez-vous"
+                               style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;"/>
+                        <PieChart fx:id="pieChartRdvs" VBox.vgrow="ALWAYS" />
+                    </VBox>
 
-                    <Label text="⚡ Actions rapides"
-                           style="-fx-font-size: 16px; -fx-font-weight: bold;
-                                  -fx-text-fill: #2C3E50;"/>
-
-                    <HBox spacing="16">
-                        <Button text="➕ Nouvel utilisateur" onAction="#onAddUser"
-                                style="-fx-background-color: #2C3E50;
-                                       -fx-text-fill: white;
-                                       -fx-background-radius: 25;
-                                       -fx-padding: 8 18;
-                                       -fx-cursor: hand;
-                                       -fx-font-size: 13px;
-                                       -fx-font-weight: bold;"/>
-                        <Button text="📅 Créer un rendez-vous" onAction="#onCreateRdv"
-                                style="-fx-background-color: #97BBE4;
-                                       -fx-text-fill: #2C3E50;
-                                       -fx-background-radius: 25;
-                                       -fx-padding: 8 18;
-                                       -fx-cursor: hand;
-                                       -fx-font-size: 13px;
-                                       -fx-font-weight: bold;"/>
-                        <Button text="📝 Modérer le forum" onAction="#onModerateForum"
-                                style="-fx-background-color: #F39C12;
-                                       -fx-text-fill: white;
-                                       -fx-background-radius: 25;
-                                       -fx-padding: 8 18;
-                                       -fx-cursor: hand;
-                                       -fx-font-size: 13px;
-                                       -fx-font-weight: bold;"/>
-                        <Button text="📊 Exporter les données" onAction="#onExportData"
-                                style="-fx-background-color: #34495E;
-                                       -fx-text-fill: white;
-                                       -fx-background-radius: 25;
-                                       -fx-padding: 8 18;
-                                       -fx-cursor: hand;
-                                       -fx-font-size: 13px;
-                                       -fx-font-weight: bold;"/>
-                    </HBox>
-                </VBox>
+                    <VBox spacing="12" HBox.hgrow="ALWAYS"
+                          style="-fx-background-color: white; -fx-background-radius: 16;
+                                 -fx-padding: 22 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
+                        <Label text="📈 Répartition des Dossiers (Risque)"
+                               style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;"/>
+                        <PieChart fx:id="pieChartDossiers" VBox.vgrow="ALWAYS" />
+                    </VBox>
+                </HBox>
 
             </VBox>
 

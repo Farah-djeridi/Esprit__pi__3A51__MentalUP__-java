@@ -14,9 +14,7 @@
 
     <!-- ═══════════════ SIDEBAR ADMIN ═══════════════ -->
     <left>
-        <VBox prefWidth="260" maxWidth="260"
-              VBox.vgrow="ALWAYS">
-              style="-fx-background-color: #2C3E50;">
+        <VBox prefWidth="260" maxWidth="260" VBox.vgrow="ALWAYS" style="-fx-background-color: #2C3E50;">
 
             <HBox alignment="CENTER_LEFT" spacing="10"
                   style="-fx-padding: 24 18 20 18;
@@ -123,17 +121,12 @@
                   style="-fx-background-color: white; -fx-padding: 14 24;
                          -fx-border-color: transparent transparent #E8EEF4 transparent; -fx-border-width: 0 0 1 0;">
                 <VBox spacing="2">
-                    <Label text="📅  Gestion des Rendez-vous"
+                    <Label text="📅  Aperçu et Statistiques des Rendez-vous"
                            style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;"/>
-                    <Label text="CRUD complet · Recherche · Filtres · Statistiques"
+                    <Label text="Statistiques globales · Recherche · Filtres"
                            style="-fx-font-size: 12px; -fx-text-fill: #5A6C7D;"/>
                 </VBox>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button text="➕  Nouveau RDV" onAction="#onAjouterRdv"
-                        style="-fx-background-color: #2C3E50; -fx-text-fill: white;
-                               -fx-font-weight: bold; -fx-font-size: 13px;
-                               -fx-background-radius: 10; -fx-padding: 9 20; -fx-cursor: hand;
-                               -fx-effect: dropshadow(gaussian, rgba(44,62,80,0.3), 8, 0, 0, 2);"/>
             </HBox>
 
             <ScrollPane fitToWidth="true" fitToHeight="true"
@@ -144,9 +137,10 @@
                     <!-- ── Statistiques ── -->
                     <HBox spacing="14">
 
-                        <VBox spacing="6" HBox.hgrow="ALWAYS"
+                        <VBox spacing="6" HBox.hgrow="ALWAYS" onMouseClicked="#onFilterTotal"
                               style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 18 20;
                                      -fx-border-color: rgba(44,62,80,0.06); -fx-border-radius: 14; -fx-border-width: 1;
+                                     -fx-cursor: hand;
                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
                             <Label text="📅  Total" style="-fx-font-size: 12px; -fx-text-fill: #5A6C7D; -fx-font-weight: 600;"/>
                             <Label fx:id="statTotal" text="—"
@@ -154,9 +148,10 @@
                             <Label text="rendez-vous" style="-fx-font-size: 11px; -fx-text-fill: #94A3B8;"/>
                         </VBox>
 
-                        <VBox spacing="6" HBox.hgrow="ALWAYS"
+                        <VBox spacing="6" HBox.hgrow="ALWAYS" onMouseClicked="#onFilterLibre"
                               style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 18 20;
                                      -fx-border-color: rgba(39,174,96,0.15); -fx-border-radius: 14; -fx-border-width: 1;
+                                     -fx-cursor: hand;
                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
                             <Label text="🟢  Libres" style="-fx-font-size: 12px; -fx-text-fill: #5A6C7D; -fx-font-weight: 600;"/>
                             <Label fx:id="statLibres" text="—"
@@ -164,9 +159,10 @@
                             <Label text="disponibles" style="-fx-font-size: 11px; -fx-text-fill: #94A3B8;"/>
                         </VBox>
 
-                        <VBox spacing="6" HBox.hgrow="ALWAYS"
+                        <VBox spacing="6" HBox.hgrow="ALWAYS" onMouseClicked="#onFilterReserve"
                               style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 18 20;
                                      -fx-border-color: rgba(230,126,34,0.15); -fx-border-radius: 14; -fx-border-width: 1;
+                                     -fx-cursor: hand;
                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
                             <Label text="🟠  Réservés" style="-fx-font-size: 12px; -fx-text-fill: #5A6C7D; -fx-font-weight: 600;"/>
                             <Label fx:id="statReserves" text="—"
@@ -174,9 +170,10 @@
                             <Label text="en attente" style="-fx-font-size: 11px; -fx-text-fill: #94A3B8;"/>
                         </VBox>
 
-                        <VBox spacing="6" HBox.hgrow="ALWAYS"
+                        <VBox spacing="6" HBox.hgrow="ALWAYS" onMouseClicked="#onFilterConfirme"
                               style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 18 20;
                                      -fx-border-color: rgba(41,128,185,0.15); -fx-border-radius: 14; -fx-border-width: 1;
+                                     -fx-cursor: hand;
                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
                             <Label text="🔵  Confirmés" style="-fx-font-size: 12px; -fx-text-fill: #5A6C7D; -fx-font-weight: 600;"/>
                             <Label fx:id="statConfirmes" text="—"
@@ -184,9 +181,10 @@
                             <Label text="validés" style="-fx-font-size: 11px; -fx-text-fill: #94A3B8;"/>
                         </VBox>
 
-                        <VBox spacing="6" HBox.hgrow="ALWAYS"
+                        <VBox spacing="6" HBox.hgrow="ALWAYS" onMouseClicked="#onFilterAujourdhui"
                               style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 18 20;
                                      -fx-border-color: rgba(44,62,80,0.06); -fx-border-radius: 14; -fx-border-width: 1;
+                                     -fx-cursor: hand;
                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);">
                             <Label text="📆  Aujourd'hui" style="-fx-font-size: 12px; -fx-text-fill: #5A6C7D; -fx-font-weight: 600;"/>
                             <Label fx:id="statAujourdhui" text="—"

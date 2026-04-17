@@ -17,137 +17,133 @@
 
     <!-- ================= SIDEBAR ================= -->
     <left>
-        <VBox prefWidth="265" style="-fx-background-color: #1a4a5f;">
+        <VBox prefWidth="270" style="-fx-background-color: #1a4a5f;">
 
+            <!-- LOGO + BRAND -->
             <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 26 20 22 20;">
                 <StackPane>
-                    <ImageView fx:id="logoImage" fitWidth="38" fitHeight="38" preserveRatio="true"/>
+                    <ImageView fx:id="logoImage" fitWidth="40" fitHeight="40" preserveRatio="true"/>
                 </StackPane>
                 <VBox spacing="3">
-                    <Label text="MentalUp" textFill="white"
-                           style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
-                    <Label text="Espace Psychologue" textFill="#8ca3b3"
-                           style="-fx-font-size: 11px;"/>
-                    <Label fx:id="currentDate" textFill="#8ca3b3"
-                           style="-fx-font-size: 11px;"/>
+                    <Label text="MentalUp" textFill="white" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+                    <Label text="Espace Psychologue" textFill="#8ca3b3" style="-fx-font-size: 12px;"/>
+                    <Label fx:id="currentDate" textFill="#8ca3b3" style="-fx-font-size: 11px;"/>
                 </VBox>
-            </HBox>
-
-            <HBox spacing="8" style="-fx-padding: 0 20 14 20;">
-                <Label text="Page :" textFill="#b0c4d4" style="-fx-font-size:12px;"/>
-                <Label text="Mon Calendrier" textFill="white"
-                       style="-fx-font-size:15px; -fx-font-weight:bold;"/>
             </HBox>
 
             <Separator style="-fx-background-color: #2a5a6f;"/>
 
-            <VBox spacing="3" style="-fx-padding: 14 12 0 12;" VBox.vgrow="ALWAYS">
+            <!-- MENU -->
+            <VBox spacing="4" style="-fx-padding: 16 14 0 14;" VBox.vgrow="ALWAYS">
 
                 <Label text="MENU PRINCIPAL" textFill="#6a8a9a"
-                       style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 0 0 6 10;"/>
+                       style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 0 0 8 8;"/>
 
                 <HBox fx:id="navHome" onMouseClicked="#goHome"
                       alignment="CENTER_LEFT" spacing="10"
                       style="-fx-padding: 11 14; -fx-background-radius: 10; -fx-cursor: hand;">
-                    <Label text="🏠  Accueil" textFill="white" style="-fx-font-size: 13px;"/>
-                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label text="🏠" style="-fx-font-size: 14px;"/>
+                    <Label text="Accueil" textFill="white" style="-fx-font-size: 14px;"/>
                 </HBox>
 
-                <VBox spacing="1">
+                <VBox spacing="2">
                     <HBox fx:id="navRdv" onMouseClicked="#toggleRdvMenu"
                           alignment="CENTER_LEFT" spacing="10"
-                          style="-fx-padding: 11 14; -fx-background-radius: 10; -fx-cursor: hand;">
-                        <Label text="📅  Rendez-vous" textFill="white" style="-fx-font-size: 13px;"/>
+                          style="-fx-padding: 11 14; -fx-background-radius: 10; -fx-cursor: hand;
+                                 -fx-background-color: rgba(255,255,255,0.12);">
+                        <Label text="📅" style="-fx-font-size: 14px;"/>
+                        <Label text="Rendez-vous" textFill="white" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
                         <Region HBox.hgrow="ALWAYS"/>
                         <Label fx:id="arrowRdv" text="▼" textFill="#6a8a9a" style="-fx-font-size: 9px;"/>
                     </HBox>
-                    <VBox fx:id="submenuRdv" spacing="1" style="-fx-padding: 2 0 2 16;">
+                    <VBox fx:id="submenuRdv" spacing="2" style="-fx-padding: 4 0 4 24;">
                         <HBox fx:id="navVoirRdv" onMouseClicked="#goVoirRendezVous"
                               alignment="CENTER_LEFT"
                               style="-fx-padding: 9 12; -fx-background-radius: 8; -fx-cursor: hand;">
-                            <Label text="• Voir les rendez-vous" textFill="#b0c4d4" style="-fx-font-size: 12px;"/>
+                            <Label text="• Voir les rendez-vous" textFill="#b0c4d4" style="-fx-font-size: 13px;"/>
                         </HBox>
                         <HBox fx:id="navCalendrier" onMouseClicked="#goCalendrier"
                               alignment="CENTER_LEFT"
-                              style="-fx-padding: 9 12; -fx-background-radius: 8;
-                                     -fx-background-color:#2a6a7f; -fx-cursor: hand;">
-                            <Label text="• Mon calendrier" textFill="white"
-                                   style="-fx-font-size: 12px; -fx-font-weight:bold;"/>
+                              style="-fx-padding: 9 12; -fx-background-radius: 8; -fx-cursor: hand;
+                                     -fx-background-color: rgba(255,255,255,0.08);">
+                            <Label text="• Mon calendrier" textFill="white" style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
                         </HBox>
                     </VBox>
                 </VBox>
 
-                <VBox spacing="1">
+                <VBox spacing="2">
                     <HBox fx:id="navDossiers" onMouseClicked="#toggleDossiersMenu"
                           alignment="CENTER_LEFT" spacing="10"
                           style="-fx-padding: 11 14; -fx-background-radius: 10; -fx-cursor: hand;">
-                        <Label text="📁  Dossiers médicaux" textFill="white" style="-fx-font-size: 13px;"/>
+                        <Label text="📁" style="-fx-font-size: 14px;"/>
+                        <Label text="Dossiers médicaux" textFill="white" style="-fx-font-size: 14px;"/>
                         <Region HBox.hgrow="ALWAYS"/>
                         <Label fx:id="arrowDossiers" text="▶" textFill="#6a8a9a" style="-fx-font-size: 9px;"/>
                     </HBox>
-                    <VBox fx:id="submenuDossiers" spacing="1" style="-fx-padding: 2 0 2 16;">
+                    <VBox fx:id="submenuDossiers" spacing="2" style="-fx-padding: 4 0 4 24;">
                         <HBox fx:id="navConsulterDossiers" onMouseClicked="#goConsulterDossiers"
                               alignment="CENTER_LEFT"
                               style="-fx-padding: 9 12; -fx-background-radius: 8; -fx-cursor: hand;">
-                            <Label text="• Consulter dossiers" textFill="#b0c4d4" style="-fx-font-size: 12px;"/>
+                            <Label text="• Consulter dossiers" textFill="#b0c4d4" style="-fx-font-size: 13px;"/>
                         </HBox>
                         <HBox fx:id="navNouveauDossier" onMouseClicked="#goNouveauDossier"
                               alignment="CENTER_LEFT"
                               style="-fx-padding: 9 12; -fx-background-radius: 8; -fx-cursor: hand;">
-                            <Label text="• Nouveau dossier" textFill="#b0c4d4" style="-fx-font-size: 12px;"/>
+                            <Label text="• Nouveau dossier" textFill="#b0c4d4" style="-fx-font-size: 13px;"/>
                         </HBox>
                     </VBox>
                 </VBox>
 
                 <HBox fx:id="navActivites" onMouseClicked="#goActivites"
-                      alignment="CENTER_LEFT"
+                      alignment="CENTER_LEFT" spacing="10"
                       style="-fx-padding: 11 14; -fx-background-radius: 10; -fx-cursor: hand;">
-                    <Label text="🎯  Activités" textFill="white" style="-fx-font-size: 13px;"/>
+                    <Label text="🎯" style="-fx-font-size: 14px;"/>
+                    <Label text="Activités" textFill="white" style="-fx-font-size: 14px;"/>
                 </HBox>
 
                 <HBox fx:id="navRessources" onMouseClicked="#goRessources"
-                      alignment="CENTER_LEFT"
+                      alignment="CENTER_LEFT" spacing="10"
                       style="-fx-padding: 11 14; -fx-background-radius: 10; -fx-cursor: hand;">
-                    <Label text="📚  Ressources" textFill="white" style="-fx-font-size: 13px;"/>
+                    <Label text="📚" style="-fx-font-size: 14px;"/>
+                    <Label text="Ressources" textFill="white" style="-fx-font-size: 14px;"/>
                 </HBox>
 
                 <HBox fx:id="navStats" onMouseClicked="#goStats"
-                      alignment="CENTER_LEFT"
+                      alignment="CENTER_LEFT" spacing="10"
                       style="-fx-padding: 11 14; -fx-background-radius: 10; -fx-cursor: hand;">
-                    <Label text="📊  Statistiques" textFill="white" style="-fx-font-size: 13px;"/>
+                    <Label text="📊" style="-fx-font-size: 14px;"/>
+                    <Label text="Statistiques" textFill="white" style="-fx-font-size: 14px;"/>
                 </HBox>
-
             </VBox>
 
             <Region VBox.vgrow="ALWAYS"/>
 
-            <VBox spacing="10" style="-fx-padding: 16 16 16 16; -fx-background-color: #154a5f;">
+            <VBox spacing="12" style="-fx-padding: 18 18 18 18; -fx-background-color: #154a5f;">
                 <Label text="APERÇU RAPIDE" textFill="#6a8a9a"
                        style="-fx-font-size: 10px; -fx-font-weight: bold;"/>
                 <HBox alignment="CENTER_LEFT">
                     <Label text="Patients actifs" textFill="#b0c4d4" style="-fx-font-size: 12px;"/>
                     <Region HBox.hgrow="ALWAYS"/>
                     <Label fx:id="sidebarPatientsCount" text="24" textFill="#50C878"
-                           style="-fx-font-size: 15px; -fx-font-weight: bold;"/>
+                           style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
                 </HBox>
                 <HBox alignment="CENTER_LEFT">
                     <Label text="RDV aujourd'hui" textFill="#b0c4d4" style="-fx-font-size: 12px;"/>
                     <Region HBox.hgrow="ALWAYS"/>
                     <Label fx:id="sidebarRdvToday" text="0" textFill="#97BBE4"
-                           style="-fx-font-size: 15px; -fx-font-weight: bold;"/>
+                           style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
                 </HBox>
                 <HBox alignment="CENTER_LEFT">
                     <Label text="Dossiers total" textFill="#b0c4d4" style="-fx-font-size: 12px;"/>
                     <Region HBox.hgrow="ALWAYS"/>
                     <Label fx:id="sidebarDossiersTotal" text="42" textFill="#F39C12"
-                           style="-fx-font-size: 15px; -fx-font-weight: bold;"/>
+                           style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
                 </HBox>
             </VBox>
 
-            <VBox spacing="10" style="-fx-padding: 16 16 22 16;
-                                       -fx-border-color: #2a5a6f; -fx-border-width: 1 0 0 0;">
+            <VBox spacing="12" style="-fx-padding: 16 18 20 18; -fx-border-color: #2a5a6f; -fx-border-width: 1 0 0 0;">
                 <HBox alignment="CENTER_LEFT" spacing="10">
-                    <Circle radius="19" fill="#2a5a6f"/>
+                    <Circle radius="20" fill="#2a5a6f"/>
                     <VBox spacing="2">
                         <Label text="Psychologue" textFill="white"
                                style="-fx-font-size: 13px; -fx-font-weight: bold;"/>
@@ -156,13 +152,12 @@
                     </VBox>
                 </HBox>
                 <Button fx:id="logoutBtn" text="Déconnexion" onAction="#logout"
+                        maxWidth="Infinity"
                         style="-fx-background-color: transparent; -fx-text-fill: #b0c4d4;
                                -fx-border-color: #e74c3c; -fx-border-width: 1.5;
                                -fx-background-radius: 8; -fx-border-radius: 8;
-                               -fx-padding: 8; -fx-cursor: hand; -fx-font-size: 12px;"
-                        maxWidth="Infinity"/>
+                               -fx-padding: 9; -fx-cursor: hand; -fx-font-size: 12px;"/>
             </VBox>
-
         </VBox>
     </left>
 

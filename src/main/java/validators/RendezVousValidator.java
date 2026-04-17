@@ -14,7 +14,7 @@ public class RendezVousValidator {
 
     // Statuts valides
     public static final List<String> STATUTS_VALIDES =
-            List.of("libre", "réservé", "confirmé", "annulé", "disponible");
+            List.of("libre", "réservé", "confirmé", "annulé", "disponible", "en attente");
 
     // Types valides
     public static final List<String> TYPES_VALIDES =

@@ -5,53 +5,77 @@ import Services.ServiceRendezVous;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.stage.Stage;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
+
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+
 
 public class RendezVousController {
 
     @FXML private VBox cardsContainer;
     @FXML private Label noResultsLabel;
-    @FXML
-    private HBox navHome;
+    @FXML private HBox navHome;
     @FXML private TextField searchField;
     @FXML private ComboBox<String> filtreStatut;
     @FXML private ComboBox<String> filtreType;
     @FXML private DatePicker filtreDate;
 
-    @FXML private Label totalRdv, rdvAVenir, rdvCeMois;
+    @FXML private Label totalRdv;
+    @FXML private Label rdvAVenir;
+    @FXML private Label rdvCeMois;
 
-    private ServiceRendezVous service = new ServiceRendezVous() {};
 
+    @FXML private VBox submenuRdv;
+    @FXML private VBox submenuDossiers;
+    @FXML private Label arrowRdv;
+    @FXML private Label arrowDossiers;
+
+    private ServiceRendezVous service = new ServiceRendezVous();
     private List<RendezVous> allRdv;
 
+    private static final DateTimeFormatter DATE_FMT =
+            DateTimeFormatter.ofPattern("EEEE d MMMM yyyy", Locale.FRENCH);
+    private static final DateTimeFormatter TIME_FMT =
+            DateTimeFormatter.ofPattern("HH:mm");
 
     @FXML
     public void initialize() {
+        filtreStatut.getItems().addAll("libre", "réservé", "confirmé", "en attente");
+        filtreType.getItems().addAll("consultation", "suivi", "urgence", "bilan");
 
-        filtreStatut.getItems().addAll("libre", "réservé", "confirmé");
-        filtreType.getItems().addAll("consultation", "suivi");
-        filtreStatut.getItems().add("en attente");
+        // Sous-menu RDV ouvert par défaut sur cette page
+        if (submenuRdv != null) {
+            submenuRdv.setVisible(true);
+            submenuRdv.setManaged(true);
+            if (arrowRdv != null) arrowRdv.setText("˅");
+        }
+        if (submenuDossiers != null) {
+            submenuDossiers.setVisible(false);
+            submenuDossiers.setManaged(false);
+        }
+
         loadData();
     }
 
-    private void loadData() {
-        allRdv = service.getAll();
+    public void loadData() {
+        allRdv = service.getByPsychologueId(6);
         afficherCards(allRdv);
         updateStats();
     }
 
     private void afficherCards(List<RendezVous> list) {
-
         cardsContainer.getChildren().clear();
 
         if (list.isEmpty()) {
@@ -59,82 +83,201 @@ public class RendezVousController {
             noResultsLabel.setManaged(true);
             return;
         }
-
         noResultsLabel.setVisible(false);
         noResultsLabel.setManaged(false);
 
-        for (RendezVous r : list) {
+        List<RendezVous> enAttente = list.stream()
+                .filter(r -> "en attente".equalsIgnoreCase(r.getStatut()) || "réservé".equalsIgnoreCase(r.getStatut()))
+                .collect(Collectors.toList());
 
-            VBox card = new VBox(10);
-            card.setPadding(new Insets(15));
-            card.setStyle("-fx-background-color: white; -fx-border-color: #E8ECF0; -fx-border-radius: 10; -fx-background-radius: 10;");
+        List<RendezVous> aVenir = list.stream()
+                .filter(r -> "confirmé".equalsIgnoreCase(r.getStatut()) &&
+                        (r.getDate() != null && !r.getDate().toLocalDate().isBefore(LocalDate.now())))
+                .collect(Collectors.toList());
 
-            Label date = new Label("📅 " + r.getDate());
-            Label heure = new Label("⏰ " + r.getHeureDebut() + " - " + r.getHeureFin());
-            Label type = new Label("Type: " + r.getTypeRdv());
+        List<RendezVous> historique = list.stream()
+                .filter(r -> "confirmé".equalsIgnoreCase(r.getStatut()) &&
+                        (r.getDate() != null && r.getDate().toLocalDate().isBefore(LocalDate.now())))
+                .collect(Collectors.toList());
 
-            Label statut = new Label(r.getStatut());
-            statut.setStyle(getColorStyle(r.getStatut()));
+        List<RendezVous> libres = list.stream()
+                .filter(r -> "libre".equalsIgnoreCase(r.getStatut()) || "disponible".equalsIgnoreCase(r.getStatut()))
+                .collect(Collectors.toList());
 
-            // 🔘 Buttons
-            Button btnConfirm = new Button("Confirmer");
-            Button btnDelete = new Button("Supprimer");
+        addSection("Demandes en attente", enAttente);
+        addSection("Prochains rendez-vous (Confirmés)", aVenir);
+        addSection("Historique (Passés)", historique);
+        addSection("Créneaux Libres", libres);
+    }
 
-            btnConfirm.setStyle("-fx-background-color: blue; -fx-text-fill: white;");
-            btnDelete.setStyle("-fx-background-color: red; -fx-text-fill: white;");
+    private void addSection(String title, List<RendezVous> sectionList) {
+        if (sectionList.isEmpty()) return;
 
-            btnConfirm.setOnAction(e -> {
-                service.confirmerRdv(r.getId());
-                loadData();
-            });
+        Label titleLabel = new Label(title);
+        titleLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #1e4976; -fx-padding: 10 0 5 0;");
+        cardsContainer.getChildren().add(titleLabel);
 
-            btnDelete.setOnAction(e -> {
-                service.delete(r.getId());
-                loadData();
-            });
-            HBox actions = new HBox(10, btnConfirm, btnDelete);
+        for (int i = 0; i < sectionList.size(); i++) {
+            RendezVous r = sectionList.get(i);
+            HBox card = buildCard(r);
 
-            card.getChildren().addAll(date, heure, type, statut, actions);
-
+            if (i > 0) {
+                Separator sep = new Separator();
+                sep.setStyle("-fx-background-color: #f1f5f9;");
+                cardsContainer.getChildren().add(sep);
+            }
             cardsContainer.getChildren().add(card);
         }
     }
 
-    // ================= COLORS =================
-    private String getColorStyle(String statut) {
+    private HBox buildCard(RendezVous r) {
+        HBox card = new HBox(16);
+        card.setAlignment(Pos.CENTER_LEFT);
+        card.setPadding(new Insets(14, 18, 14, 18));
+        card.setStyle("-fx-cursor: hand;");
+
+        // Couleur indicateur gauche
+        String color = getStatutColor(r.getStatut());
+        Region indicator = new Region();
+        indicator.setPrefWidth(4);
+        indicator.setPrefHeight(50);
+        indicator.setMinHeight(50);
+        indicator.setStyle("-fx-background-color: " + color + "; -fx-background-radius: 4;");
+
+        // Date / Heure
+        VBox dateBox = new VBox(4);
+        dateBox.setMinWidth(110);
+        dateBox.setAlignment(Pos.CENTER_LEFT);
+
+        String dateStr = r.getDate() != null
+                ? r.getDate().toLocalDate().format(DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.FRENCH))
+                : "—";
+        Label dateLabel = new Label(dateStr);
+        dateLabel.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #0f2942; -fx-font-family: 'Segoe UI';");
+
+        String heureStr = "";
+        if (r.getHeureDebut() != null && r.getHeureFin() != null) {
+            heureStr = r.getHeureDebut().toLocalTime().format(TIME_FMT)
+                    + " – " + r.getHeureFin().toLocalTime().format(TIME_FMT);
+        }
+        Label heureLabel = new Label("⏱ " + heureStr);
+        heureLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #64748b; -fx-font-family: 'Segoe UI';");
+
+        dateBox.getChildren().addAll(dateLabel, heureLabel);
+
+        // Type
+        VBox typeBox = new VBox(4);
+        typeBox.setMinWidth(130);
+
+        Label typeLabel = new Label(capitalize(r.getTypeRdv()));
+        typeLabel.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #334155; -fx-font-family: 'Segoe UI';");
+
+        Label idLabel = new Label("RDV #" + r.getId());
+        idLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #94a3b8; -fx-font-family: 'Segoe UI';");
+
+        typeBox.getChildren().addAll(typeLabel, idLabel);
+
+        // Statut pill
+        Label statutLabel = new Label(capitalize(r.getStatut()));
+        statutLabel.setStyle(getStatutStyle(r.getStatut()));
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        // Actions
+        HBox actions = new HBox(8);
+        actions.setAlignment(Pos.CENTER_RIGHT);
+
+        Button btnConfirm = new Button("✔ Confirmer");
+        btnConfirm.setStyle("-fx-background-color: #e8f5e9; -fx-text-fill: #2e7d32; -fx-background-radius: 6; "
+                + "-fx-padding: 7 14; -fx-cursor: hand; -fx-font-size: 12px; -fx-font-family: 'Segoe UI';");
+        btnConfirm.setOnAction(e -> {
+            service.confirmerRdv(r.getId());
+            loadData();
+        });
+
+        Button btnDelete = new Button("✕ Supprimer");
+        btnDelete.setStyle("-fx-background-color: #ffebee; -fx-text-fill: #c62828; -fx-background-radius: 6; "
+                + "-fx-padding: 7 12; -fx-cursor: hand; -fx-font-size: 12px; -fx-font-family: 'Segoe UI';");
+        btnDelete.setOnAction(e -> {
+            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+            confirm.setTitle("Confirmation");
+            confirm.setHeaderText("Supprimer le rendez-vous");
+            confirm.setContentText("Voulez-vous vraiment supprimer ce rendez-vous ?");
+            if (confirm.showAndWait().get() == ButtonType.OK) {
+                service.delete(r.getId());
+                loadData();
+            }
+        });
+
+        if ("en attente".equalsIgnoreCase(r.getStatut()) || "réservé".equalsIgnoreCase(r.getStatut())) {
+            btnDelete.setText("✕ Refuser");
+            btnDelete.setOnAction(e -> {
+                Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+                confirm.setTitle("Confirmation");
+                confirm.setHeaderText("Refuser la demande");
+                confirm.setContentText("Voulez-vous refuser cette demande ? Le créneau redeviendra libre.");
+                if (confirm.showAndWait().get() == ButtonType.OK) {
+                    service.refuserRdv(r.getId());
+                    loadData();
+                }
+            });
+        } else if ("confirmé".equalsIgnoreCase(r.getStatut())) {
+            btnConfirm.setDisable(true);
+            btnConfirm.setVisible(false);
+            btnConfirm.setManaged(false);
+        } else if ("libre".equalsIgnoreCase(r.getStatut()) || "disponible".equalsIgnoreCase(r.getStatut())) {
+            btnConfirm.setDisable(true);
+            btnConfirm.setVisible(false);
+            btnConfirm.setManaged(false);
+        }
+
+        actions.getChildren().addAll(btnConfirm, btnDelete);
+
+        card.getChildren().addAll(indicator, dateBox, typeBox, spacer, statutLabel, actions);
+
+        // Hover
+        card.setOnMouseEntered(e ->
+                card.setStyle("-fx-background-color: #f8fafc; -fx-cursor: hand;"));
+        card.setOnMouseExited(e ->
+                card.setStyle("-fx-cursor: hand;"));
+
+        return card;
+    }
+
+    private String getStatutColor(String statut) {
+        if (statut == null) return "#94a3b8";
         switch (statut.toLowerCase()) {
-            case "libre":
-                return "-fx-background-color: green; -fx-text-fill: white; -fx-padding:5;";
-            case "réservé":
-                return "-fx-background-color: orange; -fx-text-fill: white; -fx-padding:5;";
-            case "confirmé":
-                return "-fx-background-color: blue; -fx-text-fill: white; -fx-padding:5;";
-            default:
-                return "";
+            case "libre":     return "#4caf50";
+            case "réservé":   return "#ff9800";
+            case "confirmé":  return "#2196f3";
+            case "en attente":return "#9c27b0";
+            default:          return "#94a3b8";
         }
     }
 
-
-
-    @FXML
-    public void rechercherRendezVous() {
-        appliquerFiltres();
+    private String getStatutStyle(String statut) {
+        String base = "-fx-padding: 5 12; -fx-background-radius: 20; -fx-font-size: 11px; "
+                + "-fx-font-weight: bold; -fx-font-family: 'Segoe UI';";
+        if (statut == null) return base + "-fx-background-color: #f1f5f9; -fx-text-fill: #64748b;";
+        switch (statut.toLowerCase()) {
+            case "libre":     return base + "-fx-background-color: #e8f5e9; -fx-text-fill: #2e7d32;";
+            case "réservé":   return base + "-fx-background-color: #fff3e0; -fx-text-fill: #e65100;";
+            case "confirmé":  return base + "-fx-background-color: #e3f2fd; -fx-text-fill: #1565c0;";
+            case "en attente":return base + "-fx-background-color: #f3e5f5; -fx-text-fill: #6a1b9a;";
+            default:          return base + "-fx-background-color: #f1f5f9; -fx-text-fill: #64748b;";
+        }
     }
 
-    @FXML
-    public void filtrerParStatut() {
-        appliquerFiltres();
+    private String capitalize(String s) {
+        if (s == null || s.isEmpty()) return s;
+        return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
 
-    @FXML
-    public void filtrerParType() {
-        appliquerFiltres();
-    }
-
-    @FXML
-    public void filtrerParDate() {
-        appliquerFiltres();
-    }
+    @FXML public void rechercherRendezVous() { appliquerFiltres(); }
+    @FXML public void filtrerParStatut()     { appliquerFiltres(); }
+    @FXML public void filtrerParType()       { appliquerFiltres(); }
+    @FXML public void filtrerParDate()       { appliquerFiltres(); }
 
     @FXML
     public void reinitialiserFiltres() {
@@ -146,110 +289,82 @@ public class RendezVousController {
     }
 
     private void appliquerFiltres() {
-
+        String search = searchField.getText().trim().toLowerCase();
         List<RendezVous> filtered = allRdv.stream()
-                .filter(r -> searchField.getText().isEmpty() ||
-                        r.getTypeRdv().toLowerCase().contains(searchField.getText().toLowerCase()))
+                .filter(r -> search.isEmpty() ||
+                        (r.getTypeRdv() != null && r.getTypeRdv().toLowerCase().contains(search)) ||
+                        (r.getStatut() != null && r.getStatut().toLowerCase().contains(search)))
                 .filter(r -> filtreStatut.getValue() == null ||
-                        r.getStatut().equals(filtreStatut.getValue()))
+                        r.getStatut().equalsIgnoreCase(filtreStatut.getValue()))
                 .filter(r -> filtreType.getValue() == null ||
-                        r.getTypeRdv().equals(filtreType.getValue()))
+                        r.getTypeRdv().equalsIgnoreCase(filtreType.getValue()))
                 .filter(r -> filtreDate.getValue() == null ||
-                        r.getDate().toLocalDate().equals(filtreDate.getValue()))
+                        (r.getDate() != null && r.getDate().toLocalDate().equals(filtreDate.getValue())))
                 .collect(Collectors.toList());
-
         afficherCards(filtered);
     }
 
     private void updateStats() {
-
         totalRdv.setText(String.valueOf(allRdv.size()));
-
         long avenir = allRdv.stream()
-                .filter(r -> r.getDate().toLocalDate().isAfter(LocalDate.now()))
+                .filter(r -> r.getDate() != null && r.getDate().toLocalDate().isAfter(LocalDate.now()))
                 .count();
-
         rdvAVenir.setText(String.valueOf(avenir));
-
         long mois = allRdv.stream()
-                .filter(r -> r.getDate().toLocalDate().getMonth() == LocalDate.now().getMonth())
+                .filter(r -> r.getDate() != null &&
+                        r.getDate().toLocalDate().getMonth() == LocalDate.now().getMonth() &&
+                        r.getDate().toLocalDate().getYear() == LocalDate.now().getYear())
                 .count();
-
         rdvCeMois.setText(String.valueOf(mois));
     }
-
 
     private void loadPage(MouseEvent event, String path) {
         try {
             java.net.URL url = getClass().getResource(path);
-
             if (url == null) {
-                System.out.println("FXML introuvable: " + path);
+                System.err.println("FXML introuvable: " + path);
                 return;
             }
-
             Parent root = FXMLLoader.load(url);
-
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.setResizable(true);
+            stage.setMinWidth(900);
+            stage.setMinHeight(600);
+            stage.show();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    @FXML
-    public void goHome(MouseEvent event) {
-        loadPage(event, "/gui/DashboardPsyVue.fxml");
+    @FXML public void goHome(MouseEvent event)             { loadPage(event, "/gui/DashboardPsyVue.fxml"); }
+    @FXML public void goVoirRendezVous(MouseEvent event)   { loadPage(event, "/gui/VoirRendezVous.fxml"); }
+    @FXML public void goNouveauDossier(MouseEvent event)   { loadPage(event, "/gui/NouveauDossier.fxml"); }
+    @FXML public void goCalendrier(MouseEvent event)       { loadPage(event, "/gui/Calendrier.fxml"); }
+    @FXML public void goConsulterDossiers(MouseEvent event){ loadPage(event, "/gui/ConsulterDossiers.fxml"); }
+
+    @FXML public void toggleRdvMenu() {
+        if (submenuRdv != null) {
+            boolean s = !submenuRdv.isVisible();
+            submenuRdv.setVisible(s); submenuRdv.setManaged(s);
+            if (arrowRdv != null) arrowRdv.setText(s ? "˅" : "›");
+        }
+    }
+    @FXML public void toggleDossiersMenu() {
+        if (submenuDossiers != null) {
+            boolean s = !submenuDossiers.isVisible();
+            submenuDossiers.setVisible(s); submenuDossiers.setManaged(s);
+            if (arrowDossiers != null) arrowDossiers.setText(s ? "˅" : "›");
+        }
     }
 
-    @FXML
-    public void goVoirRendezVous(MouseEvent event) {
-        loadPage(event, "/gui/VoirRendezVous.fxml");
-    }
+    @FXML public void goActivites()  {}
+    @FXML public void goRessources() {}
+    @FXML public void goStats()      {}
+    @FXML public void logout()       {}
 
-    @FXML
-    void goNouveauDossier(MouseEvent event) {
-        loadPage(event, "/gui/NouveauDossier.fxml");
-    }
-
-    @FXML
-    void goCalendrier(MouseEvent event) {
-        loadPage(event, "/gui/Calendrier.fxml");
-    }
-
-    @FXML
-    void goConsulterDossiers(MouseEvent event) {
-        loadPage(event, "/gui/ConsulterDossiers.fxml");
-    }
-
-    @FXML
-    public void toggleRdvMenu() {}
-
-    @FXML
-    public void toggleDossiersMenu() {}
-
-
-
-    @FXML
-    public void goActivites() {}
-
-    @FXML
-    public void goRessources() {}
-
-    @FXML
-    public void goStats() {}
-
-
-
-
-
-    @FXML
-    public void logout() {}
-
-    // ================= ADD RDV =================
-    @FXML
-    public void nouveauRendezVous() {
-        System.out.println("Ajouter RDV (popup à faire)");
+    @FXML public void nouveauRendezVous() {
+        System.out.println("Nouveau RDV (popup)");
     }
 }

@@ -45,7 +45,7 @@ public class ControllerAdminRdv {
         logoImage.setImage(new Image(getClass().getResourceAsStream("/Images/logo.png")));
 
         // Remplir les ComboBox
-        filtreStatut.getItems().addAll("Tous", "libre", "réservé", "confirmé", "annulé");
+        filtreStatut.getItems().addAll("Tous", "libre", "réservé", "confirmé", "annulé", "en attente");
         filtreStatut.setValue("Tous");
 
         filtreType.getItems().addAll("Tous", "consultation", "suivi", "urgence", "bilan");
@@ -70,7 +70,7 @@ public class ControllerAdminRdv {
     private void mettreAJourStats(List<RendezVous> list) {
         long total     = list.size();
         long libres    = list.stream().filter(r -> "libre".equalsIgnoreCase(r.getStatut()) || "disponible".equalsIgnoreCase(r.getStatut())).count();
-        long reserves  = list.stream().filter(r -> "réservé".equalsIgnoreCase(r.getStatut())).count();
+        long reserves  = list.stream().filter(r -> "réservé".equalsIgnoreCase(r.getStatut()) || "en attente".equalsIgnoreCase(r.getStatut())).count();
         long confirmes = list.stream().filter(r -> "confirmé".equalsIgnoreCase(r.getStatut())).count();
         long aujourdhui = list.stream().filter(r -> r.getDate() != null && r.getDate().toLocalDate().equals(LocalDate.now())).count();
 
@@ -204,40 +204,7 @@ public class ControllerAdminRdv {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // Actions
-        HBox actions = new HBox(8);
-        actions.setAlignment(Pos.CENTER_RIGHT);
-
-        Button btnEdit = new Button("✏");
-        btnEdit.setStyle(
-            "-fx-background-color: rgba(44,62,80,0.08); -fx-text-fill: #2C3E50;" +
-            "-fx-background-radius: 8; -fx-padding: 7 12; -fx-cursor: hand; -fx-font-size: 13px;"
-        );
-        btnEdit.setOnAction(e -> ouvrirDialogEdition(r));
-
-        Button btnDelete = new Button("🗑");
-        btnDelete.setStyle(
-            "-fx-background-color: rgba(231,76,60,0.1); -fx-text-fill: #E74C3C;" +
-            "-fx-background-radius: 8; -fx-padding: 7 12; -fx-cursor: hand; -fx-font-size: 13px;"
-        );
-        btnDelete.setOnAction(e -> supprimerRdv(r));
-
-        // Bouton confirmer si réservé
-        if ("réservé".equalsIgnoreCase(r.getStatut())) {
-            Button btnConfirm = new Button("✅");
-            btnConfirm.setStyle(
-                "-fx-background-color: rgba(39,174,96,0.12); -fx-text-fill: #27AE60;" +
-                "-fx-background-radius: 8; -fx-padding: 7 12; -fx-cursor: hand; -fx-font-size: 13px;"
-            );
-            btnConfirm.setOnAction(e -> {
-                service.confirmerRdv(r.getId());
-                chargerEtAfficher();
-            });
-            actions.getChildren().add(btnConfirm);
-        }
-
-        actions.getChildren().addAll(btnEdit, btnDelete);
-        contenu.getChildren().addAll(icone, infos, spacer, badge, actions);
+        contenu.getChildren().addAll(icone, infos, spacer, badge);
         card.getChildren().addAll(barre, contenu);
 
         // Hover
@@ -327,7 +294,7 @@ public class ControllerAdminRdv {
         // Statut
         grid.add(fl("Statut"), 0, 4);
         ComboBox<String> cbStat = new ComboBox<>(); cbStat.setId("statut");
-        cbStat.getItems().addAll("libre", "réservé", "confirmé", "annulé");
+        cbStat.getItems().addAll("libre", "réservé", "confirmé", "annulé", "en attente");
         cbStat.setValue("libre"); cbStat.setPrefWidth(240);
         cbStat.setStyle("-fx-background-radius: 8;"); grid.add(cbStat, 1, 4);
 
@@ -410,6 +377,39 @@ public class ControllerAdminRdv {
     @FXML private void onTriChange(ActionEvent e)  { appliquerFiltresEtTri(); }
 
     @FXML
+    private void onFilterTotal(MouseEvent e) {
+        filtreStatut.setValue("Tous");
+        appliquerFiltresEtTri();
+    }
+
+    @FXML
+    private void onFilterLibre(MouseEvent e) {
+        filtreStatut.setValue("libre");
+        appliquerFiltresEtTri();
+    }
+
+    @FXML
+    private void onFilterReserve(MouseEvent e) {
+        filtreStatut.setValue("réservé");
+        appliquerFiltresEtTri();
+    }
+
+    @FXML
+    private void onFilterConfirme(MouseEvent e) {
+        filtreStatut.setValue("confirmé");
+        appliquerFiltresEtTri();
+    }
+
+    @FXML
+    private void onFilterAujourdhui(MouseEvent e) {
+        LocalDate today = LocalDate.now();
+        List<RendezVous> filtres = tousLesRdv.stream()
+            .filter(r -> r.getDate() != null && r.getDate().toLocalDate().equals(today))
+            .collect(Collectors.toList());
+        afficherCartes(filtres);
+    }
+
+    @FXML
     private void onReset(ActionEvent e) {
         searchField.clear();
         filtreStatut.setValue("Tous");
@@ -456,7 +456,7 @@ public class ControllerAdminRdv {
         return switch (s.toLowerCase()) {
             case "libre", "disponible" -> "#27AE60";
             case "confirmé"            -> "#2980B9";
-            case "réservé"             -> "#E67E22";
+            case "réservé", "en attente" -> "#E67E22";
             case "annulé"              -> "#95A5A6";
             default                    -> "#95A5A6";
         };

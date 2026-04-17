@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.event.ActionEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import utils.MyDataBase;
 
@@ -25,12 +26,24 @@ import javafx.scene.input.MouseEvent;
 
 public class NouveauDossierController {
 
-    public DatePicker currentDate;
+    @FXML private Label currentDate;
     @FXML private ComboBox<String> patientComboBox;
     @FXML private ComboBox<String> niveauRisqueBox;
     @FXML private DatePicker datePicker;
     @FXML private TextArea notesField;
-    @FXML private Label pageTitle;
+
+    @FXML private VBox submenuRdv;
+    @FXML private VBox submenuDossiers;
+    @FXML private Label arrowRdv;
+    @FXML private Label arrowDossiers;
+
+    @FXML private Label sidebarPatientsCount;
+    @FXML private Label sidebarRdvToday;
+    @FXML private Label sidebarDossiersTotal;
+
+    private boolean rdvOpen = false;
+    private boolean dossiersOpen = true;
+
     @FXML
     private HBox navHome;
 
@@ -63,9 +76,21 @@ public class NouveauDossierController {
 
     @FXML
     public void initialize() {
+        if (submenuRdv != null) {
+            submenuRdv.setVisible(false);
+            submenuRdv.setManaged(false);
+        }
+        if (submenuDossiers != null) {
+            submenuDossiers.setVisible(true);
+            submenuDossiers.setManaged(true);
+        }
 
         loadPatients();
         datePicker.setValue(LocalDate.now());
+        
+        if (currentDate != null) {
+            currentDate.setText(java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        }
 
         try {
             Connection cnx = MyDataBase.getInstance().getCnx();
@@ -173,13 +198,51 @@ public class NouveauDossierController {
 
 
     @FXML
-    void goCalendrier(MouseEvent event) {
+    public void goCalendrier(MouseEvent event) {
         loadPage(event, "/gui/Calendrier.fxml");
     }
 
     @FXML
-    void goConsulterDossiers(MouseEvent event) {
+    public void goConsulterDossiers(MouseEvent event) {
         loadPage(event, "/gui/ConsulterDossiers.fxml");
+    }
+
+    @FXML
+    public void goNouveauDossier(MouseEvent event) {
+        loadPage(event, "/gui/NouveauDossier.fxml");
+    }
+
+    @FXML
+    public void toggleRdvMenu(MouseEvent event) {
+        rdvOpen = !rdvOpen;
+        if (submenuRdv != null) {
+            submenuRdv.setVisible(rdvOpen);
+            submenuRdv.setManaged(rdvOpen);
+        }
+        if (arrowRdv != null) {
+            arrowRdv.setText(rdvOpen ? "▼" : "▶");
+        }
+    }
+
+    @FXML
+    public void toggleDossiersMenu(MouseEvent event) {
+        dossiersOpen = !dossiersOpen;
+        if (submenuDossiers != null) {
+            submenuDossiers.setVisible(dossiersOpen);
+            submenuDossiers.setManaged(dossiersOpen);
+        }
+        if (arrowDossiers != null) {
+            arrowDossiers.setText(dossiersOpen ? "▼" : "▶");
+        }
+    }
+
+    @FXML public void goActivites(MouseEvent event) { System.out.println("Activités"); }
+    @FXML public void goRessources(MouseEvent event) { System.out.println("Ressources"); }
+    @FXML public void goStats(MouseEvent event) { System.out.println("Statistiques"); }
+
+    @FXML
+    public void logout(ActionEvent event) {
+        System.out.println("Déconnexion");
     }
 
 

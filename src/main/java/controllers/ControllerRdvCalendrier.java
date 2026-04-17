@@ -72,6 +72,10 @@ public class ControllerRdvCalendrier {
 
     private void chargerEtAfficher() {
         creneaux = serviceRdv.getByPsychologueId(psyId);
+        System.out.println("[ControllerRdvCalendrier] psyId=" + psyId + " → " + creneaux.size() + " créneaux chargés");
+        for (RendezVous r : creneaux) {
+            System.out.println("  - id=" + r.getId() + " date=" + r.getDate() + " statut=" + r.getStatut() + " heure=" + r.getHeureDebut());
+        }
 
         LocalDate finSemaine = debutSemaine.plusDays(6);
         String[] mois = {"jan.","fév.","mar.","avr.","mai","juin",
@@ -194,9 +198,9 @@ public class ControllerRdvCalendrier {
                 bg = "rgba(41,128,185,0.15)"; textColor = "#1A5276"; border = "#2980B9";
                 iconeLabel = "🔵 Confirmé";
             }
-            case "réservé" -> {
+            case "en attente", "réservé" -> {
                 bg = "rgba(230,126,34,0.15)"; textColor = "#935116"; border = "#E67E22";
-                iconeLabel = "🟠 Réservé";
+                iconeLabel = "🟠 En attente";
             }
             default -> {
                 bg = "rgba(149,165,166,0.15)"; textColor = "#616A6B"; border = "#95A5A6";
@@ -285,7 +289,7 @@ public class ControllerRdvCalendrier {
     @FXML
     private void onNavHomeClicked(MouseEvent event) {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/Home.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("/gui/Home.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root)); stage.show();
         } catch (Exception e) { e.printStackTrace(); }

@@ -40,7 +40,7 @@ public class ControllerRdvConfirmation {
             java.time.LocalDate ld = rdv.getDate().toLocalDate();
             String[] joursFr = {"Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"};
             String[] moisFr  = {"Janvier","Février","Mars","Avril","Mai","Juin",
-                                 "Juillet","Août","Septembre","Octobre","Novembre","Décembre"};
+                    "Juillet","Août","Septembre","Octobre","Novembre","Décembre"};
             String nomJour = joursFr[ld.getDayOfWeek().getValue() - 1];
             String nomMois = moisFr[ld.getMonthValue() - 1];
             labelDate.setText(nomJour + " " + ld.getDayOfMonth() + " " + nomMois + " " + ld.getYear());
@@ -50,9 +50,9 @@ public class ControllerRdvConfirmation {
 
         // Heure
         String heureDebut = rdv.getHeureDebut() != null
-            ? rdv.getHeureDebut().toString().substring(0, 5) : "--:--";
+                ? rdv.getHeureDebut().toString().substring(0, 5) : "--:--";
         String heureFin   = rdv.getHeureFin() != null
-            ? rdv.getHeureFin().toString().substring(0, 5) : "--:--";
+                ? rdv.getHeureFin().toString().substring(0, 5) : "--:--";
         labelHeure.setText(heureDebut + " – " + heureFin);
 
 
@@ -76,14 +76,14 @@ public class ControllerRdvConfirmation {
 
             btnConfirmer.setText("Réservé !");
             btnConfirmer.setStyle(
-                "-fx-background-color: linear-gradient(to right, #1E8449, #145A32);" +
-                "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;" +
-                "-fx-background-radius: 10; -fx-padding: 10 28;"
+                    "-fx-background-color: linear-gradient(to right, #1E8449, #145A32);" +
+                            "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;" +
+                            "-fx-background-radius: 10; -fx-padding: 10 28;"
             );
 
 
             javafx.animation.PauseTransition pause =
-                new javafx.animation.PauseTransition(Duration.millis(800));
+                    new javafx.animation.PauseTransition(Duration.millis(800));
             pause.setOnFinished(e -> {
                 fermerFenetre();
                 if (onSuccess != null) onSuccess.run();
@@ -94,12 +94,12 @@ public class ControllerRdvConfirmation {
 
             btnConfirmer.setText(" Créneau indisponible");
             btnConfirmer.setStyle(
-                "-fx-background-color: linear-gradient(to right, #C0392B, #922B21);" +
-                "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;" +
-                "-fx-background-radius: 10; -fx-padding: 10 28;"
+                    "-fx-background-color: linear-gradient(to right, #C0392B, #922B21);" +
+                            "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;" +
+                            "-fx-background-radius: 10; -fx-padding: 10 28;"
             );
             javafx.animation.PauseTransition pause =
-                new javafx.animation.PauseTransition(Duration.millis(1500));
+                    new javafx.animation.PauseTransition(Duration.millis(1500));
             pause.setOnFinished(e -> fermerFenetre());
             pause.play();
         }

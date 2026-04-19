@@ -66,7 +66,7 @@ public class ServiceSujet implements IService<Sujet> {
                 s.setContenu(rs.getString("contenu"));
                 s.setNbLikes(rs.getInt("nb_likes"));
                 s.setNbDislikes(rs.getInt("nb_dislikes"));
-                s.setNbVues(rs.getInt("nb_vues"));  // 🔥 IMPORTANT : récupérer les vues
+                s.setNbVues(rs.getInt("nb_vues"));
                 s.setDateCreation(rs.getDate("date_creation"));
                 s.setAnonyme(rs.getBoolean("is_anonyme"));
                 s.setScoreToxicite(rs.getDouble("score_toxicite"));
@@ -140,7 +140,7 @@ public class ServiceSujet implements IService<Sujet> {
     }
 
     private void deleteSujetWithCheck(Sujet s, int userId) {
-        // Admin (ID 1) ou propriétaire peut supprimer
+
         if (userId != 1 && !isUserOwner(s.getId(), userId)) {
             System.out.println("Vous ne pouvez supprimer que vos propres sujets !");
             return;

@@ -18,7 +18,9 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Locale;
 
@@ -28,6 +30,8 @@ import models.Vote;
 import services.ServiceSujet;
 import services.ServiceCommentaire;
 import services.ServiceVote;
+import services.ServiceTraduction;
+import services.ProfanityFilterService;
 
 public class ControllerDetailDiscussion {
 
@@ -47,6 +51,7 @@ public class ControllerDetailDiscussion {
     @FXML private Button likeButton;
     @FXML private Button dislikeButton;
     @FXML private Button translateSujetBtn;
+    @FXML private Button cancelTranslateSujetBtn;
 
     @FXML private MenuButton topicMenuButton;
 
@@ -77,6 +82,7 @@ public class ControllerDetailDiscussion {
     private ServiceSujet serviceSujet;
     private ServiceCommentaire serviceCommentaire;
     private ServiceVote serviceVote;
+    private ServiceTraduction serviceTraduction;
 
     private Sujet currentSujet;
     private List<Commentaire> allCommentaires;
@@ -88,6 +94,15 @@ public class ControllerDetailDiscussion {
     private int currentCommentPage = 1;
     private int totalCommentPages = 1;
     private final int commentsPerPage = 3;
+
+    // Variables pour la traduction
+    private boolean isSujetTranslated = false;
+    private String originalSujetTitre;
+    private String originalSujetContenu;
+    private Map<Integer, String> originalCommentContents = new HashMap<>();
+    private Map<Integer, Boolean> isCommentTranslated = new HashMap<>();
+
+    private ProfanityFilterService profanityFilter;
 
     private static final String COLOR_PRIMARY = "#2C5F8A";
     private static final String COLOR_PRIMARY_DARK = "#1E4D7B";
@@ -106,6 +121,7 @@ public class ControllerDetailDiscussion {
         updateDate();
 
         serviceCommentaire = new ServiceCommentaire();
+        serviceTraduction = new ServiceTraduction();
         loadCurrentUserInfo();
 
         try {
@@ -131,6 +147,24 @@ public class ControllerDetailDiscussion {
                 submitCommentButton.setDisable(newVal == null || newVal.trim().isEmpty()));
 
         badgeRdv.setText("3");
+
+        // Initialiser le bouton d'annulation de traduction du sujet
+        cancelTranslateSujetBtn = new Button("↩ Annuler");
+        cancelTranslateSujetBtn.setStyle(
+                "-fx-background-color: #F1F5F9;" +
+                        "-fx-text-fill: #64748B;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-padding: 5 14;" +
+                        "-fx-font-size: 12px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-cursor: hand;"
+        );
+        cancelTranslateSujetBtn.setOnAction(e -> annulerTraductionSujet());
+        cancelTranslateSujetBtn.setVisible(false);
+    }
+
+    public void setProfanityFilter(ProfanityFilterService filter) {
+        this.profanityFilter = filter;
     }
 
     private void loadCurrentUserInfo() {
@@ -189,6 +223,11 @@ public class ControllerDetailDiscussion {
     }
 
     private void loadSujetDetails() {
+        // Sauvegarder les originaux pour la traduction
+        originalSujetTitre = currentSujet.getTitre();
+        originalSujetContenu = currentSujet.getContenu();
+        isSujetTranslated = false;
+
         sujetTitre.setText(currentSujet.getTitre());
         sujetContenu.setText(currentSujet.getContenu());
         sujetContenu.getParent().setStyle(
@@ -257,7 +296,90 @@ public class ControllerDetailDiscussion {
             topicMenuButton.getItems().addAll(editItem, new SeparatorMenuItem(), deleteItem);
         }
 
-        translateSujetBtn.setOnAction(e -> translateText(currentSujet.getContenu(), sujetContenu, translateSujetBtn));
+        // Configurer les boutons de traduction du sujet
+        translateSujetBtn.setOnAction(e -> traduireSujet());
+    }
+
+    private void traduireSujet() {
+        try {
+            // Traduire le titre
+            String titreTraduit = serviceTraduction.traduire(originalSujetTitre, "fr", "auto");
+            // Traduire le contenu
+            String contenuTraduit = serviceTraduction.traduire(originalSujetContenu, "fr", "auto");
+
+            if (titreTraduit != null && contenuTraduit != null) {
+                sujetTitre.setText(titreTraduit);
+                sujetContenu.setText(contenuTraduit);
+                isSujetTranslated = true;
+
+                // Afficher le bouton d'annulation et cacher le bouton de traduction
+                translateSujetBtn.setVisible(false);
+                cancelTranslateSujetBtn.setVisible(true);
+
+                javafx.scene.Parent parent = translateSujetBtn.getParent();
+                if (parent instanceof HBox) {
+                    HBox hboxParent = (HBox) parent;
+                    if (!hboxParent.getChildren().contains(cancelTranslateSujetBtn)) {
+                        hboxParent.getChildren().add(cancelTranslateSujetBtn);
+                    }
+                } else if (parent instanceof VBox) {
+                    VBox vboxParent = (VBox) parent;
+                    if (!vboxParent.getChildren().contains(cancelTranslateSujetBtn)) {
+                        vboxParent.getChildren().add(cancelTranslateSujetBtn);
+                    }
+                }
+
+            }} catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Erreur lors de la traduction: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    private void annulerTraductionSujet() {
+        if (originalSujetTitre != null && originalSujetContenu != null) {
+            sujetTitre.setText(originalSujetTitre);
+            sujetContenu.setText(originalSujetContenu);
+            isSujetTranslated = false;
+
+            // Restaurer les boutons
+            translateSujetBtn.setVisible(true);
+            cancelTranslateSujetBtn.setVisible(false);
+
+            showAlert("Information", "Retour au texte original", Alert.AlertType.INFORMATION);
+        }
+    }
+
+    private void traduireCommentaire(Commentaire commentaire, Label contentLabel, Button translateBtn, Button cancelBtn) {
+        try {
+            // Sauvegarder l'original si ce n'est pas déjà fait
+            if (!originalCommentContents.containsKey(commentaire.getId())) {
+                originalCommentContents.put(commentaire.getId(), commentaire.getContenu());
+            }
+
+            String contenuTraduit = serviceTraduction.traduire(commentaire.getContenu(), "fr", "auto");
+
+            if (contenuTraduit != null) {
+                contentLabel.setText(contenuTraduit);
+                isCommentTranslated.put(commentaire.getId(), true);
+
+                translateBtn.setVisible(false);
+                cancelBtn.setVisible(true);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Erreur lors de la traduction du commentaire", Alert.AlertType.ERROR);
+        }
+    }
+
+    private void annulerTraductionCommentaire(Commentaire commentaire, Label contentLabel, Button translateBtn, Button cancelBtn) {
+        String original = originalCommentContents.get(commentaire.getId());
+        if (original != null) {
+            contentLabel.setText(original);
+            isCommentTranslated.put(commentaire.getId(), false);
+
+            translateBtn.setVisible(true);
+            cancelBtn.setVisible(false);
+        }
     }
 
     private void updateLikeDislikeButtons() {
@@ -574,7 +696,41 @@ public class ControllerDetailDiscussion {
             loadCommentaires();
         });
 
-        actionsBox.getChildren().addAll(likeBtn, dislikeBtn);
+        // Boutons de traduction pour le commentaire
+        Button translateCommentBtn = new Button("🌍 Traduire");
+        translateCommentBtn.setStyle(
+                "-fx-background-color: #E0F2FE;" +
+                        "-fx-text-fill: #0369A1;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-padding: 5 12;" +
+                        "-fx-font-size: 12px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-cursor: hand;"
+        );
+
+        Button cancelTranslateCommentBtn = new Button("↩ Annuler");
+        cancelTranslateCommentBtn.setStyle(
+                "-fx-background-color: #F1F5F9;" +
+                        "-fx-text-fill: #64748B;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-padding: 5 12;" +
+                        "-fx-font-size: 12px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-cursor: hand;"
+        );
+        cancelTranslateCommentBtn.setVisible(false);
+
+        translateCommentBtn.setOnAction(e -> {
+            e.consume();
+            traduireCommentaire(commentaire, content, translateCommentBtn, cancelTranslateCommentBtn);
+        });
+
+        cancelTranslateCommentBtn.setOnAction(e -> {
+            e.consume();
+            annulerTraductionCommentaire(commentaire, content, translateCommentBtn, cancelTranslateCommentBtn);
+        });
+
+        actionsBox.getChildren().addAll(likeBtn, dislikeBtn, translateCommentBtn, cancelTranslateCommentBtn);
 
         if (isOwner) {
             MenuButton actionsMenu = new MenuButton("⋮");
@@ -689,17 +845,52 @@ public class ControllerDetailDiscussion {
         Button saveButton = new Button("✓ Sauvegarder");
         saveButton.setStyle("-fx-background-color: #2C5F8A; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 6 20; -fx-background-radius: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 1);");
         saveButton.setOnAction(e -> {
-            String newText = editArea.getText();
-            if (validateCommentEdit(newText, commentaire.getContenu())) {
-                commentaire.setContenu(newText);
-                serviceCommentaire.update(commentaire);
-                contentLabel.setText(newText);
+            String newText = editArea.getText().trim();
+
+            // 1. D'abord valider la longueur
+            if (newText.isEmpty()) {
+                showAlert("Erreur", "Le commentaire ne peut pas être vide", Alert.AlertType.WARNING);
+                return;
+            }
+            if (newText.length() < 3) {
+                showAlert("Erreur", "Le commentaire doit contenir au moins 3 caractères", Alert.AlertType.WARNING);
+                return;
+            }
+            if (newText.length() > 1000) {
+                showAlert("Erreur", "Le commentaire ne peut pas dépasser 1000 caractères", Alert.AlertType.WARNING);
+                return;
+            }
+
+            // 2. Ensuite valider les mots inappropriés (AVANT la sauvegarde)
+            if (profanityFilter != null) {
+                try {
+                    profanityFilter.validateText(newText, "commentaire");
+                } catch (IllegalArgumentException ex) {
+                    showAlert("Contenu inapproprié", ex.getMessage(), Alert.AlertType.WARNING);
+                    return; // Arrêter ici, ne pas sauvegarder
+                }
+            }
+
+            // 3. Vérifier si le texte a changé
+            if (newText.equals(commentaire.getContenu())) {
+                showAlert("Information", "Aucune modification détectée", Alert.AlertType.INFORMATION);
+                // Restaurer l'affichage normal
                 parent.getChildren().set(index, contentLabel);
                 buttonBox.setVisible(false);
                 recreateCommentMenu(commentaire, contentLabel, menuButton);
                 menuButton.setVisible(true);
-                showAlert("Succès", "Commentaire modifié !", Alert.AlertType.INFORMATION);
+                return;
             }
+
+            // 4. Tout est valide, on sauvegarde
+            commentaire.setContenu(newText);
+            serviceCommentaire.update(commentaire);
+            contentLabel.setText(newText);
+            parent.getChildren().set(index, contentLabel);
+            buttonBox.setVisible(false);
+            recreateCommentMenu(commentaire, contentLabel, menuButton);
+            menuButton.setVisible(true);
+            showAlert("Succès", "Commentaire modifié !", Alert.AlertType.INFORMATION);
         });
 
         buttonBox.getChildren().addAll(cancelButton, saveButton);
@@ -714,12 +905,12 @@ public class ControllerDetailDiscussion {
     private void recreateCommentMenu(Commentaire commentaire, Label contentLabel, MenuButton menuButton) {
         menuButton.getItems().clear();
 
-        MenuItem editItem = new MenuItem("✏️ Modifier");
+        MenuItem editItem = new MenuItem("✏Modifier");
         editItem.setOnAction(e -> {
             editComment(commentaire, contentLabel, menuButton);
         });
 
-        MenuItem deleteItem = new MenuItem("🗑️ Supprimer");
+        MenuItem deleteItem = new MenuItem("🗑 Supprimer");
         deleteItem.setStyle("-fx-text-fill: #E74C3C;");
         deleteItem.setOnAction(e -> deleteComment(commentaire));
 
@@ -741,30 +932,21 @@ public class ControllerDetailDiscussion {
         }
     }
 
-    private void translateText(String originalText, Label targetLabel, Button translateBtn) {
-        if (translateBtn.getText().contains("Traduit")) {
-            return;
-        }
-
-        translateBtn.setText("Traduction...");
-        translateBtn.setDisable(true);
-
-        javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(1));
-        pause.setOnFinished(e -> {
-            targetLabel.setText("[Traduction] " + originalText + " (simulation)");
-            translateBtn.setText("✓ Traduit");
-            translateBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: #27AE60; -fx-cursor: hand;");
-            translateBtn.setDisable(false);
-        });
-        pause.play();
-    }
-
     @FXML
     private void onSubmitComment() {
         String contenu = commentTextArea.getText().trim();
 
         if (!validateCommentContent(contenu)) {
             return;
+        }
+
+        if (profanityFilter != null) {
+            try {
+                profanityFilter.validateText(contenu, "commentaire");
+            } catch (IllegalArgumentException e) {
+                showAlert("Contenu inapproprié", e.getMessage(), Alert.AlertType.WARNING);
+                return;
+            }
         }
 
         Commentaire commentaire = new Commentaire();
@@ -845,15 +1027,59 @@ public class ControllerDetailDiscussion {
             String newTitre = titreField.getText().trim();
             String newContenu = contenuArea.getText().trim();
 
-            if (validateSujetContent(newTitre, newContenu)) {
-                currentSujet.setTitre(newTitre);
-                currentSujet.setContenu(newContenu);
-                currentSujet.setAnonyme(anonymeCheck.isSelected());
-                serviceSujet.update(currentSujet);
-                loadSujetDetails();
-                showAlert("Succès", "Sujet modifié !", Alert.AlertType.INFORMATION);
+            // 1. D'abord valider la longueur
+            if (!validateSujetLength(newTitre, newContenu)) {
+                return;
             }
+
+            // 2. Ensuite valider les mots inappropriés
+            if (profanityFilter != null) {
+                try {
+                    profanityFilter.validateText(newTitre, "titre");
+                    profanityFilter.validateText(newContenu, "contenu");
+                } catch (IllegalArgumentException ex) {
+                    showAlert("Contenu inapproprié", ex.getMessage(), Alert.AlertType.WARNING);
+                    return;
+                }
+            }
+
+            // 3. Tout est valide, on peut modifier
+            currentSujet.setTitre(newTitre);
+            currentSujet.setContenu(newContenu);
+            currentSujet.setAnonyme(anonymeCheck.isSelected());
+            serviceSujet.update(currentSujet);
+            loadSujetDetails();
+            showAlert("Succès", "Sujet modifié !", Alert.AlertType.INFORMATION);
         }
+    }
+
+    // Nouvelle méthode pour valider seulement la longueur
+    private boolean validateSujetLength(String titre, String contenu) {
+        if (titre == null || titre.trim().isEmpty()) {
+            showAlert("Erreur", "Le titre ne peut pas être vide", Alert.AlertType.WARNING);
+            return false;
+        }
+        if (titre.length() < 3) {
+            showAlert("Erreur", "Le titre doit contenir au moins 3 caractères", Alert.AlertType.WARNING);
+            return false;
+        }
+        if (titre.length() > 100) {
+            showAlert("Erreur", "Le titre ne peut pas dépasser 100 caractères", Alert.AlertType.WARNING);
+            return false;
+        }
+        if (contenu == null || contenu.trim().isEmpty()) {
+            showAlert("Erreur", "Le contenu ne peut pas être vide", Alert.AlertType.WARNING);
+            return false;
+        }
+        if (contenu.length() < 10) {
+            showAlert("Erreur", "Le contenu doit contenir au moins 10 caractères", Alert.AlertType.WARNING);
+            return false;
+        }
+        if (contenu.length() > 5000) {
+            showAlert("Erreur", "Le contenu ne peut pas dépasser 5000 caractères", Alert.AlertType.WARNING);
+            return false;
+        }
+        return true;
     }
 
     @FXML

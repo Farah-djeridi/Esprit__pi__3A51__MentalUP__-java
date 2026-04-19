@@ -290,7 +290,6 @@
 
                     <HBox spacing="10" alignment="CENTER_LEFT"
                           style="-fx-background-color: #2C3E50; -fx-background-radius: 16 16 0 0; -fx-padding: 14 15;">
-                        <Label text="ID" prefWidth="50" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
                         <Label text="Contenu" prefWidth="280" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
                         <Label text="Auteur" prefWidth="130" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
                         <Label text="Sujet" prefWidth="180" style="-fx-text-fill: white; -fx-font-weight: bold;"/>

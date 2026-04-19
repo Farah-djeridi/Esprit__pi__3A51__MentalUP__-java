@@ -248,7 +248,7 @@
                                    wrapText="true" style="-fx-font-size: 14px; -fx-text-fill: #4A5A6A; -fx-line-spacing: 2;"/>
 
                             <Button fx:id="translateSujetBtn" text="🌐 Voir traduction"
-                                    style="-fx-background-color: transparent; -fx-text-fill: #2C5F8A; -fx-cursor: hand; -fx-alignment: CENTER_LEFT; -fx-padding: 0;"/>
+                                    style="-fx-background-color: #E0F2FE; -fx-text-fill: #0369A1; -fx-background-radius: 20; -fx-padding: 5 12; -fx-font-size: 12px; -fx-font-weight: bold; -fx-cursor: hand;"/>
 
                             <HBox spacing="12" alignment="CENTER_LEFT">
                                 <Button fx:id="likeButton" text="👍 0"

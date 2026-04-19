@@ -40,6 +40,13 @@
         <version>5.10.1</version>
         <scope>test</scope>
     </dependency>
+
+    <dependency>
+        <groupId>org.json</groupId>
+        <artifactId>json</artifactId>
+        <version>20240303</version>
+    </dependency>
+
 </dependencies>
     <build>
         <plugins>
@@ -48,7 +55,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>test.MainFX</mainClass> <!-- Change to your Main class -->
+                    <mainClass>test.MainFX</mainClass>
                 </configuration>
             </plugin>
         </plugins>

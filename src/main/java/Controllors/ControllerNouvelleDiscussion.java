@@ -5,6 +5,7 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import javafx.scene.layout.VBox;
 import models.Sujet;
+import services.ProfanityFilterService;
 import services.ServiceSujet;
 
 import java.time.LocalDate;
@@ -21,6 +22,7 @@ public class ControllerNouvelleDiscussion {
 
     private ServiceSujet serviceSujet;
     private int userId;
+    private ProfanityFilterService profanityFilter;
 
     private static final int TITRE_MIN = 3;
     private static final int TITRE_MAX = 100;
@@ -42,6 +44,10 @@ public class ControllerNouvelleDiscussion {
 
         submitButton.setOnAction(e -> submitDiscussion());
         cancelButton.setOnAction(e -> closeWindow());
+    }
+
+    public void setProfanityFilter(ProfanityFilterService filter) {
+        this.profanityFilter = filter;
     }
 
     private void setupValidation() {
@@ -127,8 +133,19 @@ public class ControllerNouvelleDiscussion {
     }
 
     private void submitDiscussion() {
-        String titre = titreField.getText().trim();
-        String contenu = contenuArea.getText().trim();
+            String titre = titreField.getText().trim();
+            String contenu = contenuArea.getText().trim();
+
+            // Validation des mots inappropriés
+            if (profanityFilter != null) {
+                try {
+                    profanityFilter.validateText(titre, "titre");
+                    profanityFilter.validateText(contenu, "contenu");
+                } catch (IllegalArgumentException e) {
+                    showStyledAlert("Contenu inapproprié", e.getMessage(), Alert.AlertType.WARNING);
+                    return;
+                }
+            }
 
 
         if (titre.isEmpty()) {

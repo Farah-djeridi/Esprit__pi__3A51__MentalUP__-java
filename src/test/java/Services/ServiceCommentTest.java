@@ -14,7 +14,7 @@ public class ServiceCommentTest {
     private static ServiceCommentaire service;
     private static int commentaireId;
     private static final int USER_ID = 2;
-    private static final int SUJET_ID = 4;
+    private static final int SUJET_ID = 16;
 
     @BeforeAll
     public static void setup() {

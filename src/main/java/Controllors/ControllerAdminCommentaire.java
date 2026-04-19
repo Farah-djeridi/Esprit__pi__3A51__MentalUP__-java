@@ -154,9 +154,6 @@ public class ControllerAdminCommentaire {
         row.setStyle("-fx-background-color: " + (isEven ? "white" : "#F8FAFE") +
                 "; -fx-padding: 12 15; -fx-border-color: #E8EEF4; -fx-border-width: 0 0 1 0;");
 
-        Label idLabel = new Label(String.valueOf(commentaire.getId()));
-        idLabel.setPrefWidth(50);
-        idLabel.setStyle("-fx-text-fill: #2C3E50; -fx-font-weight: bold;");
 
         String contenuText = commentaire.getContenu();
         if (contenuText.length() > 55) {
@@ -229,7 +226,7 @@ public class ControllerAdminCommentaire {
 
         actionsBox.getChildren().addAll(editBtn, deleteBtn);
 
-        row.getChildren().addAll(idLabel, contenuLabel, auteurLabel, sujetLabel, dateLabel,
+        row.getChildren().addAll( contenuLabel, auteurLabel, sujetLabel, dateLabel,
                 likesLabel, dislikesLabel, actionsBox);
         return row;
     }

@@ -1,0 +1,5 @@
+# Configuration API Ninjas
+# Copiez ce fichier en config.properties et remplacez par votre clé
+# Obtenez votre clé sur: https://api-ninjas.com/
+
+api.ninjas.key=VOTRE_CLE_API_ICI

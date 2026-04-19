@@ -186,9 +186,7 @@ public class ControllerAdminSujet {
         row.setStyle("-fx-background-color: " + (isEven ? "rgba(255,255,255,0.9)" : "rgba(248,250,252,0.9)") +
                 "; -fx-padding: 12 16; -fx-border-color: #E2E8F0; -fx-border-width: 0 0 1 0;");
 
-        Label idLabel = new Label(String.valueOf(sujet.getId()));
-        idLabel.setPrefWidth(50);
-        idLabel.setStyle("-fx-text-fill: #1A2B3C; -fx-font-weight: bold; -fx-font-size: 12px;");
+
 
         Label titreLabel = new Label(sujet.getTitre());
         titreLabel.setPrefWidth(200);
@@ -253,7 +251,7 @@ public class ControllerAdminSujet {
 
         actionsBox.getChildren().addAll(editBtn, deleteBtn);
 
-        row.getChildren().addAll(idLabel, titreLabel, auteurLabel, contenuLabel, dateLabel,
+        row.getChildren().addAll( titreLabel, auteurLabel, contenuLabel, dateLabel,
                 likesLabel, dislikesLabel, vuesLabel, actionsBox);
         return row;
     }

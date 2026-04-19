@@ -26,10 +26,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Locale;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import models.Sujet;
 import services.ServiceSujet;
 import services.ServiceCommentaire;
+import services.ServiceTraduction;
 import services.ServiceVote;
+import services.ProfanityFilterService;
 import models.Vote;
 
 public class ControllerForum {
@@ -70,7 +75,12 @@ public class ControllerForum {
     private final int itemsPerPage = 5;
 
     private int currentUserId = 2;
-    private String currentUserName = "Sophie Amara";
+
+    private ServiceTraduction serviceTraduction;
+    private ProfanityFilterService profanityFilter;
+    private Map<Integer, String> originalTitres = new HashMap<>();
+    private Map<Integer, String> originalContenus = new HashMap<>();
+    private Map<Integer, Boolean> isTranslated = new HashMap<>();
 
     private static final String COLOR_PRIMARY = "#2C5F8A";
     private static final String COLOR_PRIMARY_DARK = "#1E4D7B";
@@ -92,9 +102,6 @@ public class ControllerForum {
     public void initialize() {
         updateDate();
 
-        labelUserName.setText(currentUserName);
-        avatarInitials.setText(getInitials(currentUserName));
-
         try {
             Image logo = new Image(getClass().getResourceAsStream("/images/logo.png"));
             if (logo != null) {
@@ -110,6 +117,9 @@ public class ControllerForum {
         allSujets = new ArrayList<>();
         filteredSujets = new ArrayList<>();
 
+        // Initialiser le filtre de profanity
+        profanityFilter = new ProfanityFilterService();
+
         setupNavigationHoverEffects();
         loadSujetsFromDatabase();
         setupSearchAndFilter();
@@ -118,6 +128,13 @@ public class ControllerForum {
 
         orderCombo.getItems().addAll("Plus récents", "Plus populaires");
         orderCombo.setValue("Plus récents");
+
+        serviceTraduction = new ServiceTraduction();
+
+        // Afficher un avertissement si l'API n'est pas configurée
+        if (!profanityFilter.isApiConfigured()) {
+            System.err.println("⚠️ Filtre de mots inappropriés: API non configurée");
+        }
     }
 
     private void updateDate() {
@@ -383,6 +400,68 @@ public class ControllerForum {
         statsRow.getChildren().addAll(commentsLabel, vuesLabel);
 
         HBox actionsBox = new HBox(6);
+        Button translateBtn = new Button("🌍 Traduire");
+        Button cancelBtn = new Button("↩ Annuler");
+
+// style
+        translateBtn.setStyle(
+                "-fx-background-color: #E0F2FE;" +
+                        "-fx-text-fill: #0369A1;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-padding: 5 14;" +
+                        "-fx-font-size: 12px;" +
+                        "-fx-font-weight: bold;"
+        );
+
+        cancelBtn.setStyle(
+                "-fx-background-color: #F1F5F9;" +
+                        "-fx-text-fill: #64748B;" +
+                        "-fx-background-radius: 20;" +
+                        "-fx-padding: 5 14;" +
+                        "-fx-font-size: 12px;" +
+                        "-fx-font-weight: bold;"
+        );
+
+        translateBtn.setOnAction(e -> {
+            e.consume();
+
+            try {
+                // sauvegarde SEULEMENT la première fois
+                if (!isTranslated.getOrDefault(sujet.getId(), false)) {
+                    originalTitres.put(sujet.getId(), sujet.getTitre());
+                    originalContenus.put(sujet.getId(), sujet.getContenu());
+                }
+
+                String titreTraduit = serviceTraduction.traduire(
+                        sujet.getTitre(), "fr", "auto");
+
+                String contenuTraduit = serviceTraduction.traduire(
+                        sujet.getContenu(), "fr", "auto");
+
+                if (titreTraduit != null) sujet.setTitre(titreTraduit);
+                if (contenuTraduit != null) sujet.setContenu(contenuTraduit);
+
+                isTranslated.put(sujet.getId(), true);
+
+                refreshDisplay();
+
+            } catch (Exception ex) {
+                showAlert("Erreur", "Traduction échouée", Alert.AlertType.ERROR);
+            }
+        });
+        cancelBtn.setOnAction(e -> {
+            e.consume();
+
+            if (isTranslated.getOrDefault(sujet.getId(), false)) {
+
+                sujet.setTitre(originalTitres.get(sujet.getId()));
+                sujet.setContenu(originalContenus.get(sujet.getId()));
+
+                isTranslated.put(sujet.getId(), false);
+
+                refreshDisplay();
+            }
+        });
         actionsBox.setAlignment(Pos.CENTER_RIGHT);
 
         Vote userVote = serviceVote.getUserVoteOnSujet(sujet.getId());
@@ -475,7 +554,17 @@ public class ControllerForum {
             onSujetClicked(sujet, true);
         });
 
-        actionsBox.getChildren().addAll(likeBtn, dislikeBtn, commentBtn);
+
+        if (isTranslated.getOrDefault(sujet.getId(), false)) {
+            actionsBox.getChildren().addAll(
+                    likeBtn, dislikeBtn, commentBtn, translateBtn, cancelBtn
+            );
+        } else {
+            actionsBox.getChildren().addAll(
+                    likeBtn, dislikeBtn, commentBtn, translateBtn
+            );
+        }
+
 
         if (isOwner) {
             MenuButton actionsMenu = new MenuButton("⋮");
@@ -518,6 +607,7 @@ public class ControllerForum {
             Parent root = loader.load();
             ControllerEditSujet controller = loader.getController();
             controller.setSujet(sujet, serviceSujet);
+            controller.setProfanityFilter(profanityFilter);
             Stage stage = new Stage();
             stage.setTitle("Modifier la discussion");
             stage.setScene(new Scene(root));
@@ -700,6 +790,7 @@ public class ControllerForum {
             ControllerNouvelleDiscussion controller = loader.getController();
             controller.setServiceSujet(serviceSujet);
             controller.setUserId(currentUserId);
+            controller.setProfanityFilter(profanityFilter);
             Stage stage = new Stage();
             stage.setTitle("Nouvelle discussion");
             stage.setScene(new Scene(root));
@@ -728,6 +819,7 @@ public class ControllerForum {
             ControllerDetailDiscussion controller = loader.getController();
             controller.setSujet(sujet);
             controller.setCurrentUserId(currentUserId);
+            controller.setProfanityFilter(profanityFilter);
             Stage stage = (Stage) navForum.getScene().getWindow();
             stage.getScene().setRoot(root);
         } catch (IOException e) {

@@ -4,6 +4,8 @@ import Models.RendezVous;
 import utils.MyDataBase;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -53,11 +55,7 @@ public class ServiceRendezVous {
 
     // UPDATE
     public void update(RendezVous r) {
-        // Automatically generate Jitsi link if confirmed and online (mode is in 'lieu')
-        if ("confirmé".equalsIgnoreCase(r.getStatut()) && "En ligne".equalsIgnoreCase(r.getLieu()) && (r.getLienMeet() == null || r.getLienMeet().isEmpty())) {
-            String roomName = "MentalUp-" + UUID.randomUUID().toString().substring(0, 8);
-            r.setLienMeet("https://meet.jit.si/" + roomName);
-        }
+
 
         String sql = "UPDATE rendez_vous SET " +
                 "date=?, heure_debut=?, heure_fin=?, type_rdv=?, statut=?, lieu=?, telephone=?, lien_meet=?, etudiant_id=? " +
@@ -115,6 +113,65 @@ public class ServiceRendezVous {
             System.err.println("[getByPsychologueId] " + e.getMessage());
         }
         return list;
+    }
+
+    public List<RendezVous> getSlotsWithVirtuals(int psyId, LocalDate start, LocalDate end) {
+        List<RendezVous> realRdvs = getByPsychologueId(psyId);
+        List<RendezVous> result = new ArrayList<>();
+
+        for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
+            // Lundi (1) à Vendredi (5)
+            int dayOfWeek = date.getDayOfWeek().getValue();
+            if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+                // Créneaux du matin
+                addVirtualIfMissing(result, realRdvs, psyId, date, "09:00", "10:00");
+                addVirtualIfMissing(result, realRdvs, psyId, date, "10:00", "11:00");
+                addVirtualIfMissing(result, realRdvs, psyId, date, "11:00", "12:00");
+                addVirtualIfMissing(result, realRdvs, psyId, date, "12:00", "12:30");
+                
+                // Pause 12:30 - 13:30
+                
+                // Créneaux de l'après-midi
+                addVirtualIfMissing(result, realRdvs, psyId, date, "13:30", "14:30");
+                addVirtualIfMissing(result, realRdvs, psyId, date, "14:30", "15:30");
+                addVirtualIfMissing(result, realRdvs, psyId, date, "15:30", "16:00");
+            }
+        }
+        
+        // Ajouter aussi les RDV qui ne sont pas dans les horaires standards (si existants)
+        for (RendezVous r : realRdvs) {
+            if (!result.stream().anyMatch(v -> v.getId() == r.getId())) {
+                result.add(r);
+            }
+        }
+
+        return result;
+    }
+
+    private void addVirtualIfMissing(List<RendezVous> result, List<RendezVous> realRdvs, int psyId, LocalDate date, String startStr, String endStr) {
+        Time start = Time.valueOf(startStr + ":00");
+        Time end = Time.valueOf(endStr + ":00");
+        
+        // Vérifier si un RDV réel existe déjà à cette heure
+        RendezVous existing = realRdvs.stream()
+                .filter(r -> r.getDate().toLocalDate().equals(date) && r.getHeureDebut().equals(start))
+                .findFirst()
+                .orElse(null);
+        
+        if (existing != null) {
+            result.add(existing);
+        } else {
+            // Créer un créneau virtuel
+            RendezVous v = new RendezVous();
+            v.setId(-1); // Indique un créneau virtuel
+            v.setDate(Date.valueOf(date));
+            v.setHeureDebut(start);
+            v.setHeureFin(end);
+            v.setStatut("libre");
+            v.setPsychologueId(psyId);
+            v.setTypeRdv("consultation");
+            result.add(v);
+        }
     }
 
     public boolean reserverCreneau(int rdvId, int etudiantId, String mode) {
@@ -276,15 +333,12 @@ public class ServiceRendezVous {
 
     public void confirmerRdv(int id, String mode) {
         // Map mode to lieu
-        String meetLink = null;
-        if ("En ligne".equalsIgnoreCase(mode)) {
-            meetLink = "https://meet.jit.si/MentalUp-" + UUID.randomUUID().toString().substring(0, 8);
-        }
+
         String sql = "UPDATE rendez_vous SET statut='confirmé', lieu=?, lien_meet=? WHERE id=?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, mode);
-            ps.setString(2, meetLink);
+            ps.setString(2, null);
             ps.setInt(3, id);
             ps.executeUpdate();
         } catch (SQLException e) {

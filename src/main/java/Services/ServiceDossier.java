@@ -33,7 +33,7 @@ public class ServiceDossier implements IService<Dossier> {
 
     @Override
     public void update(Dossier d) {
-        String query = "UPDATE dossier_patient SET date_creation=?, notes_generales=?, niveau_risque=?, patient_id=?, psychologue_id=?, ai_summary=?, ai_key_points=? WHERE id=?";
+        String query = "UPDATE dossier_patient SET date_creation=?, notes_generales=?, niveau_risque=?, patient_id=?, psychologue_id=?, ai_summary=? WHERE id=?";
         try (PreparedStatement ps = cnx.prepareStatement(query)) {
             ps.setDate(1, d.getDateCreation());
             ps.setString(2, d.getNotesGenerales());
@@ -41,8 +41,7 @@ public class ServiceDossier implements IService<Dossier> {
             ps.setInt(4, d.getPatientId());
             ps.setInt(5, d.getPsychologueId());
             ps.setString(6, d.getAiSummary());
-            ps.setString(7, d.getAiKeyPoints());
-            ps.setInt(8, d.getId());
+            ps.setInt(7, d.getId());
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -70,16 +69,17 @@ public class ServiceDossier implements IService<Dossier> {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return new Dossier(
+                Dossier d = new Dossier(
                         rs.getInt("id"),
                         rs.getDate("date_creation"),
                         rs.getString("notes_generales"),
                         rs.getString("niveau_risque"),
                         rs.getInt("patient_id"),
                         rs.getInt("psychologue_id"),
-                        rs.getString("ai_summary"),
-                        rs.getString("ai_key_points")
+                        rs.getString("ai_summary")
                 );
+                d.setPatientNom(rs.getString("nom") + " " + rs.getString("prenom"));
+                return d;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -98,16 +98,17 @@ public class ServiceDossier implements IService<Dossier> {
         try (Statement st = cnx.createStatement()) {
             ResultSet rs = st.executeQuery(query);
             while (rs.next()) {
-                dossiers.add(new Dossier(
+                Dossier d = new Dossier(
                         rs.getInt("id"),
                         rs.getDate("date_creation"),
                         rs.getString("notes_generales"),
                         rs.getString("niveau_risque"),
                         rs.getInt("patient_id"),
                         rs.getInt("psychologue_id"),
-                        rs.getString("ai_summary"),
-                        rs.getString("ai_key_points")
-                ));
+                        rs.getString("ai_summary")
+                );
+                d.setPatientNom(rs.getString("nom") + " " + rs.getString("prenom"));
+                dossiers.add(d);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -120,22 +121,29 @@ public class ServiceDossier implements IService<Dossier> {
     // Recherche par patientId ou mot clé
     public List<Dossier> search(String keyword) {
         List<Dossier> results = new ArrayList<>();
-        String query = "SELECT * FROM dossier_patient WHERE notes_generales LIKE ? OR niveau_risque LIKE ?";
+        String query = "SELECT d.*, u.nom, u.prenom " +
+                "FROM dossier_patient d " +
+                "JOIN user u ON d.patient_id = u.id " +
+                "WHERE d.notes_generales LIKE ? OR d.niveau_risque LIKE ? OR u.nom LIKE ? OR u.prenom LIKE ?";
         try (PreparedStatement ps = cnx.prepareStatement(query)) {
-            ps.setString(1, "%" + keyword + "%");
-            ps.setString(2, "%" + keyword + "%");
+            String k = "%" + keyword + "%";
+            ps.setString(1, k);
+            ps.setString(2, k);
+            ps.setString(3, k);
+            ps.setString(4, k);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                results.add(new Dossier(
+                Dossier d = new Dossier(
                         rs.getInt("id"),
                         rs.getDate("date_creation"),
                         rs.getString("notes_generales"),
                         rs.getString("niveau_risque"),
                         rs.getInt("patient_id"),
                         rs.getInt("psychologue_id"),
-                        rs.getString("ai_summary"),
-                        rs.getString("ai_key_points")
-                ));
+                        rs.getString("ai_summary")
+                );
+                d.setPatientNom(rs.getString("nom") + " " + rs.getString("prenom"));
+                results.add(d);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -157,8 +165,7 @@ public class ServiceDossier implements IService<Dossier> {
                         rs.getString("niveau_risque"),
                         rs.getInt("patient_id"),
                         rs.getInt("psychologue_id"),
-                        rs.getString("ai_summary"),
-                        rs.getString("ai_key_points")
+                        rs.getString("ai_summary")
                 ));
             }
         } catch (SQLException e) {

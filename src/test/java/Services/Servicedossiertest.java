@@ -323,7 +323,7 @@ class ServiceDossierTest {
         d.setPsychologueId(2);
         d.setNotesGenerales(null); // admin ne touche pas aux notes
         d.setAiSummary(null);
-        d.setAiKeyPoints(null);
+
         return d;
     }
 }

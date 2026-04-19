@@ -131,21 +131,13 @@
 
                 <!-- Légende des couleurs -->
                 <HBox spacing="14" alignment="CENTER_RIGHT">
-                    <HBox spacing="5" alignment="CENTER">
+                    <HBox fx:id="filterGreen" onMouseClicked="#toggleFilterGreen" spacing="5" alignment="CENTER" style="-fx-cursor: hand;">
                         <Circle radius="6" style="-fx-fill: #27AE60;"/>
                         <Label text="Libre" style="-fx-font-size: 11px; -fx-text-fill: #5A6C7D; -fx-font-weight: 600;"/>
                     </HBox>
-                    <HBox spacing="5" alignment="CENTER">
-                        <Circle radius="6" style="-fx-fill: #2980B9;"/>
-                        <Label text="Confirmé" style="-fx-font-size: 11px; -fx-text-fill: #5A6C7D; -fx-font-weight: 600;"/>
-                    </HBox>
-                    <HBox spacing="5" alignment="CENTER">
-                        <Circle radius="6" style="-fx-fill: #E67E22;"/>
-                        <Label text="Réservé" style="-fx-font-size: 11px; -fx-text-fill: #5A6C7D; -fx-font-weight: 600;"/>
-                    </HBox>
-                    <HBox spacing="5" alignment="CENTER">
-                        <Circle radius="6" style="-fx-fill: #95A5A6;"/>
-                        <Label text="Annulé" style="-fx-font-size: 11px; -fx-text-fill: #5A6C7D; -fx-font-weight: 600;"/>
+                    <HBox fx:id="filterRed" onMouseClicked="#toggleFilterRed" spacing="5" alignment="CENTER" style="-fx-cursor: hand;">
+                        <Circle radius="6" style="-fx-fill: #E74C3C;"/>
+                        <Label text="Réservé / Confirmé" style="-fx-font-size: 11px; -fx-text-fill: #5A6C7D; -fx-font-weight: 600;"/>
                     </HBox>
                 </HBox>
 

@@ -90,24 +90,19 @@ public class RendezVousController {
                 .filter(r -> "en attente".equalsIgnoreCase(r.getStatut()) || "réservé".equalsIgnoreCase(r.getStatut()))
                 .collect(Collectors.toList());
 
-        List<RendezVous> aVenir = list.stream()
-                .filter(r -> ("confirmé".equalsIgnoreCase(r.getStatut()) || "en cours".equalsIgnoreCase(r.getStatut())) &&
-                        (r.getDate() != null && !r.getDate().toLocalDate().isBefore(LocalDate.now())))
+        List<RendezVous> confirmes = list.stream()
+                .filter(r -> "confirmé".equalsIgnoreCase(r.getStatut()) || "en cours".equalsIgnoreCase(r.getStatut()))
+                .filter(r -> r.getDate() != null && !r.getDate().toLocalDate().isBefore(LocalDate.now()))
                 .collect(Collectors.toList());
 
-        List<RendezVous> historique = list.stream()
-                .filter(r -> ("confirmé".equalsIgnoreCase(r.getStatut()) || "terminé".equalsIgnoreCase(r.getStatut())) &&
-                        (r.getDate() != null && r.getDate().toLocalDate().isBefore(LocalDate.now())))
+        List<RendezVous> faits = list.stream()
+                .filter(r -> "terminé".equalsIgnoreCase(r.getStatut()) || 
+                            (r.getDate() != null && r.getDate().toLocalDate().isBefore(LocalDate.now()) && !"libre".equalsIgnoreCase(r.getStatut())))
                 .collect(Collectors.toList());
 
-        List<RendezVous> libres = list.stream()
-                .filter(r -> "libre".equalsIgnoreCase(r.getStatut()) || "disponible".equalsIgnoreCase(r.getStatut()))
-                .collect(Collectors.toList());
-
-        addSection("Demandes en attente", enAttente);
-        addSection("Prochains rendez-vous (Confirmés)", aVenir);
-        addSection("Historique (Passés)", historique);
-        addSection("Créneaux Libres", libres);
+        addSection("📥 Demandes en attente de confirmation", enAttente);
+        addSection("📅 Rendez-vous confirmés", confirmes);
+        addSection("✅ Rendez-vous faits (Historique)", faits);
     }
 
     private void addSection(String title, List<RendezVous> sectionList) {
@@ -232,13 +227,7 @@ public class RendezVousController {
             btnConfirm.setManaged(false);
         }
 
-        if ("confirmé".equalsIgnoreCase(r.getStatut()) && "En ligne".equalsIgnoreCase(r.getMode())) {
-            Button btnMeet = new Button("🎥 Rejoindre");
-            btnMeet.setStyle("-fx-background-color: #2563eb; -fx-text-fill: white; -fx-background-radius: 6; "
-                    + "-fx-padding: 7 14; -fx-cursor: hand; -fx-font-size: 12px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';");
-            btnMeet.setOnAction(e -> rejoindreMeeting(r));
-            actions.getChildren().add(0, btnMeet);
-        }
+
 
         actions.getChildren().addAll(btnConfirm, btnDelete);
 
@@ -253,21 +242,7 @@ public class RendezVousController {
         return card;
     }
 
-    private void rejoindreMeeting(RendezVous r) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/Meet.fxml"));
-            Parent root = loader.load();
 
-            ControllerMeet ctrl = loader.getController();
-            ctrl.initData(r, 6, "psychologue");
-
-            Stage stage = (Stage) cardsContainer.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     private String getStatutColor(String statut) {
         if (statut == null) return "#94a3b8";
@@ -333,17 +308,17 @@ public class RendezVousController {
     }
 
     private void updateStats() {
-        totalRdv.setText(String.valueOf(allRdv.size()));
+        if (totalRdv != null) totalRdv.setText(String.valueOf(allRdv.size()));
         long avenir = allRdv.stream()
                 .filter(r -> r.getDate() != null && r.getDate().toLocalDate().isAfter(LocalDate.now()))
                 .count();
-        rdvAVenir.setText(String.valueOf(avenir));
+        if (rdvAVenir != null) rdvAVenir.setText(String.valueOf(avenir));
         long mois = allRdv.stream()
                 .filter(r -> r.getDate() != null &&
                         r.getDate().toLocalDate().getMonth() == LocalDate.now().getMonth() &&
                         r.getDate().toLocalDate().getYear() == LocalDate.now().getYear())
                 .count();
-        rdvCeMois.setText(String.valueOf(mois));
+        if (rdvCeMois != null) rdvCeMois.setText(String.valueOf(mois));
     }
 
     private void loadPage(MouseEvent event, String path) {

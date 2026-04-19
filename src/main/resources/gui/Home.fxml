@@ -360,6 +360,21 @@
 
 
 
+                <!-- Section Psychologues -->
+                <VBox spacing="12"
+                      style="-fx-background-color: white;
+                             -fx-background-radius: 16;
+                             -fx-padding: 22 25;
+                             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 10, 0, 0, 2);">
+
+                    <Label text="Nos Psychologues les mieux notés"
+                           style="-fx-font-size: 17px; -fx-font-weight: bold;
+                                  -fx-text-fill: #2C3E50;"/>
+
+                    <HBox fx:id="psyListContainer" spacing="14" alignment="CENTER_LEFT">
+                        <Label text="Chargement des praticiens..." style="-fx-text-fill: #94A3B8; -fx-font-size: 13px;"/>
+                    </HBox>
+                </VBox>
             </VBox>
 
         </VBox>

@@ -73,8 +73,7 @@
             <Label text="Mode du rendez-vous" textFill="#5A6C7D" style="-fx-font-size: 11px; -fx-font-weight: 600;"/>
             <ComboBox fx:id="comboMode" promptText="Choisir le mode" maxWidth="Infinity"
                       style="-fx-background-color: #F8FAFC; -fx-border-color: #E2E8F0; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 8;"/>
-            <Label text="Si 'En ligne', un lien Jitsi Meet sera généré lors de la confirmation par le psy."
-                   textFill="#94A3B8" style="-fx-font-size: 10px;" wrapText="true"/>
+
         </VBox>
 
     </VBox>

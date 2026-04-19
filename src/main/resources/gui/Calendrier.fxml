@@ -183,24 +183,20 @@
                 <HBox alignment="CENTER_LEFT" spacing="16"
                       style="-fx-padding: 8 14; -fx-background-color:#F8FAFC;
                              -fx-background-radius:10; -fx-border-color:#E0E7EF; -fx-border-radius:10;">
-                    <HBox alignment="CENTER_LEFT" spacing="5">
+                    <HBox fx:id="filterGreen" onMouseClicked="#toggleFilterGreen" alignment="CENTER_LEFT" spacing="5" style="-fx-cursor: hand;">
                         <Region prefWidth="12" prefHeight="12"
                                 style="-fx-background-color:#27AE60; -fx-background-radius:3;"/>
                         <Label text="Libre" textFill="#5A6C7D" style="-fx-font-size:11px;"/>
                     </HBox>
-                    <HBox alignment="CENTER_LEFT" spacing="5">
+                    <HBox fx:id="filterRed" onMouseClicked="#toggleFilterRed" alignment="CENTER_LEFT" spacing="5" style="-fx-cursor: hand;">
                         <Region prefWidth="12" prefHeight="12"
-                                style="-fx-background-color:#E67E22; -fx-background-radius:3;"/>
-                        <Label text="Réservé" textFill="#5A6C7D" style="-fx-font-size:11px;"/>
-                    </HBox>
-                    <HBox alignment="CENTER_LEFT" spacing="5">
-                        <Region prefWidth="12" prefHeight="12"
-                                style="-fx-background-color:#2980B9; -fx-background-radius:3;"/>
-                        <Label text="Confirmé" textFill="#5A6C7D" style="-fx-font-size:11px;"/>
+                                style="-fx-background-color:#E74C3C; -fx-background-radius:3;"/>
+                        <Label text="Réservé / Confirmé" textFill="#5A6C7D" style="-fx-font-size:11px;"/>
                     </HBox>
                 </HBox>
 
                 <Button text="+ Nouveau créneau" onAction="#ouvrirDialogAjout"
+                        visible="false" managed="false"
                         style="-fx-background-color:#1a4a5f; -fx-text-fill:white;
                                -fx-background-radius:10; -fx-padding:10 18;
                                -fx-cursor:hand; -fx-font-size:13px; -fx-font-weight:bold;"/>

@@ -23,7 +23,7 @@ public class MainTestDossier {
         d.setPatientId(1);
         d.setPsychologueId(2);
         d.setAiSummary("Résumé AI test");
-        d.setAiKeyPoints("Points clés AI test");
+
 
         service.add(d);
         System.out.println("✅ Dossier ajouté");

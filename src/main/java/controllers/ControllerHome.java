@@ -17,6 +17,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import Services.ServiceRating;
+import utils.MyDataBase;
+import java.sql.*;
 
 public class ControllerHome {
 
@@ -27,7 +30,9 @@ public class ControllerHome {
     @FXML private Button startButton, notifButton, logoutButton;
     @FXML private HBox navAccueil, navSuivi, navRdv, navForum, navActivites, navRessources;
     @FXML private Label badgeRdv, labelUserName, labelDate, avatarInitials;
+    @FXML private HBox psyListContainer;
     @FXML private ImageView logoImage;
+    private final ServiceRating serviceRating = new ServiceRating();
 
     private void loadPage(String fxml, MouseEvent event) {
         try {
@@ -81,6 +86,53 @@ public class ControllerHome {
             ftCard3.play();
         }
         logoImage.setImage(new Image(getClass().getResourceAsStream("/Images/logo.png")));
+        chargerPsychologues();
+    }
+
+    private void chargerPsychologues() {
+        if (psyListContainer == null) return;
+        psyListContainer.getChildren().clear();
+        
+        Connection conn = MyDataBase.getInstance().getCnx();
+        try (Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery("SELECT id, prenom, nom FROM user WHERE role = 'psychologue' LIMIT 3")) {
+            
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String nomComplet = "Dr. " + rs.getString("prenom") + " " + rs.getString("nom");
+                double avg = serviceRating.getAverageForPsy(id);
+                
+                VBox card = createMiniPsyCard(nomComplet, avg);
+                psyListContainer.getChildren().add(card);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private VBox createMiniPsyCard(String nom, double avg) {
+        VBox card = new VBox(8);
+        card.setAlignment(javafx.geometry.Pos.CENTER);
+        card.setStyle("-fx-background-color: #F8FBFF; -fx-background-radius: 12; -fx-padding: 15; -fx-border-color: #E2E8F0; -fx-border-radius: 12;");
+        card.setPrefWidth(160);
+
+        Label lblNom = new Label(nom);
+        lblNom.setStyle("-fx-font-weight: bold; -fx-text-fill: #2C3E50; -fx-font-size: 13px;");
+        
+        HBox stars = new HBox(2);
+        stars.setAlignment(javafx.geometry.Pos.CENTER);
+        int fullStars = (int) Math.round(avg);
+        for (int i = 1; i <= 5; i++) {
+            Label star = new Label(i <= fullStars ? "★" : "☆");
+            star.setStyle("-fx-text-fill: #F1C40F; -fx-font-size: 14px;");
+            stars.getChildren().add(star);
+        }
+        
+        Label lblAvg = new Label(String.format("%.1f/5", avg));
+        lblAvg.setStyle("-fx-text-fill: #64748B; -fx-font-size: 11px;");
+
+        card.getChildren().addAll(lblNom, stars, lblAvg);
+        return card;
     }
 
     // 🔹 Navigation

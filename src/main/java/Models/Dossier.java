@@ -12,26 +12,24 @@ public class Dossier {
     private final IntegerProperty patientId = new SimpleIntegerProperty();
     private final IntegerProperty psychologueId = new SimpleIntegerProperty();
     private final StringProperty aiSummary = new SimpleStringProperty();
-    private final StringProperty aiKeyPoints = new SimpleStringProperty();
     private String patientNom;
 
     public Dossier() {}
 
 
     public Dossier(Date dateCreation, String notesGenerales, String niveauRisque,
-                   int patientId, int psychologueId, String aiSummary, String aiKeyPoints) {
+                   int patientId, int psychologueId, String aiSummary) {
         this.dateCreation.set(dateCreation);
         this.notesGenerales.set(notesGenerales);
         this.niveauRisque.set(niveauRisque);
         this.patientId.set(patientId);
         this.psychologueId.set(psychologueId);
         this.aiSummary.set(aiSummary);
-        this.aiKeyPoints.set(aiKeyPoints);
     }
 
 
     public Dossier(int id, Date dateCreation, String notesGenerales, String niveauRisque,
-                   int patientId, int psychologueId, String aiSummary, String aiKeyPoints) {
+                   int patientId, int psychologueId, String aiSummary) {
         this.id.set(id);
         this.dateCreation.set(dateCreation);
         this.notesGenerales.set(notesGenerales);
@@ -39,7 +37,6 @@ public class Dossier {
         this.patientId.set(patientId);
         this.psychologueId.set(psychologueId);
         this.aiSummary.set(aiSummary);
-        this.aiKeyPoints.set(aiKeyPoints);
     }
 
     public IntegerProperty idProperty() { return id; }
@@ -49,7 +46,6 @@ public class Dossier {
     public IntegerProperty patientIdProperty() { return patientId; }
     public IntegerProperty psychologueIdProperty() { return psychologueId; }
     public StringProperty aiSummaryProperty() { return aiSummary; }
-    public StringProperty aiKeyPointsProperty() { return aiKeyPoints; }
 
 
     public int getId() { return id.get(); }
@@ -72,9 +68,6 @@ public class Dossier {
 
     public String getAiSummary() { return aiSummary.get(); }
     public void setAiSummary(String value) { aiSummary.set(value); }
-
-    public String getAiKeyPoints() { return aiKeyPoints.get(); }
-    public void setAiKeyPoints(String value) { aiKeyPoints.set(value); }
 
 
     public String getPatientNom() {

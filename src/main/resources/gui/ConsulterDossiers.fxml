@@ -264,10 +264,11 @@
                                 <Label text="NIVEAU DE RISQUE" textFill="#94a3b8"
                                        style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
                                 <ComboBox fx:id="niveauRisqueBox" maxWidth="Infinity"
-                                          style="-fx-background-color: #f8fafc;
-                                                 -fx-border-color: #e2e8f0; -fx-border-radius: 8;
-                                                 -fx-background-radius: 8; -fx-font-size: 13px;
-                                                 -fx-font-family: 'Segoe UI'; -fx-padding: 4;"/>
+                                          style="-fx-background-color: white;
+                                                 -fx-border-color: #cbd5e1; -fx-border-radius: 8;
+                                                 -fx-background-radius: 8; -fx-font-size: 14px;
+                                                 -fx-text-fill: #1e293b;
+                                                 -fx-font-family: 'Segoe UI'; -fx-padding: 6;"/>
                             </VBox>
 
                             <!-- Notes -->
@@ -276,51 +277,36 @@
                                        style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
                                 <TextArea fx:id="notesArea"
                                           promptText="Notes de consultation..."
-                                          wrapText="true" prefRowCount="6"
-                                          style="-fx-background-color: #f8fafc;
-                                                 -fx-border-color: #e2e8f0; -fx-border-radius: 8;
-                                                 -fx-background-radius: 8; -fx-font-size: 13px;
-                                                 -fx-font-family: 'Segoe UI';"/>
+                                          wrapText="true" prefRowCount="8"
+                                          style="-fx-background-color: white;
+                                                 -fx-border-color: #cbd5e1; -fx-border-radius: 10;
+                                                 -fx-background-radius: 10; -fx-font-size: 15px;
+                                                 -fx-text-fill: #0f172a;
+                                                 -fx-font-family: 'Segoe UI'; -fx-padding: 10;"/>
                             </VBox>
 
                             <!-- IA Summary section -->
-                            <VBox spacing="6"
-                                  style="-fx-background-color: #f0f7ff; -fx-background-radius: 10;
-                                         -fx-border-color: #bde0fb; -fx-border-width: 1;
-                                         -fx-border-radius: 10; -fx-padding: 14 16;">
-                                <HBox alignment="CENTER_LEFT" spacing="8">
-                                    <Label text="✦" textFill="#1565c0" style="-fx-font-size: 14px;"/>
+                            <VBox spacing="10"
+                                  style="-fx-background-color: white; -fx-background-radius: 12;
+                                         -fx-border-color: #1565c0; -fx-border-width: 1.5;
+                                         -fx-border-radius: 12; -fx-padding: 18 20;">
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <Label text="✦" textFill="#1565c0" style="-fx-font-size: 18px;"/>
                                     <Label text="Résumé IA" textFill="#1565c0"
-                                           style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
+                                           style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
                                     <Region HBox.hgrow="ALWAYS"/>
-                                    <Button fx:id="btnGenererIA" text="Générer" onAction="#genererIA"
+                                    <Button fx:id="btnGenererIA" text="Générer résumé" onAction="#genererIA"
                                             style="-fx-background-color: #1565c0; -fx-text-fill: white;
-                                                   -fx-background-radius: 6; -fx-padding: 5 14;
-                                                   -fx-cursor: hand; -fx-font-size: 11px;
-                                                   -fx-font-family: 'Segoe UI';"/>
+                                                   -fx-background-radius: 8; -fx-padding: 8 16;
+                                                   -fx-cursor: hand; -fx-font-size: 12px;
+                                                   -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
                                 </HBox>
-                                <Label fx:id="aiSummaryLabel"
-                                       text="Cliquez sur 'Générer' pour obtenir un résumé IA du dossier"
-                                       textFill="#4a7ab0" wrapText="true"
-                                       style="-fx-font-size: 12px; -fx-font-family: 'Segoe UI';
-                                              -fx-font-style: italic;"/>
-                            </VBox>
-
-                            <!-- Points clés IA -->
-                            <VBox spacing="6"
-                                  style="-fx-background-color: #f6fff0; -fx-background-radius: 10;
-                                         -fx-border-color: #b8e6a0; -fx-border-width: 1;
-                                         -fx-border-radius: 10; -fx-padding: 14 16;">
-                                <HBox alignment="CENTER_LEFT" spacing="8">
-                                    <Label text="◉" textFill="#2e7d32" style="-fx-font-size: 14px;"/>
-                                    <Label text="Points clés IA" textFill="#2e7d32"
-                                           style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
-                                </HBox>
-                                <Label fx:id="aiKeyPointsLabel"
-                                       text="Les points clés apparaîtront ici après génération"
-                                       textFill="#4a8040" wrapText="true"
-                                       style="-fx-font-size: 12px; -fx-font-family: 'Segoe UI';
-                                              -fx-font-style: italic;"/>
+                                <TextArea fx:id="aiSummaryArea" editable="false" wrapText="true"
+                                          prefRowCount="4"
+                                          style="-fx-background-color: transparent; -fx-border-color: transparent;
+                                                 -fx-control-inner-background: white; -fx-font-size: 14px;
+                                                 -fx-font-family: 'Segoe UI'; -fx-line-spacing: 1.4;
+                                                 -fx-text-fill: #1e293b; -fx-font-weight: 500;"/>
                             </VBox>
 
                             <!-- ACTION BUTTONS -->

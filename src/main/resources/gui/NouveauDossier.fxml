@@ -302,17 +302,46 @@
                             <Label text="Notes générales" textFill="#0f2942"
                                    style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
                         </HBox>
-                        <VBox spacing="6">
-                            <Label text="Observations et recommandations" textFill="#64748b"
-                                   style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
+                        <VBox spacing="8">
+                            <Label text="Observations et recommandations *" textFill="#0f2942"
+                                   style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
                             <TextArea fx:id="notesField"
-                                      promptText="Décrivez l'état du patient, vos observations et recommandations..."
-                                      wrapText="true" prefHeight="140"
-                                      style="-fx-background-color: #f8fafc;
-                                             -fx-border-color: #e2e8f0; -fx-border-radius: 8;
-                                             -fx-background-radius: 8; -fx-font-size: 13px;
-                                             -fx-font-family: 'Segoe UI';"/>
+                                      promptText="Décrivez l'état du patient, vos observations et recommandations détaillées..."
+                                      wrapText="true" prefHeight="180"
+                                      style="-fx-background-color: white;
+                                             -fx-border-color: #cbd5e1; -fx-border-radius: 10;
+                                             -fx-background-radius: 10; -fx-font-size: 14px;
+                                             -fx-text-fill: #1e293b;
+                                             -fx-font-family: 'Segoe UI'; -fx-padding: 8;"/>
                         </VBox>
+                    </VBox>
+
+                    <!-- IA SUMMARY PREVIEW -->
+                    <VBox spacing="12"
+                          style="-fx-background-color: white; -fx-background-radius: 14;
+                                 -fx-padding: 22 24; -fx-border-color: #1565c0; -fx-border-width: 1;
+                                 -fx-border-left-width: 4; -fx-border-left-color: #1565c0;
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 8, 0, 0, 2);">
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <StackPane>
+                                <Circle radius="16" fill="#e3f2fd"/>
+                                <Label text="✦" textFill="#1565c0" style="-fx-font-size: 13px;"/>
+                            </StackPane>
+                            <Label text="Aperçu du résumé IA" textFill="#0f2942"
+                                   style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Button text="🪄 Générer" onAction="#handleGenerateIA"
+                                    style="-fx-background-color: #1565c0; -fx-text-fill: white;
+                                           -fx-background-radius: 8; -fx-padding: 8 16;
+                                           -fx-cursor: hand; -fx-font-size: 12px;
+                                           -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
+                        </HBox>
+                        <TextArea fx:id="aiSummaryArea" editable="false" wrapText="true" prefRowCount="3"
+                                  text="Rédigez au moins 50 caractères dans les notes pour générer un résumé."
+                                  style="-fx-background-color: transparent; -fx-border-color: transparent;
+                                         -fx-control-inner-background: white; -fx-font-size: 14px;
+                                         -fx-font-family: 'Segoe UI'; -fx-line-spacing: 1.4;
+                                         -fx-text-fill: #1e293b;"/>
                     </VBox>
 
                     <!-- ACTION BUTTONS -->

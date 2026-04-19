@@ -12,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.collections.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -28,9 +29,8 @@ public class ConsulterDossiersController {
     @FXML private TextArea notesArea;
     @FXML private ComboBox<String> niveauRisqueBox;
 
-    // IA labels
-    @FXML private Label aiSummaryLabel;
-    @FXML private Label aiKeyPointsLabel;
+    // IA fields
+    @FXML private TextArea aiSummaryArea;
     @FXML private Button btnGenererIA;
 
     @FXML private HBox navHome;
@@ -84,28 +84,69 @@ public class ConsulterDossiersController {
                     setGraphic(null);
                     setStyle("-fx-background-color: transparent;");
                 } else {
-                    // Custom card cell
-                    VBox cell = new VBox(4);
-                    cell.setStyle("-fx-padding: 10 14; -fx-background-radius: 8;");
+                    HBox root = new HBox(12);
+                    root.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+                    root.setStyle("-fx-padding: 10 14; -fx-background-radius: 10;");
 
-                    Label title = new Label("Dossier #" + d.getId());
-                    title.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #0f2942; -fx-font-family: 'Segoe UI';");
+                    VBox infos = new VBox(4);
+                    HBox.setHgrow(infos, Priority.ALWAYS);
 
+                    Label title = new Label((d.getPatientNom() != null ? d.getPatientNom() : "Patient #" + d.getPatientId()));
+                    title.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #0f2942;");
+
+                    HBox sub = new HBox(8);
+                    Label idLabel = new Label("N° " + d.getId());
+                    idLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #64748b; -fx-background-color: #f1f5f9; -fx-padding: 2 6; -fx-background-radius: 4;");
+                    
                     String risqueColor = getRisqueColor(d.getNiveauRisque());
-                    Label risque = new Label("● " + (d.getNiveauRisque() != null ? d.getNiveauRisque() : "N/A"));
-                    risque.setStyle("-fx-font-size: 11px; -fx-text-fill: " + risqueColor + "; -fx-font-family: 'Segoe UI';");
+                    Label risque = new Label(d.getNiveauRisque() != null ? d.getNiveauRisque().toUpperCase() : "N/A");
+                    risque.setStyle("-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: white; -fx-background-color: " + risqueColor + "; -fx-padding: 2 8; -fx-background-radius: 4;");
+                    
+                    sub.getChildren().addAll(idLabel, risque);
+                    infos.getChildren().addAll(title, sub);
 
-                    Label date = new Label(d.getDateCreation() != null ? d.getDateCreation().toString() : "");
-                    date.setStyle("-fx-font-size: 11px; -fx-text-fill: #94a3b8; -fx-font-family: 'Segoe UI';");
+                    Button btnDel = new Button("✕");
+                    btnDel.setStyle("-fx-background-color: transparent; -fx-text-fill: #ef4444; -fx-font-weight: bold; -fx-cursor: hand;");
+                    btnDel.setOnAction(e -> {
+                        dossierList.getSelectionModel().select(d);
+                        handleDelete();
+                    });
 
-                    cell.getChildren().addAll(title, risque, date);
-                    setGraphic(cell);
+                    // Selection logic
+                    updateStyle(root, title, isSelected());
+
+                    root.getChildren().addAll(infos, btnDel);
+                    setGraphic(root);
                     setText(null);
 
-                    // Hover effect
-                    setOnMouseEntered(e -> cell.setStyle("-fx-padding: 10 14; -fx-background-radius: 8; -fx-background-color: #f0f7ff;"));
-                    setOnMouseExited(e -> cell.setStyle("-fx-padding: 10 14; -fx-background-radius: 8;"));
+                    // Hover effect (only if not selected)
+                    setOnMouseEntered(e -> {
+                        if (!isSelected()) root.setStyle("-fx-padding: 10 14; -fx-background-radius: 10; -fx-background-color: #f1f5f9;");
+                    });
+                    setOnMouseExited(e -> {
+                        if (!isSelected()) root.setStyle("-fx-padding: 10 14; -fx-background-radius: 10; -fx-background-color: transparent;");
+                    });
                     setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
+                }
+            }
+
+            @Override
+            public void updateSelected(boolean selected) {
+                super.updateSelected(selected);
+                if (getGraphic() instanceof HBox root) {
+                    VBox infos = (VBox) root.getChildren().get(0);
+                    Label title = (Label) infos.getChildren().get(0);
+                    updateStyle(root, title, selected);
+                }
+            }
+
+            private void updateStyle(HBox root, Label title, boolean selected) {
+                if (selected) {
+                    root.setStyle("-fx-padding: 10 14; -fx-background-radius: 10; -fx-background-color: #e0f2fe; -fx-border-color: #0284c7; -fx-border-width: 0 0 0 4;");
+                    title.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #0369a1;");
+                } else {
+                    root.setStyle("-fx-padding: 10 14; -fx-background-radius: 10; -fx-background-color: transparent;");
+                    title.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #0f2942;");
                 }
             }
         });
@@ -126,23 +167,17 @@ public class ConsulterDossiersController {
         if (d == null) return;
         selected = d;
 
-        patientLabel.setText("Patient ID : " + d.getPatientId());
+        patientLabel.setText(d.getPatientNom() != null ? d.getPatientNom() : "Patient #" + d.getPatientId());
         dateLabel.setText(d.getDateCreation() != null ? d.getDateCreation().toString() : "—");
         notesArea.setText(d.getNotesGenerales());
         niveauRisqueBox.setValue(d.getNiveauRisque());
 
         // Afficher les données IA si présentes
-        if (aiSummaryLabel != null) {
+        if (aiSummaryArea != null) {
             String summary = d.getAiSummary();
-            aiSummaryLabel.setText(summary != null && !summary.isEmpty()
+            aiSummaryArea.setText(summary != null && !summary.isEmpty()
                     ? summary
                     : "Cliquez sur 'Générer' pour obtenir un résumé IA du dossier");
-        }
-        if (aiKeyPointsLabel != null) {
-            String keyPoints = d.getAiKeyPoints();
-            aiKeyPointsLabel.setText(keyPoints != null && !keyPoints.isEmpty()
-                    ? keyPoints
-                    : "Les points clés apparaîtront ici après génération");
         }
     }
 
@@ -153,47 +188,25 @@ public class ConsulterDossiersController {
             return;
         }
 
-        String notes = selected.getNotesGenerales();
-        String risque = selected.getNiveauRisque();
+        String notes = notesArea.getText();
+        String risque = niveauRisqueBox.getValue();
 
-        if (notes == null || notes.trim().isEmpty()) {
-            showAlert("Attention", "Ce dossier ne contient pas encore de notes à analyser.");
+        if (notes == null || notes.trim().length() < 50) {
+            showAlert("Attention", "Le dossier doit contenir au moins 50 caractères de notes pour être résumé par l'IA.");
             return;
         }
 
-        // Simulation d'un résumé IA basé sur les données du dossier
-        String summary = genererResume(notes, risque);
-        String keyPoints = genererPointsCles(notes, risque);
+        // Simulation d'un résumé IA strict et concis
+        String summary = "RÉSUMÉ IA (" + (risque != null ? risque.toUpperCase() : "N/A") + ") : " 
+                         + (notes.length() > 150 ? notes.substring(0, 150) + "..." : notes);
 
+        selected.setNotesGenerales(notes);
         selected.setAiSummary(summary);
-        selected.setAiKeyPoints(keyPoints);
         service.update(selected);
 
-        if (aiSummaryLabel != null) aiSummaryLabel.setText(summary);
-        if (aiKeyPointsLabel != null) aiKeyPointsLabel.setText(keyPoints);
-    }
-
-    private String genererResume(String notes, String risque) {
-        // Résumé automatique simple basé sur le contenu
-        int len = notes.length();
-        String niveauStr = risque != null ? risque.toLowerCase() : "indéterminé";
-        return "Analyse du dossier : niveau de risque " + niveauStr + ". "
-                + "Notes de " + len + " caractères rédigées par le praticien. "
-                + "Suivi recommandé selon le protocole standard pour ce niveau de risque.";
-    }
-
-    private String genererPointsCles(String notes, String risque) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("• Niveau de risque : ").append(risque != null ? risque : "Non défini").append("\n");
-        sb.append("• Longueur des notes : ").append(notes.length()).append(" caractères\n");
-        if (notes.toLowerCase().contains("anxiété") || notes.toLowerCase().contains("anxiete"))
-            sb.append("• Mention : anxiété détectée\n");
-        if (notes.toLowerCase().contains("dépression") || notes.toLowerCase().contains("depression"))
-            sb.append("• Mention : dépression détectée\n");
-        if (notes.toLowerCase().contains("suivi"))
-            sb.append("• Suivi en cours mentionné\n");
-        sb.append("• Action : révision du dossier recommandée");
-        return sb.toString();
+        if (aiSummaryArea != null) {
+            aiSummaryArea.setText(summary);
+        }
     }
 
     @FXML
@@ -202,10 +215,25 @@ public class ConsulterDossiersController {
             showAlert("Erreur", "Sélectionnez un dossier !");
             return;
         }
-        selected.setNotesGenerales(notesArea.getText());
-        selected.setNiveauRisque(niveauRisqueBox.getValue());
+        
+        String notes = notesArea.getText();
+        String risque = niveauRisqueBox.getValue();
+        
+        if (notes == null || notes.trim().isEmpty() || risque == null) {
+            showAlert("Erreur de saisie", "Tous les champs (Notes et Niveau de risque) doivent être remplis.");
+            return;
+        }
+        
+        selected.setNotesGenerales(notes);
+        selected.setNiveauRisque(risque);
         service.update(selected);
         showAlert("Succès", "Dossier modifié avec succès !");
+        
+        // Vider les champs après modification
+        selected = null;
+        dossierList.getSelectionModel().clearSelection();
+        resetDetails();
+        
         loadData();
     }
 
@@ -232,10 +260,8 @@ public class ConsulterDossiersController {
         dateLabel.setText("—");
         notesArea.clear();
         niveauRisqueBox.setValue(null);
-        if (aiSummaryLabel != null)
-            aiSummaryLabel.setText("Cliquez sur 'Générer' pour obtenir un résumé IA du dossier");
-        if (aiKeyPointsLabel != null)
-            aiKeyPointsLabel.setText("Les points clés apparaîtront ici après génération");
+        if (aiSummaryArea != null)
+            aiSummaryArea.setText("Cliquez sur 'Générer' pour obtenir un résumé IA du dossier");
     }
 
     @FXML

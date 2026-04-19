@@ -180,53 +180,13 @@
                            style="-fx-font-size: 12px; -fx-font-family: 'Segoe UI';"/>
                 </VBox>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button text="+ Nouveau RDV" onAction="#nouveauRendezVous"
-                        style="-fx-background-color: #0f2942; -fx-text-fill: white;
-                               -fx-background-radius: 8; -fx-padding: 10 20;
-                               -fx-cursor: hand; -fx-font-size: 13px; -fx-font-family: 'Segoe UI';
-                               -fx-font-weight: bold;"/>
             </HBox>
 
             <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
                         style="-fx-background-color: transparent; -fx-background: transparent;">
                 <VBox spacing="18" style="-fx-padding: 22 28 28 28;">
 
-                    <!-- STAT PILLS -->
-                    <HBox spacing="14">
-                        <HBox spacing="12" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS"
-                              style="-fx-background-color: white; -fx-background-radius: 12;
-                                     -fx-padding: 14 20; -fx-border-color: #e2e8f0; -fx-border-width: 1;
-                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 6, 0, 0, 1);">
-                            <VBox spacing="2">
-                                <Label text="TOTAL" textFill="#94a3b8"
-                                       style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
-                                <Label fx:id="totalRdv" text="0" textFill="#0f2942"
-                                       style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
-                            </VBox>
-                        </HBox>
-                        <HBox spacing="12" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS"
-                              style="-fx-background-color: white; -fx-background-radius: 12;
-                                     -fx-padding: 14 20; -fx-border-color: #e2e8f0; -fx-border-width: 1;
-                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 6, 0, 0, 1);">
-                            <VBox spacing="2">
-                                <Label text="À VENIR" textFill="#94a3b8"
-                                       style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
-                                <Label fx:id="rdvAVenir" text="0" textFill="#4caf50"
-                                       style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
-                            </VBox>
-                        </HBox>
-                        <HBox spacing="12" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS"
-                              style="-fx-background-color: white; -fx-background-radius: 12;
-                                     -fx-padding: 14 20; -fx-border-color: #e2e8f0; -fx-border-width: 1;
-                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 6, 0, 0, 1);">
-                            <VBox spacing="2">
-                                <Label text="CE MOIS" textFill="#94a3b8"
-                                       style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
-                                <Label fx:id="rdvCeMois" text="0" textFill="#ff9800"
-                                       style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
-                            </VBox>
-                        </HBox>
-                    </HBox>
+
 
                     <!-- SEARCH + FILTERS -->
                     <VBox spacing="10"

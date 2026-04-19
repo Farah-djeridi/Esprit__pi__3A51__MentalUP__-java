@@ -36,6 +36,11 @@ public class ControllerRdvCalendrier {
     @FXML private VBox      colonneHeures;
     @FXML private Button    btnVueSemaine, btnVueJour;
     @FXML private ImageView logoImage;
+    @FXML private HBox filterGreen;
+    @FXML private HBox filterRed;
+
+    private boolean showLibre = true;
+    private boolean showReserved = true;
 
     private final ServiceRendezVous serviceRdv = new ServiceRendezVous();
     private int    psyId;
@@ -71,11 +76,8 @@ public class ControllerRdvCalendrier {
 
 
     private void chargerEtAfficher() {
-        creneaux = serviceRdv.getByPsychologueId(psyId);
+        creneaux = serviceRdv.getSlotsWithVirtuals(psyId, debutSemaine, debutSemaine.plusDays(6));
         System.out.println("[ControllerRdvCalendrier] psyId=" + psyId + " → " + creneaux.size() + " créneaux chargés");
-        for (RendezVous r : creneaux) {
-            System.out.println("  - id=" + r.getId() + " date=" + r.getDate() + " statut=" + r.getStatut() + " heure=" + r.getHeureDebut());
-        }
 
         LocalDate finSemaine = debutSemaine.plusDays(6);
         String[] mois = {"jan.","fév.","mar.","avr.","mai","juin",
@@ -127,8 +129,13 @@ public class ControllerRdvCalendrier {
 
 
         colonneHeures.getChildren().clear();
-        for (int h = HEURE_DEBUT; h <= HEURE_FIN; h++) {
-            Label lh = new Label(String.format("%02dh", h));
+        for (int h = 0; h <= (16 - 9) * 2 + 1; h++) {
+            int totalM = h * 30;
+            int hh = 9 + (totalM / 60);
+            int mm = totalM % 60;
+            if (hh > 16 || (hh == 16 && mm > 0)) break;
+            
+            Label lh = new Label(String.format("%02d:%02d", hh, mm));
             lh.setStyle("-fx-font-size: 11px; -fx-text-fill: #94A3B8; -fx-font-weight: 600;");
             lh.setPrefHeight(HAUTEUR_HEURE);
             lh.setAlignment(javafx.geometry.Pos.TOP_CENTER);
@@ -156,8 +163,11 @@ public class ControllerRdvCalendrier {
                     .filter(r -> r.getDate() != null && r.getDate().toLocalDate().equals(jour))
                     .toList();
 
-            for (int h = HEURE_DEBUT; h <= HEURE_FIN; h++) {
-                final int heure = h;
+            for (int h = 0; h <= (16 - 9) * 2 + 1; h++) {
+                int totalM = h * 30;
+                final int heure = 9 + (totalM / 60);
+                final int minute = totalM % 60;
+                if (heure > 16 || (heure == 16 && minute > 0)) break;
                 VBox cellule = new VBox();
                 cellule.setPrefHeight(HAUTEUR_HEURE);
                 cellule.setAlignment(javafx.geometry.Pos.TOP_LEFT);
@@ -168,11 +178,19 @@ public class ControllerRdvCalendrier {
 
                 Optional<RendezVous> rdvOpt = creneauxJour.stream()
                         .filter(r -> r.getHeureDebut() != null &&
-                                r.getHeureDebut().toLocalTime().getHour() == heure)
+                                r.getHeureDebut().toLocalTime().getHour() == heure &&
+                                r.getHeureDebut().toLocalTime().getMinute() == minute)
                         .findFirst();
 
-                if (rdvOpt.isPresent()) {
-                    cellule.getChildren().add(createCreneauBlock(rdvOpt.get()));
+                if (rdvOpt.isPresent() && !"annulé".equalsIgnoreCase(rdvOpt.get().getStatut())) {
+                    RendezVous r = rdvOpt.get();
+                    String status = r.getStatut();
+                    boolean isLibre = (r.getId() == -1 || "libre".equalsIgnoreCase(status));
+                    boolean isReserved = "réservé".equalsIgnoreCase(status) || "confirmé".equalsIgnoreCase(status) || "en attente".equalsIgnoreCase(status);
+
+                    if ((isLibre && showLibre) || (isReserved && showReserved)) {
+                        cellule.getChildren().add(createCreneauBlock(r));
+                    }
                 }
                 colonne.getChildren().add(cellule);
             }
@@ -194,13 +212,9 @@ public class ControllerRdvCalendrier {
                 bg = "rgba(39,174,96,0.15)"; textColor = "#1E8449"; border = "#27AE60";
                 iconeLabel = "🟢 Libre";
             }
-            case "confirmé" -> {
-                bg = "rgba(41,128,185,0.15)"; textColor = "#1A5276"; border = "#2980B9";
-                iconeLabel = "🔵 Confirmé";
-            }
-            case "en attente", "réservé" -> {
-                bg = "rgba(230,126,34,0.15)"; textColor = "#935116"; border = "#E67E22";
-                iconeLabel = "🟠 En attente";
+            case "confirmé", "réservé", "en attente" -> {
+                bg = "rgba(231,76,60,0.15)"; textColor = "#C0392B"; border = "#E74C3C";
+                iconeLabel = "🔴 Réservé";
             }
             default -> {
                 bg = "rgba(149,165,166,0.15)"; textColor = "#616A6B"; border = "#95A5A6";
@@ -315,6 +329,35 @@ public class ControllerRdvCalendrier {
         );
     }
     @FXML private void onLogout(ActionEvent e) {}
+
+    @FXML public void toggleFilterGreen() {
+        if (showLibre && !showReserved) {
+            showLibre = true;
+            showReserved = true;
+        } else {
+            showLibre = true;
+            showReserved = false;
+        }
+        updateLegendOpacity();
+        construireGrille();
+    }
+
+    @FXML public void toggleFilterRed() {
+        if (showReserved && !showLibre) {
+            showLibre = true;
+            showReserved = true;
+        } else {
+            showLibre = false;
+            showReserved = true;
+        }
+        updateLegendOpacity();
+        construireGrille();
+    }
+
+    private void updateLegendOpacity() {
+        filterGreen.setOpacity(showLibre ? 1.0 : 0.4);
+        filterRed.setOpacity(showReserved ? 1.0 : 0.4);
+    }
 
     private LocalDate lundiDeLaSemaine(LocalDate date) {
         return date.with(DayOfWeek.MONDAY);

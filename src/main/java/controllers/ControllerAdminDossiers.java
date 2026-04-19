@@ -308,7 +308,6 @@ public class ControllerAdminDossiers {
         int existingId = existing != null ? existing.getId() : 0;
         String existingNotes    = existing != null ? existing.getNotesGenerales() : null;
         String existingAiSum    = existing != null ? existing.getAiSummary()      : null;
-        String existingAiKeys   = existing != null ? existing.getAiKeyPoints()    : null;
 
         dialog.setResultConverter(btn -> {
             if (btn.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
@@ -326,7 +325,6 @@ public class ControllerAdminDossiers {
                 d.setPsychologueId(psyId);
                 d.setNotesGenerales(existingNotes);
                 d.setAiSummary(existingAiSum);
-                d.setAiKeyPoints(existingAiKeys);
 
                 DossierValidator.ValidationResult full = DossierValidator.valider(d);
                 if (!full.isValide()) {

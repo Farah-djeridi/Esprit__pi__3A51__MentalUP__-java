@@ -31,6 +31,8 @@ public class NouveauDossierController {
     @FXML private ComboBox<String> niveauRisqueBox;
     @FXML private DatePicker datePicker;
     @FXML private TextArea notesField;
+    @FXML private TextArea aiSummaryArea;
+    private String generatedSummary = "";
 
     @FXML private VBox submenuRdv;
     @FXML private VBox submenuDossiers;
@@ -111,34 +113,43 @@ public class NouveauDossierController {
 
     @FXML
     void handleSave(ActionEvent event) {
-
         String selectedPatient = patientComboBox.getValue();
+        String notes = notesField.getText();
+        String risque = niveauRisqueBox.getValue();
+        LocalDate date = datePicker.getValue();
 
-        if (selectedPatient == null) {
-            System.out.println("⚠️ Veuillez sélectionner un patient !");
+        if (selectedPatient == null || notes == null || notes.trim().isEmpty() || risque == null || date == null) {
+            showAlert("Erreur de saisie", "Veuillez remplir tous les champs obligatoires (Patient, Date, Risque, Notes).");
             return;
         }
 
         int patientId = patientMap.get(selectedPatient);
-
         int psychologueId = 2; // simulé (connecté)
 
         Dossier d = new Dossier();
         d.setPatientId(patientId);
         d.setPsychologueId(psychologueId);
-        d.setNotesGenerales(notesField.getText());
-        d.setNiveauRisque(niveauRisqueBox.getValue());
-
-        // DATE depuis DatePicker
-        d.setDateCreation(Date.valueOf(datePicker.getValue()));
+        d.setNotesGenerales(notes);
+        d.setNiveauRisque(risque);
+        d.setAiSummary(generatedSummary);
+        d.setDateCreation(Date.valueOf(date));
 
         new ServiceDossier().add(d);
-
-        System.out.println("✅ Dossier ajouté !");
-
         showAlert("Succès", "Dossier ajouté avec succès !");
-
         clearFields();
+    }
+
+    @FXML
+    void handleGenerateIA(ActionEvent event) {
+        String notes = notesField.getText();
+        if (notes == null || notes.trim().length() < 50) {
+            showAlert("Action impossible", "Les notes doivent contenir au moins 50 caractères pour être résumées par l'IA.");
+            return;
+        }
+
+        // Simuler un résumé strict
+        generatedSummary = "RÉSUMÉ : " + (notes.length() > 100 ? notes.substring(0, 100) + "..." : notes);
+        aiSummaryArea.setText(generatedSummary);
     }
 
     @FXML
@@ -154,9 +165,14 @@ public class NouveauDossierController {
     }
 
     private void clearFields() {
-
+        patientComboBox.setValue(null);
+        datePicker.setValue(java.time.LocalDate.now());
         niveauRisqueBox.setValue(null);
         notesField.clear();
+        generatedSummary = "";
+        if (aiSummaryArea != null) {
+            aiSummaryArea.setText("Rédigez au moins 50 caractères dans les notes pour générer un résumé.");
+        }
     }
 
     private void showAlert(String title, String msg) {

@@ -2,6 +2,8 @@ package controllers;
 
 import Models.RendezVous;
 import Services.ServiceRendezVous;
+import Models.Rating;
+import Services.ServiceRating;
 import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
 import javafx.event.ActionEvent;
@@ -35,6 +37,7 @@ public class ControllerRdvEtudiant {
     @FXML private ImageView logoImage;
 
     private final ServiceRendezVous serviceRdv = new ServiceRendezVous();
+    private final ServiceRating serviceRating = new ServiceRating();
 
 
     private final int etudiantId  = 2;
@@ -134,8 +137,44 @@ public class ControllerRdvEtudiant {
             st.setToX(1); st.setToY(1); st.play();
         });
 
-        card.getChildren().addAll(avatar, labelNom, labelSpe, btnChoisir);
+        // Rating Stars
+        double avg = serviceRating.getAverageForPsy(psyId);
+        HBox stars = createStarsDisplay(avg);
+        
+        Button btnRate = new Button("Noter ★");
+        btnRate.setStyle("-fx-background-color: transparent; -fx-text-fill: #2C5F8A; -fx-font-size: 11px; -fx-underline: true; -fx-cursor: hand;");
+        btnRate.setOnAction(e -> showRatingDialog(psyId, nom));
+
+        card.getChildren().addAll(avatar, labelNom, labelSpe, stars, btnRate, btnChoisir);
         return card;
+    }
+
+    private HBox createStarsDisplay(double avg) {
+        HBox container = new HBox(2);
+        container.setAlignment(javafx.geometry.Pos.CENTER);
+        int fullStars = (int) Math.round(avg);
+        for (int i = 1; i <= 5; i++) {
+            Label star = new Label(i <= fullStars ? "★" : "☆");
+            star.setStyle("-fx-text-fill: #F1C40F; -fx-font-size: 14px;");
+            container.getChildren().add(star);
+        }
+        Label lblAvg = new Label(String.format(" (%.1f)", avg));
+        lblAvg.setStyle("-fx-font-size: 10px; -fx-text-fill: #94A3B8;");
+        container.getChildren().add(lblAvg);
+        return container;
+    }
+
+    private void showRatingDialog(int psyId, String psyNom) {
+        javafx.scene.control.ChoiceDialog<Integer> dialog = new javafx.scene.control.ChoiceDialog<>(5, 1, 2, 3, 4, 5);
+        dialog.setTitle("Noter le praticien");
+        dialog.setHeaderText("Quelle note donnez-vous au " + psyNom + " ?");
+        dialog.setContentText("Note (sur 5) :");
+        
+        dialog.showAndWait().ifPresent(note -> {
+            Rating r = new Rating(etudiantId, psyId, note, "Note via dashboard");
+            serviceRating.add(r);
+            chargerPsychologues(); // Refresh
+        });
     }
 
     // ══════════════════════════════════════════════════════
@@ -206,14 +245,7 @@ public class ControllerRdvEtudiant {
 
         card.getChildren().addAll(barre, icone, infos, spacer);
 
-        // Ajout du bouton "Rejoindre" si En ligne et (Confirmé ou En cours)
-        if (("confirmé".equalsIgnoreCase(r.getStatut()) || "en cours".equalsIgnoreCase(r.getStatut())) 
-            && "En ligne".equalsIgnoreCase(r.getMode())) {
-            Button btnMeet = new Button("🎥 Rejoindre");
-            btnMeet.setStyle("-fx-background-color: #2980B9; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 5 12; -fx-cursor: hand; -fx-font-size: 11px;");
-            btnMeet.setOnAction(e -> rejoindreMeeting(r));
-            card.getChildren().add(btnMeet);
-        }
+
 
         card.getChildren().add(badge);
 
@@ -234,21 +266,7 @@ public class ControllerRdvEtudiant {
         return card;
     }
 
-    private void rejoindreMeeting(RendezVous r) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/Meet.fxml"));
-            Parent root = loader.load();
 
-            ControllerMeet ctrl = loader.getController();
-            ctrl.initData(r, etudiantId, "patient");
-
-            Stage stage = (Stage) rdvAujContainer.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     // ══════════════════════════════════════════════════════
     //  OUVRIR CALENDRIER

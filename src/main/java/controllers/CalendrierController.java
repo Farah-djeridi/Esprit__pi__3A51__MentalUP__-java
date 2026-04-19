@@ -44,6 +44,12 @@ public class CalendrierController {
     private static final int HOUR_END    = 19;
     private static final int CELL_HEIGHT = 46;
 
+    private boolean showLibre = true;
+    private boolean showReserved = true;
+
+    @FXML private HBox filterGreen;
+    @FXML private HBox filterRed;
+
     @FXML
     public void initialize() {
         currentDate.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
@@ -98,23 +104,25 @@ public class CalendrierController {
         }
 
         // Rows heures
-        List<RendezVous> rdvs = service.getByPsychologueId(6);
-        for (int h = 0; h < (HOUR_END - HOUR_START); h++) {
-            int hour = HOUR_START + h;
+        List<RendezVous> rdvs = service.getSlotsWithVirtuals(6, currentWeekStart, currentWeekStart.plusDays(6));
+        for (int h = 0; h <= (16 - 9) * 2 + 1; h++) {
+            int totalMinutes = h * 30;
+            int hour = 9 + (totalMinutes / 60);
+            int minute = totalMinutes % 60;
             int row  = h + 1;
+            if (hour > 16 || (hour == 16 && minute > 0)) break;
             calendarGrid.getRowConstraints().add(rowConstraint(CELL_HEIGHT));
 
-            Label lh = new Label(String.format("%02d h", hour));
-            lh.setStyle("-fx-font-size:11px; -fx-text-fill:#9aaebb; -fx-padding:4 6 0 4;");
-            lh.setAlignment(Pos.TOP_RIGHT);
-            lh.setMaxWidth(Double.MAX_VALUE);
+            Label lh = new Label(String.format("%02d:%02d", hour, minute));
             lh.setStyle("-fx-font-size:11px; -fx-text-fill:#9aaebb; -fx-padding:6 6 0 4;" +
                     "-fx-border-color:#F0F4F8; -fx-border-width:0 1 1 0; -fx-background-color:#F8FAFC;");
+            lh.setAlignment(Pos.TOP_RIGHT);
+            lh.setMaxWidth(Double.MAX_VALUE);
             calendarGrid.add(lh, 0, row);
 
             for (int d = 0; d < 7; d++) {
                 LocalDate day = currentWeekStart.plusDays(d);
-                calendarGrid.add(buildCell(day, hour, rdvs), d + 1, row);
+                calendarGrid.add(buildCell(day, hour, minute, rdvs), d + 1, row);
             }
         }
     }
@@ -148,20 +156,34 @@ public class CalendrierController {
         return vb;
     }
 
-    private StackPane buildCell(LocalDate day, int hour, List<RendezVous> rdvs) {
+    private StackPane buildCell(LocalDate day, int hour, int minute, List<RendezVous> rdvs) {
         boolean isToday = day.equals(LocalDate.now());
         String bg = isToday ? "#f5faff" : "white";
 
         StackPane cell = new StackPane();
-
         cell.setMinHeight(CELL_HEIGHT);
         cell.setMaxWidth(Double.MAX_VALUE);
-        cell.setStyle("-fx-background-color:" + bg +
-                "; -fx-border-color:#F0F4F8; -fx-border-width:0 1 1 0;");
+        cell.setStyle("-fx-background-color:" + bg + "; -fx-border-color:#F0F4F8; -fx-border-width:0 1 1 0;");
 
         for (RendezVous r : rdvs) {
             if (r.getDate().toLocalDate().equals(day) &&
-                    r.getHeureDebut().toLocalTime().getHour() == hour) {
+                    r.getHeureDebut().toLocalTime().getHour() == hour &&
+                    r.getHeureDebut().toLocalTime().getMinute() == minute) {
+
+                String status = r.getStatut();
+                boolean isLibre = (r.getId() == -1 || "libre".equalsIgnoreCase(status));
+                boolean isReserved = "réservé".equalsIgnoreCase(status) || "confirmé".equalsIgnoreCase(status) || "en attente".equalsIgnoreCase(status);
+
+                if (isLibre && !showLibre) return cell;
+                if (isReserved && !showReserved) return cell;
+
+                if ("annulé".equalsIgnoreCase(r.getStatut())) {
+                     Label lAnnule = new Label("🚫 Bloqué");
+                     lAnnule.setStyle("-fx-font-size: 10px; -fx-text-fill: #E74C3C; -fx-font-weight: bold;");
+                     cell.getChildren().add(lAnnule);
+                     cell.setOnMouseClicked(e -> ouvrirDialogEdition(r));
+                     return cell;
+                }
 
                 VBox rdvBox = buildRdvBox(r);
                 cell.getChildren().add(rdvBox);
@@ -179,15 +201,48 @@ public class CalendrierController {
         cell.setOnMouseExited(e ->
                 cell.setStyle("-fx-background-color:" + bg +
                         "; -fx-border-color:#F0F4F8; -fx-border-width:0 1 1 0;"));
-        cell.setOnMouseClicked(e -> ouvrirDialogAjout(day, hour));
+        // Addition restricted
+        // cell.setOnMouseClicked(e -> ouvrirDialogAjout(day, hour));
 
         return cell;
     }
 
+    @FXML public void toggleFilterGreen() {
+        if (showLibre && !showReserved) {
+            // Déjà en mode focus Vert -> on réaffiche tout
+            showLibre = true;
+            showReserved = true;
+        } else {
+            // On focus sur le Vert
+            showLibre = true;
+            showReserved = false;
+        }
+        updateLegendOpacity();
+        buildCalendar();
+    }
+
+    @FXML public void toggleFilterRed() {
+        if (showReserved && !showLibre) {
+            // Déjà en mode focus Rouge -> on réaffiche tout
+            showLibre = true;
+            showReserved = true;
+        } else {
+            // On focus sur le Rouge
+            showLibre = false;
+            showReserved = true;
+        }
+        updateLegendOpacity();
+        buildCalendar();
+    }
+
+    private void updateLegendOpacity() {
+        filterGreen.setOpacity(showLibre ? 1.0 : 0.4);
+        filterRed.setOpacity(showReserved ? 1.0 : 0.4);
+    }
+
     private VBox buildRdvBox(RendezVous r) {
         String color = switch (r.getStatut()) {
-            case "réservé"  -> "#E67E22";
-            case "confirmé" -> "#2980B9";
+            case "réservé", "confirmé", "en attente" -> "#E74C3C";
             default         -> "#27AE60";
         };
 
@@ -256,9 +311,9 @@ public class CalendrierController {
 
         dialog.showAndWait().ifPresent(rdv -> { if(rdv!=null){ service.add(rdv); buildCalendar(); updateSidebarStats(); } });
     }
-
+ 
     private void ouvrirDialogEdition(RendezVous existing) {
-        Dialog<RendezVous> dialog = buildFormDialog("Modifier le créneau");
+        Dialog<RendezVous> dialog = buildFormDialog(existing.getId() == -1 ? "Bloquer ce créneau" : "Modifier le créneau");
         DatePicker dp     = (DatePicker) dialog.getDialogPane().lookup("#datePicker");
         TextField tfStart = (TextField)  dialog.getDialogPane().lookup("#heureDebut");
         TextField tfEnd   = (TextField)  dialog.getDialogPane().lookup("#heureFin");
@@ -270,22 +325,45 @@ public class CalendrierController {
         tfEnd.setText(existing.getHeureFin().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")));
         cbStat.setValue(existing.getStatut());
         cbType.setValue(existing.getTypeRdv());
+        
+        // Empêcher modification date/heure pour les créneaux automatiques
+        dp.setDisable(true); tfStart.setDisable(true); tfEnd.setDisable(true);
 
-        ButtonType deleteType = new ButtonType("🗑  Supprimer", ButtonBar.ButtonData.LEFT);
-        dialog.getDialogPane().getButtonTypes().add(deleteType);
+        if (existing.getId() != -1) {
+            ButtonType deleteType = new ButtonType("🗑  Libérer", ButtonBar.ButtonData.LEFT);
+            dialog.getDialogPane().getButtonTypes().add(deleteType);
+            
+            ButtonType blockType = new ButtonType("🚫 Bloquer", ButtonBar.ButtonData.OTHER);
+            dialog.getDialogPane().getButtonTypes().add(blockType);
+        } else {
+            ButtonType blockType = new ButtonType("🚫 Bloquer", ButtonBar.ButtonData.OK_DONE);
+            dialog.getDialogPane().getButtonTypes().setAll(blockType, ButtonType.CANCEL);
+        }
 
         dialog.setResultConverter(btn -> {
-            if (btn.getButtonData() == ButtonBar.ButtonData.LEFT) {
+            if (btn != null && btn.getButtonData() == ButtonBar.ButtonData.LEFT) {
                 service.delete(existing.getId());
                 return null;
             }
-            if (btn.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+            if (btn != null && btn.getText().contains("Bloquer")) {
+                existing.setStatut("annulé");
+                return existing;
+            }
+            if (btn != null && btn.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
                 return buildRdv(dp, tfStart, tfEnd, cbStat, cbType, existing.getId());
             }
             return null;
         });
 
-        dialog.showAndWait().ifPresent(rdv -> { if(rdv!=null) service.update(rdv); });
+        dialog.showAndWait().ifPresent(rdv -> {
+            if (rdv != null) {
+                if (rdv.getId() == -1) {
+                    service.add(rdv);
+                } else {
+                    service.update(rdv);
+                }
+            }
+        });
         buildCalendar();
         updateSidebarStats();
     }

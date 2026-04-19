@@ -27,9 +27,12 @@
                                       -fx-font-weight: bold;"/>
                         <Label text="Espace suivi mental"
                                style="-fx-text-fill: #7b8ba1;
-                                      -fx-font-size: 11px;"/>
+                                      -fx-font-size: 11px;
+                                      -fx-font-weight: 600;"/>
                     </VBox>
+
                     <Region HBox.hgrow="ALWAYS"/>
+
                     <Label text="mercredi 8 avril 2026"
                            style="-fx-text-fill: #9aa8b8;
                                   -fx-font-size: 11px;

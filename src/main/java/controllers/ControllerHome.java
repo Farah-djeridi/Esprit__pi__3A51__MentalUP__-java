@@ -2,19 +2,29 @@ package controllers;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
-import javafx.event.ActionEvent;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.event.ActionEvent;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.util.Duration;
+import models.Notification;
+import services.NotificationService;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Optional;
 
 public class ControllerHome {
 
@@ -28,6 +38,16 @@ public class ControllerHome {
 
     @FXML private StackPane contentArea;
     @FXML private VBox homeContent;
+
+    @FXML private VBox notifPanel;
+    @FXML private ListView<Notification> notifListView;
+    @FXML private Label notifBadgeLabel;
+
+    @FXML private ComboBox<String> notifFilterCombo;
+    @FXML private Button clearAllNotifButton;
+
+    private final NotificationService notificationService = new NotificationService();
+    private final int currentUserId = 1;
 
     @FXML
     public void initialize() {
@@ -64,10 +84,249 @@ public class ControllerHome {
                 logoImage.setImage(new Image(getClass().getResourceAsStream("/Images/logo.png")));
             }
         } catch (Exception e) {
-            System.out.println("Logo introuvable : /Images/logo.jpg");
+            System.out.println("Logo introuvable : /Images/logo.png");
         }
 
+        if (notifPanel != null) {
+            notifPanel.setVisible(false);
+            notifPanel.setManaged(false);
+            notifPanel.setOpacity(0);
+        }
+
+        configurerFiltreNotifications();
+        configurerListViewNotifications();
+        chargerNotifications();
+        mettreAJourBadgeNotif();
         setActiveNav(navAccueil);
+    }
+
+    private void configurerFiltreNotifications() {
+        if (notifFilterCombo == null) {
+            return;
+        }
+
+        notifFilterCombo.setItems(FXCollections.observableArrayList(
+                "Tous",
+                "progression_hausse",
+                "progression_baisse",
+                "progression_stable"
+        ));
+        notifFilterCombo.setValue("Tous");
+    }
+
+    private void configurerListViewNotifications() {
+        if (notifListView == null) {
+            return;
+        }
+
+        notifListView.setCellFactory(listView -> new ListCell<Notification>() {
+            @Override
+            protected void updateItem(Notification notif, boolean empty) {
+                super.updateItem(notif, empty);
+
+                if (empty || notif == null) {
+                    setText(null);
+                    setGraphic(null);
+                    setStyle("-fx-background-color: transparent;");
+                    return;
+                }
+
+                String iconText = getIconForType(notif.getType());
+
+                Label iconLabel = new Label(iconText);
+                iconLabel.setStyle(
+                        "-fx-font-size: 16px;" +
+                                "-fx-font-weight: bold;"
+                );
+
+                StackPane iconContainer = new StackPane(iconLabel);
+                iconContainer.setMinSize(34, 34);
+                iconContainer.setPrefSize(34, 34);
+                iconContainer.setMaxSize(34, 34);
+                iconContainer.setStyle(getIconContainerStyle(notif.getType()));
+
+                Label titleLabel = new Label(
+                        notif.getTitle() == null ? "Notification" : notif.getTitle()
+                );
+                titleLabel.setStyle(
+                        "-fx-font-size: 13px;" +
+                                "-fx-font-weight: bold;" +
+                                "-fx-text-fill: #1E3A5F;"
+                );
+
+                Label messageLabel = new Label(
+                        notif.getMessage() == null ? "" : notif.getMessage()
+                );
+                messageLabel.setWrapText(true);
+                messageLabel.setStyle(
+                        "-fx-font-size: 12px;" +
+                                "-fx-text-fill: #5B6B7A;" +
+                                "-fx-font-weight: 500;"
+                );
+
+                Label dateLabel = new Label(getRelativeTime(notif.getCreatedAt()));
+                dateLabel.setStyle(
+                        "-fx-font-size: 11px;" +
+                                "-fx-text-fill: #8A9AAA;"
+                );
+
+                Circle unreadDot = new Circle(5);
+                unreadDot.setFill(notif.isRead() ? Color.TRANSPARENT : Color.web("#E74C3C"));
+
+                Button deleteBtn = new Button("✕");
+                deleteBtn.setStyle(
+                        "-fx-background-color: transparent;" +
+                                "-fx-text-fill: #8A9AAA;" +
+                                "-fx-font-size: 12px;" +
+                                "-fx-font-weight: bold;" +
+                                "-fx-cursor: hand;"
+                );
+                deleteBtn.setOnAction(e -> {
+                    notificationService.deleteNotificationById(notif.getId());
+                    chargerNotifications();
+                    mettreAJourBadgeNotif();
+                });
+
+                Region spacer = new Region();
+                HBox.setHgrow(spacer, Priority.ALWAYS);
+
+                HBox topRow = new HBox(8, unreadDot, iconContainer, titleLabel, spacer, dateLabel, deleteBtn);
+                topRow.setAlignment(Pos.CENTER_LEFT);
+
+                VBox content = new VBox(6, topRow, messageLabel);
+                content.setPadding(new Insets(12));
+                content.setStyle(
+                        "-fx-background-color: white;" +
+                                "-fx-background-radius: 14;" +
+                                "-fx-border-color: #E6EEF8;" +
+                                "-fx-border-radius: 14;" +
+                                "-fx-effect: dropshadow(gaussian, rgba(30,58,95,0.06), 8, 0, 0, 2);"
+                );
+
+                setGraphic(content);
+                setText(null);
+                setPadding(new Insets(4, 2, 4, 2));
+                setStyle("-fx-background-color: transparent;");
+            }
+        });
+    }
+
+    private String getIconForType(String type) {
+        if (type == null) {
+            return "🔔";
+        }
+
+        switch (type) {
+            case "progression_hausse":
+                return "📈";
+            case "progression_baisse":
+                return "📉";
+            case "progression_stable":
+                return "➖";
+            default:
+                return "🔔";
+        }
+    }
+
+    private String getIconContainerStyle(String type) {
+        if (type == null) {
+            return "-fx-background-color: #EEF4FB;" +
+                    "-fx-background-radius: 999;" +
+                    "-fx-border-color: #D8E5F2;" +
+                    "-fx-border-radius: 999;";
+        }
+
+        switch (type) {
+            case "progression_hausse":
+                return "-fx-background-color: #E8F8F0;" +
+                        "-fx-background-radius: 999;" +
+                        "-fx-border-color: #BFE8D1;" +
+                        "-fx-border-radius: 999;";
+
+            case "progression_baisse":
+                return "-fx-background-color: #FFF1F1;" +
+                        "-fx-background-radius: 999;" +
+                        "-fx-border-color: #F5C2C0;" +
+                        "-fx-border-radius: 999;";
+
+            case "progression_stable":
+                return "-fx-background-color: #FFF8E8;" +
+                        "-fx-background-radius: 999;" +
+                        "-fx-border-color: #F1DFB3;" +
+                        "-fx-border-radius: 999;";
+
+            default:
+                return "-fx-background-color: #EEF4FB;" +
+                        "-fx-background-radius: 999;" +
+                        "-fx-border-color: #D8E5F2;" +
+                        "-fx-border-radius: 999;";
+        }
+    }
+
+    private String getRelativeTime(Timestamp timestamp) {
+        if (timestamp == null) {
+            return "";
+        }
+
+        LocalDateTime dateTime = timestamp.toLocalDateTime();
+        LocalDateTime now = LocalDateTime.now();
+        java.time.Duration duration = java.time.Duration.between(dateTime, now);
+
+        long minutes = duration.toMinutes();
+        long hours = duration.toHours();
+        long days = duration.toDays();
+
+        if (minutes < 1) {
+            return "à l'instant";
+        } else if (minutes < 60) {
+            return "il y a " + minutes + " min";
+        } else if (hours < 24) {
+            return "il y a " + hours + " h";
+        } else if (days < 7) {
+            return "il y a " + days + " j";
+        } else {
+            return dateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+        }
+    }
+
+    private void chargerNotifications() {
+        String filtre = notifFilterCombo != null ? notifFilterCombo.getValue() : "Tous";
+        List<Notification> notifications = notificationService.getNotificationsByUserAndType(currentUserId, filtre);
+
+        if (notifListView != null) {
+            notifListView.setItems(FXCollections.observableArrayList(notifications));
+        }
+    }
+
+    private void mettreAJourBadgeNotif() {
+        if (notifBadgeLabel == null) {
+            return;
+        }
+
+        int unreadCount = notificationService.countUnreadNotifications(currentUserId);
+        notifBadgeLabel.setText(String.valueOf(unreadCount));
+        notifBadgeLabel.setVisible(true);
+        notifBadgeLabel.setManaged(true);
+    }
+
+    @FXML
+    private void onNotifFilterChanged(ActionEvent event) {
+        chargerNotifications();
+    }
+
+    @FXML
+    private void onClearAllNotifications(ActionEvent event) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmation");
+        alert.setHeaderText("Supprimer toutes les notifications ?");
+        alert.setContentText("Cette action supprimera toutes vos notifications.");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            notificationService.deleteAllNotifications(currentUserId);
+            chargerNotifications();
+            mettreAJourBadgeNotif();
+        }
     }
 
     private void loadContent(String fxmlPath) {
@@ -86,7 +345,12 @@ public class ControllerHome {
     }
 
     private void showHomeContent() {
-        contentArea.getChildren().setAll(homeContent);
+        contentArea.getChildren().clear();
+        contentArea.getChildren().add(homeContent);
+
+        if (notifPanel != null && !contentArea.getChildren().contains(notifPanel)) {
+            contentArea.getChildren().add(notifPanel);
+        }
 
         FadeTransition ft = new FadeTransition(Duration.millis(250), homeContent);
         ft.setFromValue(0);
@@ -128,6 +392,8 @@ public class ControllerHome {
     @FXML
     void onNavHomeClicked(MouseEvent event) {
         showHomeContent();
+        chargerNotifications();
+        mettreAJourBadgeNotif();
         setActiveNav(navAccueil);
     }
 
@@ -145,7 +411,6 @@ public class ControllerHome {
 
     @FXML
     private void onNavRdvClicked(MouseEvent event) {
-        System.out.println("Rendez-vous");
         setActiveNav(navRdv);
     }
 
@@ -157,13 +422,11 @@ public class ControllerHome {
 
     @FXML
     private void onNavActivitesClicked(MouseEvent event) {
-        System.out.println("Activités");
         setActiveNav(navActivites);
     }
 
     @FXML
     private void onNavRessourcesClicked(MouseEvent event) {
-        System.out.println("Ressources");
         setActiveNav(navRessources);
     }
 
@@ -213,6 +476,7 @@ public class ControllerHome {
         st.setToX(1.02);
         st.setToY(1.02);
         st.play();
+
         card.setStyle(
                 "-fx-background-color: #F8FBFF;" +
                         "-fx-background-radius: 16;" +
@@ -229,6 +493,7 @@ public class ControllerHome {
         st.setToX(1);
         st.setToY(1);
         st.play();
+
         card.setStyle(
                 "-fx-background-color: white;" +
                         "-fx-background-radius: 16;" +
@@ -245,10 +510,12 @@ public class ControllerHome {
         st.setToX(1.05);
         st.setToY(1.05);
         st.play();
+
         adv.setStyle(
                 "-fx-padding: 10;" +
                         "-fx-background-radius: 12;" +
-                        "-fx-background-color: rgba(151,187,228,0.15);"
+                        "-fx-background-color: rgba(151,187,228,0.15);" +
+                        "-fx-cursor: hand;"
         );
     }
 
@@ -259,47 +526,44 @@ public class ControllerHome {
         st.setToX(1);
         st.setToY(1);
         st.play();
+
         adv.setStyle(
                 "-fx-padding: 10;" +
                         "-fx-background-radius: 12;" +
-                        "-fx-background-color: transparent;"
+                        "-fx-background-color: transparent;" +
+                        "-fx-cursor: hand;"
         );
     }
 
     @FXML
     private void onNotifications(ActionEvent event) {
-        Button btn = (Button) event.getSource();
-        ScaleTransition st = new ScaleTransition(Duration.millis(150), btn);
-        st.setToX(1.1);
-        st.setToY(1.1);
-        st.setAutoReverse(true);
-        st.setCycleCount(2);
-        st.play();
-        System.out.println("Notifications");
+        if (notifPanel == null) {
+            return;
+        }
+
+        boolean ouverture = !notifPanel.isVisible();
+        notifPanel.setVisible(ouverture);
+        notifPanel.setManaged(ouverture);
+
+        if (ouverture) {
+            chargerNotifications();
+            notificationService.markAllAsRead(currentUserId);
+            mettreAJourBadgeNotif();
+
+            FadeTransition ft = new FadeTransition(Duration.millis(220), notifPanel);
+            ft.setFromValue(0);
+            ft.setToValue(1);
+            ft.play();
+        }
     }
 
     @FXML
     private void onLogout(ActionEvent event) {
-        Button btn = (Button) event.getSource();
-        ScaleTransition st = new ScaleTransition(Duration.millis(150), btn);
-        st.setToX(0.95);
-        st.setToY(0.95);
-        st.setAutoReverse(true);
-        st.setCycleCount(2);
-        st.play();
         System.out.println("Logout");
     }
 
     @FXML
     private void onStartSuivi(ActionEvent event) {
-        Button btn = (Button) event.getSource();
-        ScaleTransition st = new ScaleTransition(Duration.millis(150), btn);
-        st.setToX(1.05);
-        st.setToY(1.05);
-        st.setAutoReverse(true);
-        st.setCycleCount(2);
-        st.play();
-
         loadContent("/suivi_mentale.fxml");
         setActiveNav(navSuivi);
     }

@@ -15,7 +15,6 @@
         <VBox prefWidth="240"
               style="-fx-background-color: linear-gradient(to bottom, #D6E8F7, #2C5F8A);">
 
-            <!-- LOGO CENTRÉ -->
             <VBox alignment="CENTER"
                   spacing="8"
                   style="-fx-padding: 22 0 18 0;
@@ -194,18 +193,36 @@
                             <Label fx:id="labelDate" text="mercredi 8 avril 2026"
                                    style="-fx-font-size: 12px; -fx-text-fill: #5A6C7D; -fx-font-weight: 500;"/>
                         </VBox>
+
                         <Region HBox.hgrow="ALWAYS"/>
-                        <Button fx:id="notifButton" text="🔔" onAction="#onNotifications"
-                                style="-fx-background-color: rgba(151,187,228,0.15);
-                                       -fx-text-fill: #2C5F8A;
-                                       -fx-padding: 6;
-                                       -fx-cursor: hand;
-                                       -fx-font-size: 16px;
-                                       -fx-border-color: rgba(151,187,228,0.4);
-                                       -fx-border-radius: 50;
-                                       -fx-border-width: 1;
-                                       -fx-min-width: 32;
-                                       -fx-min-height: 32;"/>
+
+                        <StackPane alignment="TOP_RIGHT" pickOnBounds="false">
+                            <Button fx:id="notifButton"
+                                    text="🔔"
+                                    onAction="#onNotifications"
+                                    style="-fx-background-color: rgba(151,187,228,0.15);
+                                           -fx-text-fill: #2C5F8A;
+                                           -fx-padding: 6;
+                                           -fx-cursor: hand;
+                                           -fx-font-size: 16px;
+                                           -fx-border-color: rgba(151,187,228,0.4);
+                                           -fx-border-radius: 50;
+                                           -fx-border-width: 1;
+                                           -fx-min-width: 32;
+                                           -fx-min-height: 32;"/>
+
+                            <Label fx:id="notifBadgeLabel"
+                                   text="2"
+                                   StackPane.alignment="TOP_RIGHT"
+                                   translateX="8"
+                                   translateY="-8"
+                                   style="-fx-background-color: #E74C3C;
+                                          -fx-text-fill: white;
+                                          -fx-font-size: 10px;
+                                          -fx-font-weight: bold;
+                                          -fx-background-radius: 999;
+                                          -fx-padding: 2 6;"/>
+                        </StackPane>
                     </HBox>
 
                     <VBox spacing="16" style="-fx-padding: 20 24 24 24;" VBox.vgrow="ALWAYS">
@@ -349,6 +366,70 @@
                         </VBox>
 
                     </VBox>
+                </VBox>
+
+                <VBox fx:id="notifPanel"
+                      visible="false"
+                      managed="false"
+                      mouseTransparent="false"
+                      pickOnBounds="false"
+                      StackPane.alignment="TOP_RIGHT"
+                      translateX="-24"
+                      translateY="78"
+                      prefWidth="370"
+                      minWidth="370"
+                      maxWidth="370"
+                      prefHeight="360"
+                      spacing="10"
+                      style="-fx-background-color: white;
+                             -fx-background-radius: 18;
+                             -fx-border-color: #D6E8F7;
+                             -fx-border-radius: 18;
+                             -fx-padding: 14;
+                             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.20), 18, 0, 0, 4);">
+
+                    <HBox alignment="CENTER_LEFT">
+                        <Label text="Notifications"
+                               style="-fx-font-size: 15px;
+                                      -fx-font-weight: bold;
+                                      -fx-text-fill: #2C3E50;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="✕"
+                                onAction="#onNotifications"
+                                style="-fx-background-color: transparent;
+                                       -fx-text-fill: #5A6C7D;
+                                       -fx-font-size: 12px;
+                                       -fx-font-weight: bold;
+                                       -fx-cursor: hand;"/>
+                    </HBox>
+
+                    <HBox spacing="8" alignment="CENTER_LEFT">
+                        <ComboBox fx:id="notifFilterCombo"
+                                  onAction="#onNotifFilterChanged"
+                                  prefWidth="180"
+                                  style="-fx-background-radius: 10;"/>
+
+                        <Button fx:id="clearAllNotifButton"
+                                text="Tout supprimer"
+                                onAction="#onClearAllNotifications"
+                                style="-fx-background-color: #fff1f1;
+                                       -fx-text-fill: #d94b4b;
+                                       -fx-font-size: 12px;
+                                       -fx-font-weight: bold;
+                                       -fx-background-radius: 10;
+                                       -fx-cursor: hand;"/>
+                    </HBox>
+
+                    <ListView fx:id="notifListView"
+                              prefHeight="280"
+                              minHeight="280"
+                              maxHeight="280"
+                              focusTraversable="false"
+                              style="-fx-background-color: transparent;
+                                     -fx-control-inner-background: transparent;
+                                     -fx-background-insets: 0;
+                                     -fx-padding: 6;
+                                     -fx-border-color: transparent;"/>
                 </VBox>
 
             </children>

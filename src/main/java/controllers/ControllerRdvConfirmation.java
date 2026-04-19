@@ -7,6 +7,7 @@ import javafx.animation.ScaleTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -18,6 +19,7 @@ public class ControllerRdvConfirmation {
     @FXML private Label  labelDate;
     @FXML private Label  labelHeure;
     @FXML private Label  labelType;
+    @FXML private ComboBox<String> comboMode;
     @FXML private Button btnConfirmer;
 
 
@@ -57,6 +59,10 @@ public class ControllerRdvConfirmation {
 
 
         labelType.setText(rdv.getTypeRdv() != null ? rdv.getTypeRdv() : "Consultation individuelle");
+
+        // Initialiser comboMode
+        comboMode.getItems().addAll("Présentiel", "En ligne");
+        comboMode.setValue("Présentiel");
     }
 
 
@@ -69,8 +75,8 @@ public class ControllerRdvConfirmation {
         st.setCycleCount(2);
         st.play();
 
-
-        boolean ok = serviceRdv.reserverCreneau(rdv.getId(), etudiantId);
+        String selectedMode = comboMode.getValue();
+        boolean ok = serviceRdv.reserverCreneau(rdv.getId(), etudiantId, selectedMode);
 
         if (ok) {
 

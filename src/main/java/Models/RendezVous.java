@@ -131,6 +131,25 @@ public class RendezVous {
 
     // 🔹 toString()
 
+    // 🔹 toString()
+
+    public String getMode() {
+        return "En ligne".equalsIgnoreCase(this.lieu) ? "En ligne" : "Présentiel";
+    }
+
+    public void setMode(String mode) {
+        this.lieu = mode;
+    }
+
+    public boolean isPsyJoined() {
+        return "en cours".equalsIgnoreCase(this.statut);
+    }
+
+    public void setPsyJoined(boolean joined) {
+        if (joined) this.statut = "en cours";
+        else if ("en cours".equalsIgnoreCase(this.statut)) this.statut = "confirmé";
+    }
+
     @Override
     public String toString() {
         return "RendezVous{" +

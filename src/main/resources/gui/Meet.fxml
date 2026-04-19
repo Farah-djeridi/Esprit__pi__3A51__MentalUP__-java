@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.shape.Circle?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controllers.ControllerMeet"
+            prefWidth="1200" prefHeight="800">
+
+    <!-- Sidebar supprimée comme demandé -->
+
+    <center>
+        <VBox spacing="0" style="-fx-background-color: #F0F4F8;">
+            <!-- Header -->
+            <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-background-color: white; -fx-padding: 15 25; -fx-border-color: #E8ECF0; -fx-border-width: 0 0 1 0;">
+                <Button text="⬅ Retour aux rendez-vous" onAction="#onRetour"
+                        style="-fx-background-color: #f1f5f9; -fx-text-fill: #475569; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 16; -fx-cursor: hand;"/>
+                <Label fx:id="labelMeetingTitle" text="Session de consultation" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1a4a5f;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="btnTerminer" text="🛑 Terminer la session" onAction="#onTerminerSession"
+                        style="-fx-background-color: #fee2e2; -fx-text-fill: #dc2626; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 16; -fx-cursor: hand;"/>
+                <HBox fx:id="statusBadge" spacing="8" alignment="CENTER" style="-fx-background-color: #ecfdf5; -fx-padding: 6 12; -fx-background-radius: 20;">
+                    <Circle radius="4" fill="#10b981"/>
+                    <Label text="Session Active" style="-fx-text-fill: #065f46; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                </HBox>
+            </HBox>
+
+            <!-- Main Area -->
+            <SplitPane fx:id="splitPane" dividerPositions="0.6" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
+                <items>
+                    <!-- Left: Meeting Control (Browser Launch) -->
+                    <VBox alignment="CENTER" spacing="30" style="-fx-background-color: #1e293b; -fx-padding: 40;">
+                        <Label text="🎥" style="-fx-font-size: 80px;"/>
+                        <Label text="Visioconférence" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                        
+                        <VBox alignment="CENTER" spacing="10">
+                            <Label text="Pour garantir le bon fonctionnement de votre caméra et de votre micro," 
+                                   textAlignment="CENTER" wrapText="true" style="-fx-text-fill: #cbd5e1; -fx-font-size: 15px;"/>
+                            <Label text="la réunion s'ouvrira dans votre navigateur sécurisé." 
+                                   textAlignment="CENTER" wrapText="true" style="-fx-text-fill: #cbd5e1; -fx-font-size: 15px;"/>
+                        </VBox>
+
+                        <Button fx:id="btnLaunchMeet" text="Rejoindre l'appel vidéo" onAction="#onLaunchMeet"
+                                style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold; 
+                                       -fx-padding: 15 40; -fx-background-radius: 12; -fx-cursor: hand;"/>
+                        
+                        <VBox fx:id="waitingArea" alignment="CENTER" spacing="15" visible="false" managed="false">
+                            <ProgressIndicator prefWidth="40" prefHeight="40" style="-fx-progress-color: white;"/>
+                            <Label text="En attente du psychologue..." style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                        </VBox>
+                    </VBox>
+
+                    <!-- Right: Patient Dossier (Multitask) -->
+                    <VBox fx:id="dossierPanel" style="-fx-background-color: white;">
+                        <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 15 20; -fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-width: 0 0 1 0;">
+                            <Label text="📁 Dossier Médical" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1a4a5f;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Button text="✕" onAction="#closeDossierPanel" style="-fx-background-color: transparent; -fx-cursor: hand;"/>
+                        </HBox>
+                        <StackPane fx:id="dossierContent" VBox.vgrow="ALWAYS">
+                            <!-- Dynamically loaded -->
+                        </StackPane>
+                    </VBox>
+                </items>
+            </SplitPane>
+        </VBox>
+    </center>
+
+</BorderPane>

@@ -91,12 +91,12 @@ public class RendezVousController {
                 .collect(Collectors.toList());
 
         List<RendezVous> aVenir = list.stream()
-                .filter(r -> "confirmé".equalsIgnoreCase(r.getStatut()) &&
+                .filter(r -> ("confirmé".equalsIgnoreCase(r.getStatut()) || "en cours".equalsIgnoreCase(r.getStatut())) &&
                         (r.getDate() != null && !r.getDate().toLocalDate().isBefore(LocalDate.now())))
                 .collect(Collectors.toList());
 
         List<RendezVous> historique = list.stream()
-                .filter(r -> "confirmé".equalsIgnoreCase(r.getStatut()) &&
+                .filter(r -> ("confirmé".equalsIgnoreCase(r.getStatut()) || "terminé".equalsIgnoreCase(r.getStatut())) &&
                         (r.getDate() != null && r.getDate().toLocalDate().isBefore(LocalDate.now())))
                 .collect(Collectors.toList());
 
@@ -192,7 +192,7 @@ public class RendezVousController {
         btnConfirm.setStyle("-fx-background-color: #e8f5e9; -fx-text-fill: #2e7d32; -fx-background-radius: 6; "
                 + "-fx-padding: 7 14; -fx-cursor: hand; -fx-font-size: 12px; -fx-font-family: 'Segoe UI';");
         btnConfirm.setOnAction(e -> {
-            service.confirmerRdv(r.getId());
+            service.confirmerRdv(r.getId(), r.getMode());
             loadData();
         });
 
@@ -232,6 +232,14 @@ public class RendezVousController {
             btnConfirm.setManaged(false);
         }
 
+        if ("confirmé".equalsIgnoreCase(r.getStatut()) && "En ligne".equalsIgnoreCase(r.getMode())) {
+            Button btnMeet = new Button("🎥 Rejoindre");
+            btnMeet.setStyle("-fx-background-color: #2563eb; -fx-text-fill: white; -fx-background-radius: 6; "
+                    + "-fx-padding: 7 14; -fx-cursor: hand; -fx-font-size: 12px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';");
+            btnMeet.setOnAction(e -> rejoindreMeeting(r));
+            actions.getChildren().add(0, btnMeet);
+        }
+
         actions.getChildren().addAll(btnConfirm, btnDelete);
 
         card.getChildren().addAll(indicator, dateBox, typeBox, spacer, statutLabel, actions);
@@ -245,12 +253,30 @@ public class RendezVousController {
         return card;
     }
 
+    private void rejoindreMeeting(RendezVous r) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/Meet.fxml"));
+            Parent root = loader.load();
+
+            ControllerMeet ctrl = loader.getController();
+            ctrl.initData(r, 6, "psychologue");
+
+            Stage stage = (Stage) cardsContainer.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private String getStatutColor(String statut) {
         if (statut == null) return "#94a3b8";
         switch (statut.toLowerCase()) {
             case "libre":     return "#4caf50";
             case "réservé":   return "#ff9800";
             case "confirmé":  return "#2196f3";
+            case "en cours":  return "#10b981";
+            case "terminé":   return "#64748b";
             case "en attente":return "#9c27b0";
             default:          return "#94a3b8";
         }
@@ -264,6 +290,8 @@ public class RendezVousController {
             case "libre":     return base + "-fx-background-color: #e8f5e9; -fx-text-fill: #2e7d32;";
             case "réservé":   return base + "-fx-background-color: #fff3e0; -fx-text-fill: #e65100;";
             case "confirmé":  return base + "-fx-background-color: #e3f2fd; -fx-text-fill: #1565c0;";
+            case "en cours":  return base + "-fx-background-color: #ecfdf5; -fx-text-fill: #059669;";
+            case "terminé":   return base + "-fx-background-color: #f1f5f9; -fx-text-fill: #475569;";
             case "en attente":return base + "-fx-background-color: #f3e5f5; -fx-text-fill: #6a1b9a;";
             default:          return base + "-fx-background-color: #f1f5f9; -fx-text-fill: #64748b;";
         }

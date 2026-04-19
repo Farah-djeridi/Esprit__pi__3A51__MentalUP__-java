@@ -204,7 +204,9 @@ public class ControllerAdminRdv {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        contenu.getChildren().addAll(icone, infos, spacer, badge);
+        contenu.getChildren().addAll(icone, infos, spacer);
+
+        contenu.getChildren().add(badge);
         card.getChildren().addAll(barre, contenu);
 
         // Hover
@@ -221,6 +223,7 @@ public class ControllerAdminRdv {
 
         return card;
     }
+
 
 
     @FXML

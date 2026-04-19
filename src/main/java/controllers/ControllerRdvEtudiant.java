@@ -204,7 +204,18 @@ public class ControllerRdvEtudiant {
                         "-fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 3 10;"
         );
 
-        card.getChildren().addAll(barre, icone, infos, spacer, badge);
+        card.getChildren().addAll(barre, icone, infos, spacer);
+
+        // Ajout du bouton "Rejoindre" si En ligne et (Confirmé ou En cours)
+        if (("confirmé".equalsIgnoreCase(r.getStatut()) || "en cours".equalsIgnoreCase(r.getStatut())) 
+            && "En ligne".equalsIgnoreCase(r.getMode())) {
+            Button btnMeet = new Button("🎥 Rejoindre");
+            btnMeet.setStyle("-fx-background-color: #2980B9; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 5 12; -fx-cursor: hand; -fx-font-size: 11px;");
+            btnMeet.setOnAction(e -> rejoindreMeeting(r));
+            card.getChildren().add(btnMeet);
+        }
+
+        card.getChildren().add(badge);
 
         if (canCancel && ("réservé".equalsIgnoreCase(r.getStatut()) || "en attente".equalsIgnoreCase(r.getStatut()))) {
             Button btnAnnuler = new Button("Annuler");
@@ -221,6 +232,22 @@ public class ControllerRdvEtudiant {
             card.getChildren().add(btnAnnuler);
         }
         return card;
+    }
+
+    private void rejoindreMeeting(RendezVous r) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/Meet.fxml"));
+            Parent root = loader.load();
+
+            ControllerMeet ctrl = loader.getController();
+            ctrl.initData(r, etudiantId, "patient");
+
+            Stage stage = (Stage) rdvAujContainer.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // ══════════════════════════════════════════════════════

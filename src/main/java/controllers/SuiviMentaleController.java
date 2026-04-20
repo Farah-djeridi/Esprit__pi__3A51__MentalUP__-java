@@ -1,6 +1,7 @@
 package controllers;
 
 import services.NotificationService;
+import services.ExportPdfService;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,6 +22,7 @@ import models.SuiviMentale;
 import services.ServiceObjectif;
 import services.ServiceSuiviMentale;
 
+import java.io.File;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -55,6 +57,14 @@ public class SuiviMentaleController {
     @FXML private TextField energieField;
     @FXML private TextArea journalArea;
 
+    @FXML private Label dateErrorLabel;
+    @FXML private Label humeurErrorLabel;
+    @FXML private Label qualiteSommeilErrorLabel;
+    @FXML private Label heureSommeilErrorLabel;
+    @FXML private Label stressErrorLabel;
+    @FXML private Label energieErrorLabel;
+    @FXML private Label journalErrorLabel;
+
     @FXML private Button saveButton;
     @FXML private Button clearButton;
 
@@ -88,6 +98,7 @@ public class SuiviMentaleController {
     private final ServiceSuiviMentale suiviService = new ServiceSuiviMentale();
     private final ServiceObjectif objectifService = new ServiceObjectif();
     private final NotificationService notificationService = new NotificationService();
+    private final ExportPdfService exportPdfService = new ExportPdfService();
 
     private Integer editingSuiviId = null;
     private final int currentUserId = 1;
@@ -178,10 +189,30 @@ public class SuiviMentaleController {
             conseilLabel.setText("Prenez quelques minutes pour respirer profondément aujourd’hui.");
         }
 
+        resetValidationMessages();
         refreshAll();
         verifierAjoutAutorise();
         afficherObjectifLie();
         showAjouterSection();
+        verifierRappelQuotidien();
+    }
+
+    private void verifierRappelQuotidien() {
+        try {
+            boolean suiviExisteAujourdHui = suiviService.hasSuiviToday(currentUserId);
+
+            if (!suiviExisteAujourdHui) {
+                boolean rappelExiste = notificationService.hasReminderNotificationToday(currentUserId);
+
+                if (!rappelExiste) {
+                    notificationService.creerNotificationRappelSuivi(currentUserId);
+                    notificationService.afficherPopupRappelSuivi();
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Erreur rappel quotidien : " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -305,6 +336,159 @@ public class SuiviMentaleController {
         }
     }
 
+    private void resetValidationMessages() {
+        if (dateErrorLabel != null) dateErrorLabel.setText("");
+        if (humeurErrorLabel != null) humeurErrorLabel.setText("");
+        if (qualiteSommeilErrorLabel != null) qualiteSommeilErrorLabel.setText("");
+        if (heureSommeilErrorLabel != null) heureSommeilErrorLabel.setText("");
+        if (stressErrorLabel != null) stressErrorLabel.setText("");
+        if (energieErrorLabel != null) energieErrorLabel.setText("");
+        if (journalErrorLabel != null) journalErrorLabel.setText("");
+    }
+
+    private void setFieldMessage(Label errorLabel, String message) {
+        if (errorLabel != null) {
+            errorLabel.setText(message == null ? "" : message);
+        }
+    }
+
+    private boolean validerFormulaire(List<String> erreurs) {
+        boolean valide = true;
+        resetValidationMessages();
+
+        if (dateSuiviPicker == null || dateSuiviPicker.getValue() == null) {
+            setFieldMessage(dateErrorLabel, "La date est obligatoire.");
+            erreurs.add("La date est obligatoire.");
+            valide = false;
+        } else if (dateSuiviPicker.getValue().isAfter(LocalDate.now())) {
+            setFieldMessage(dateErrorLabel, "La date ne doit pas être au futur.");
+            erreurs.add("La date du suivi ne doit pas être au futur.");
+            valide = false;
+        }
+
+        if (humeurCombo == null || humeurCombo.getValue() == null || humeurCombo.getValue().trim().isEmpty()) {
+            setFieldMessage(humeurErrorLabel, "Veuillez choisir une humeur.");
+            erreurs.add("Veuillez choisir une humeur.");
+            valide = false;
+        }
+
+        if (qualiteSommeilCombo == null || qualiteSommeilCombo.getValue() == null || qualiteSommeilCombo.getValue().trim().isEmpty()) {
+            setFieldMessage(qualiteSommeilErrorLabel, "Veuillez choisir une qualité du sommeil.");
+            erreurs.add("Veuillez choisir une qualité du sommeil.");
+            valide = false;
+        }
+
+        if (heureSommeilField == null || heureSommeilField.getText() == null || heureSommeilField.getText().trim().isEmpty()) {
+            setFieldMessage(heureSommeilErrorLabel, "Veuillez saisir les heures de sommeil.");
+            erreurs.add("Veuillez saisir les heures de sommeil.");
+            valide = false;
+        } else {
+            try {
+                double heures = Double.parseDouble(heureSommeilField.getText().trim());
+                if (heures < 0 || heures > 24) {
+                    setFieldMessage(heureSommeilErrorLabel, "La valeur doit être entre 0 et 24.");
+                    erreurs.add("Les heures de sommeil doivent être entre 0 et 24.");
+                    valide = false;
+                }
+            } catch (Exception e) {
+                setFieldMessage(heureSommeilErrorLabel, "Veuillez saisir un nombre valide.");
+                erreurs.add("Heures de sommeil invalides.");
+                valide = false;
+            }
+        }
+
+        if (stressField == null || stressField.getText() == null || stressField.getText().trim().isEmpty()) {
+            setFieldMessage(stressErrorLabel, "Veuillez saisir le stress.");
+            erreurs.add("Veuillez saisir le stress.");
+            valide = false;
+        } else {
+            try {
+                int stress = Integer.parseInt(stressField.getText().trim());
+                if (stress < 0 || stress > 10) {
+                    setFieldMessage(stressErrorLabel, "Le stress doit être entre 0 et 10.");
+                    erreurs.add("Le stress doit être entre 0 et 10.");
+                    valide = false;
+                }
+            } catch (Exception e) {
+                setFieldMessage(stressErrorLabel, "Veuillez saisir un entier valide.");
+                erreurs.add("Taux de stress invalide.");
+                valide = false;
+            }
+        }
+
+        if (energieField == null || energieField.getText() == null || energieField.getText().trim().isEmpty()) {
+            setFieldMessage(energieErrorLabel, "Veuillez saisir l'énergie.");
+            erreurs.add("Veuillez saisir l'énergie.");
+            valide = false;
+        } else {
+            try {
+                int energie = Integer.parseInt(energieField.getText().trim());
+                if (energie < 0 || energie > 10) {
+                    setFieldMessage(energieErrorLabel, "L'énergie doit être entre 0 et 10.");
+                    erreurs.add("L'énergie doit être entre 0 et 10.");
+                    valide = false;
+                }
+            } catch (Exception e) {
+                setFieldMessage(energieErrorLabel, "Veuillez saisir un entier valide.");
+                erreurs.add("Niveau d'énergie invalide.");
+                valide = false;
+            }
+        }
+
+        if (journalArea == null || journalArea.getText() == null || journalArea.getText().trim().isEmpty()) {
+            setFieldMessage(journalErrorLabel, "Veuillez saisir le journal émotionnel.");
+            erreurs.add("Veuillez saisir le journal émotionnel.");
+            valide = false;
+        }
+
+        return valide;
+    }
+
+    private Alert creerPopupConfirmationStylise(String header, String content) {
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.setTitle("Confirmation");
+        confirmation.setHeaderText(header);
+        confirmation.setContentText(content);
+
+        DialogPane dialogPane = confirmation.getDialogPane();
+        dialogPane.setStyle(
+                "-fx-background-color: linear-gradient(to bottom, #ffffff, #f8fbff);" +
+                        "-fx-background-radius: 18;" +
+                        "-fx-border-color: #dbe7f5;" +
+                        "-fx-border-radius: 18;" +
+                        "-fx-padding: 18;"
+        );
+
+        Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
+        Button cancelButton = (Button) dialogPane.lookupButton(ButtonType.CANCEL);
+
+        if (okButton != null) {
+            okButton.setText("Confirmer");
+            okButton.setStyle(
+                    "-fx-background-color: linear-gradient(to right, #234b7d, #2f5d97);" +
+                            "-fx-text-fill: white;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-background-radius: 14;" +
+                            "-fx-padding: 8 18;" +
+                            "-fx-cursor: hand;"
+            );
+        }
+
+        if (cancelButton != null) {
+            cancelButton.setText("Annuler");
+            cancelButton.setStyle(
+                    "-fx-background-color: #eef2f7;" +
+                            "-fx-text-fill: #475569;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-background-radius: 14;" +
+                            "-fx-padding: 8 18;" +
+                            "-fx-cursor: hand;"
+            );
+        }
+
+        return confirmation;
+    }
+
     @FXML
     public void saveSuivi() {
         try {
@@ -315,85 +499,17 @@ public class SuiviMentaleController {
                 return;
             }
 
-            if (dateSuiviPicker == null || dateSuiviPicker.getValue() == null) {
-                afficherMessage("La date est obligatoire.", true);
+            List<String> erreurs = new ArrayList<>();
+            boolean formulaireValide = validerFormulaire(erreurs);
+
+            if (!formulaireValide) {
+                afficherMessage("Veuillez corriger les champs manquants.", true);
                 return;
             }
 
-            if (dateSuiviPicker.getValue().isAfter(LocalDate.now())) {
-                afficherMessage("La date du suivi ne doit pas être au futur.", true);
-                return;
-            }
-
-            if (humeurCombo == null || humeurCombo.getValue() == null || humeurCombo.getValue().trim().isEmpty()) {
-                afficherMessage("Veuillez choisir une humeur.", true);
-                return;
-            }
-
-            if (qualiteSommeilCombo == null || qualiteSommeilCombo.getValue() == null || qualiteSommeilCombo.getValue().trim().isEmpty()) {
-                afficherMessage("Veuillez choisir une qualité du sommeil.", true);
-                return;
-            }
-
-            if (heureSommeilField == null || heureSommeilField.getText() == null || heureSommeilField.getText().trim().isEmpty()) {
-                afficherMessage("Veuillez saisir les heures de sommeil.", true);
-                return;
-            }
-
-            if (stressField == null || stressField.getText() == null || stressField.getText().trim().isEmpty()) {
-                afficherMessage("Veuillez saisir le stress.", true);
-                return;
-            }
-
-            if (energieField == null || energieField.getText() == null || energieField.getText().trim().isEmpty()) {
-                afficherMessage("Veuillez saisir l'énergie.", true);
-                return;
-            }
-
-            if (journalArea == null || journalArea.getText() == null || journalArea.getText().trim().isEmpty()) {
-                afficherMessage("Veuillez saisir le journal émotionnel.", true);
-                return;
-            }
-
-            double heures;
-            int stress;
-            int energie;
-
-            try {
-                heures = Double.parseDouble(heureSommeilField.getText().trim());
-            } catch (Exception e) {
-                afficherMessage("Heures de sommeil invalides.", true);
-                return;
-            }
-
-            try {
-                stress = Integer.parseInt(stressField.getText().trim());
-            } catch (Exception e) {
-                afficherMessage("Taux de stress invalide.", true);
-                return;
-            }
-
-            try {
-                energie = Integer.parseInt(energieField.getText().trim());
-            } catch (Exception e) {
-                afficherMessage("Niveau d'énergie invalide.", true);
-                return;
-            }
-
-            if (heures < 0 || heures > 24) {
-                afficherMessage("Les heures de sommeil doivent être entre 0 et 24.", true);
-                return;
-            }
-
-            if (stress < 0 || stress > 10) {
-                afficherMessage("Le stress doit être entre 0 et 10.", true);
-                return;
-            }
-
-            if (energie < 0 || energie > 10) {
-                afficherMessage("L'énergie doit être entre 0 et 10.", true);
-                return;
-            }
+            double heures = Double.parseDouble(heureSommeilField.getText().trim());
+            int stress = Integer.parseInt(stressField.getText().trim());
+            int energie = Integer.parseInt(energieField.getText().trim());
 
             Objectif objectifLie = objectifService.getObjectifEnCoursByUser(currentUserId);
 
@@ -404,10 +520,8 @@ public class SuiviMentaleController {
 
             int ancienneProgression = objectifLie.getProgression();
 
-            Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
-            confirmation.setTitle("Confirmation");
-            confirmation.setHeaderText("Confirmer l'enregistrement du suivi");
-            confirmation.setContentText(
+            Alert confirmation = creerPopupConfirmationStylise(
+                    "Confirmer l'enregistrement du suivi",
                     "Ce suivi sera lié à l'objectif : " + safeTexte(objectifLie.getTitre()) +
                             "\nType : " + safeTexte(objectifLie.getTypeObjectif()) +
                             "\nValeur cible : " + objectifLie.getValeurCible() +
@@ -449,14 +563,6 @@ public class SuiviMentaleController {
 
             int nouvelleProgression = mettreAJourProgressionObjectifEtRetournerValeur(objectifLie.getId());
 
-            System.out.println("Ancienne progression = " + ancienneProgression);
-            System.out.println("Nouvelle progression = " + nouvelleProgression);
-            System.out.println("Current user id = " + currentUserId);
-            System.out.println("Objectif id = " + objectifLie.getId());
-
-            // IMPORTANT :
-            // 1) on enregistre la notification en base
-            // 2) puis la popup s'affiche dans NotificationService
             notificationService.notifierProgression(
                     ancienneProgression,
                     nouvelleProgression,
@@ -490,6 +596,7 @@ public class SuiviMentaleController {
         if (journalArea != null) journalArea.clear();
         if (saveButton != null) saveButton.setText("💾 Enregistrer");
 
+        resetValidationMessages();
         afficherMessage("", false);
         afficherObjectifLie();
     }
@@ -855,15 +962,16 @@ public class SuiviMentaleController {
             saveButton.setText("Mettre à jour");
         }
 
+        resetValidationMessages();
         afficherGlobalMessage("Suivi prêt à être modifié.", false);
         showAjouterSection();
     }
 
     private void confirmerSuppression(SuiviMentale s) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmation");
-        alert.setHeaderText("Supprimer ce suivi ?");
-        alert.setContentText("Cette action est irréversible.");
+        Alert alert = creerPopupConfirmationStylise(
+                "Supprimer ce suivi ?",
+                "Cette action est irréversible."
+        );
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
@@ -1036,7 +1144,50 @@ public class SuiviMentaleController {
 
     @FXML
     public void exporterPDF() {
-        afficherGlobalMessage("Export PDF à connecter ensuite.", false);
+        try {
+            List<SuiviMentale> suivis = suiviService.getByUser(currentUserId);
+
+            if (suivis == null || suivis.isEmpty()) {
+                afficherGlobalMessage("Aucun suivi à exporter.", true);
+                return;
+            }
+
+            File pdf = exportPdfService.exporterSuivisUtilisateurEnPdf(suivis, currentUserId);
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Export PDF");
+            alert.setHeaderText("Export terminé avec succès");
+            alert.setContentText("Le fichier PDF a été enregistré ici :\n" + pdf.getAbsolutePath());
+
+            DialogPane dialogPane = alert.getDialogPane();
+            dialogPane.setStyle(
+                    "-fx-background-color: linear-gradient(to bottom, #ffffff, #f8fbff);" +
+                            "-fx-background-radius: 18;" +
+                            "-fx-border-color: #dbe7f5;" +
+                            "-fx-border-radius: 18;" +
+                            "-fx-padding: 18;"
+            );
+
+            Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
+            if (okButton != null) {
+                okButton.setStyle(
+                        "-fx-background-color: linear-gradient(to right, #234b7d, #2f5d97);" +
+                                "-fx-text-fill: white;" +
+                                "-fx-font-weight: bold;" +
+                                "-fx-background-radius: 14;" +
+                                "-fx-padding: 8 18;" +
+                                "-fx-cursor: hand;"
+                );
+            }
+
+            alert.showAndWait();
+
+            afficherGlobalMessage("Export PDF réalisé avec succès.", false);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            afficherGlobalMessage("Erreur lors de l'export PDF : " + e.getMessage(), true);
+        }
     }
 
     private void afficherMessage(String msg, boolean erreur) {
@@ -1045,10 +1196,40 @@ public class SuiviMentaleController {
         }
 
         messageLabel.setText(msg == null ? "" : msg);
+
+        if (msg == null || msg.isEmpty()) {
+            messageLabel.setStyle(
+                    "-fx-font-size: 12px;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-text-fill: transparent;" +
+                            "-fx-background-color: transparent;" +
+                            "-fx-padding: 0;"
+            );
+            return;
+        }
+
         if (erreur) {
-            messageLabel.setStyle("-fx-text-fill: #c0392b; -fx-font-weight: bold;");
+            messageLabel.setStyle(
+                    "-fx-font-size: 12px;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-text-fill: #dc2626;" +
+                            "-fx-background-color: #fff1f2;" +
+                            "-fx-background-radius: 12;" +
+                            "-fx-border-color: #fecdd3;" +
+                            "-fx-border-radius: 12;" +
+                            "-fx-padding: 8 12;"
+            );
         } else {
-            messageLabel.setStyle("-fx-text-fill: #1e8449; -fx-font-weight: bold;");
+            messageLabel.setStyle(
+                    "-fx-font-size: 12px;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-text-fill: #15803d;" +
+                            "-fx-background-color: #ecfdf5;" +
+                            "-fx-background-radius: 12;" +
+                            "-fx-border-color: #bbf7d0;" +
+                            "-fx-border-radius: 12;" +
+                            "-fx-padding: 8 12;"
+            );
         }
     }
 

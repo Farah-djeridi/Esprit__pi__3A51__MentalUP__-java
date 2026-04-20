@@ -49,6 +49,9 @@ public class ControllerHome {
     private final NotificationService notificationService = new NotificationService();
     private final int currentUserId = 1;
 
+    // évite d’afficher plusieurs fois le popup durant la même session
+    private boolean popupRappelDejaAffiche = false;
+
     @FXML
     public void initialize() {
         if (bannerBox != null) {
@@ -95,9 +98,52 @@ public class ControllerHome {
 
         configurerFiltreNotifications();
         configurerListViewNotifications();
+
+        // 1) Vérification immédiate du rappel du jour au lancement
+        verifierEtDeclencherRappelImmediat();
+
+        // 2) Chargement normal des notifications ensuite
         chargerNotifications();
         mettreAJourBadgeNotif();
         setActiveNav(navAccueil);
+    }
+
+    /**
+     * Vérifie immédiatement s'il faut créer une notification de rappel du jour.
+     * Cette méthode suppose que NotificationService contient une méthode
+     * qui vérifie s'il n'existe pas déjà un suivi aujourd'hui
+     * et crée une notification "rappel_suivi" si nécessaire.
+     *
+     * Si chez toi le nom de la méthode est différent,
+     * remplace seulement la ligne concernée.
+     */
+    private void verifierEtDeclencherRappelImmediat() {
+        try {
+            // Cette méthode doit :
+            // - vérifier si l'utilisateur n'a pas encore ajouté de suivi aujourd'hui
+            // - créer une notification de type "rappel_suivi" si besoin
+            // - éviter les doublons pour la même date
+            boolean rappelCree = notificationService.checkAndCreateDailyReminder(currentUserId);
+
+            if (rappelCree && !popupRappelDejaAffiche) {
+                popupRappelDejaAffiche = true;
+                afficherPopupRappel(
+                        "Vous n'avez pas encore ajouté votre suivi mental aujourd'hui 🧠"
+                );
+            }
+
+        } catch (Exception e) {
+            System.out.println("Erreur lors de la vérification immédiate du rappel : " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void afficherPopupRappel(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Rappel automatique");
+        alert.setHeaderText("Suivi mental");
+        alert.setContentText(message);
+        alert.show();
     }
 
     private void configurerFiltreNotifications() {
@@ -109,7 +155,8 @@ public class ControllerHome {
                 "Tous",
                 "progression_hausse",
                 "progression_baisse",
-                "progression_stable"
+                "progression_stable",
+                "rappel_suivi"
         ));
         notifFilterCombo.setValue("Tous");
     }
@@ -223,6 +270,8 @@ public class ControllerHome {
                 return "📉";
             case "progression_stable":
                 return "➖";
+            case "rappel_suivi":
+                return "⏰";
             default:
                 return "🔔";
         }
@@ -253,6 +302,12 @@ public class ControllerHome {
                 return "-fx-background-color: #FFF8E8;" +
                         "-fx-background-radius: 999;" +
                         "-fx-border-color: #F1DFB3;" +
+                        "-fx-border-radius: 999;";
+
+            case "rappel_suivi":
+                return "-fx-background-color: #EEF4FF;" +
+                        "-fx-background-radius: 999;" +
+                        "-fx-border-color: #C9D9F7;" +
                         "-fx-border-radius: 999;";
 
             default:
@@ -305,8 +360,14 @@ public class ControllerHome {
 
         int unreadCount = notificationService.countUnreadNotifications(currentUserId);
         notifBadgeLabel.setText(String.valueOf(unreadCount));
-        notifBadgeLabel.setVisible(true);
-        notifBadgeLabel.setManaged(true);
+
+        if (unreadCount > 0) {
+            notifBadgeLabel.setVisible(true);
+            notifBadgeLabel.setManaged(true);
+        } else {
+            notifBadgeLabel.setVisible(false);
+            notifBadgeLabel.setManaged(false);
+        }
     }
 
     @FXML
@@ -356,6 +417,11 @@ public class ControllerHome {
         ft.setFromValue(0);
         ft.setToValue(1);
         ft.play();
+
+        // Revérification quand on revient à l'accueil
+        verifierEtDeclencherRappelImmediat();
+        chargerNotifications();
+        mettreAJourBadgeNotif();
     }
 
     private void setActiveNav(HBox activeItem) {
@@ -392,8 +458,6 @@ public class ControllerHome {
     @FXML
     void onNavHomeClicked(MouseEvent event) {
         showHomeContent();
-        chargerNotifications();
-        mettreAJourBadgeNotif();
         setActiveNav(navAccueil);
     }
 

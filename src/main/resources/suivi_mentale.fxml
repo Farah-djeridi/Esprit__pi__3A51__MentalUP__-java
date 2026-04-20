@@ -188,6 +188,12 @@
                                                        -fx-border-radius: 12;
                                                        -fx-border-color: #dbe7f5;
                                                        -fx-pref-height: 38px;"/>
+                                    <Label fx:id="dateErrorLabel"
+                                           text=""
+                                           wrapText="true"
+                                           style="-fx-text-fill: #dc2626;
+                                                  -fx-font-size: 11px;
+                                                  -fx-font-weight: 600;"/>
                                 </VBox>
 
                                 <VBox spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="1">
@@ -201,6 +207,12 @@
                                                      -fx-border-radius: 12;
                                                      -fx-border-color: #dbe7f5;
                                                      -fx-pref-height: 38px;"/>
+                                    <Label fx:id="humeurErrorLabel"
+                                           text=""
+                                           wrapText="true"
+                                           style="-fx-text-fill: #dc2626;
+                                                  -fx-font-size: 11px;
+                                                  -fx-font-weight: 600;"/>
                                 </VBox>
 
                                 <VBox spacing="6" GridPane.rowIndex="1" GridPane.columnIndex="0">
@@ -214,6 +226,12 @@
                                                      -fx-border-radius: 12;
                                                      -fx-border-color: #dbe7f5;
                                                      -fx-pref-height: 38px;"/>
+                                    <Label fx:id="qualiteSommeilErrorLabel"
+                                           text=""
+                                           wrapText="true"
+                                           style="-fx-text-fill: #dc2626;
+                                                  -fx-font-size: 11px;
+                                                  -fx-font-weight: 600;"/>
                                 </VBox>
 
                                 <VBox spacing="6" GridPane.rowIndex="1" GridPane.columnIndex="1">
@@ -229,6 +247,12 @@
                                                       -fx-border-color: #dbe7f5;
                                                       -fx-pref-height: 38px;
                                                       -fx-padding: 0 12;"/>
+                                    <Label fx:id="heureSommeilErrorLabel"
+                                           text=""
+                                           wrapText="true"
+                                           style="-fx-text-fill: #dc2626;
+                                                  -fx-font-size: 11px;
+                                                  -fx-font-weight: 600;"/>
                                 </VBox>
 
                                 <VBox spacing="6" GridPane.rowIndex="2" GridPane.columnIndex="0">
@@ -244,6 +268,12 @@
                                                       -fx-border-color: #dbe7f5;
                                                       -fx-pref-height: 38px;
                                                       -fx-padding: 0 12;"/>
+                                    <Label fx:id="stressErrorLabel"
+                                           text=""
+                                           wrapText="true"
+                                           style="-fx-text-fill: #dc2626;
+                                                  -fx-font-size: 11px;
+                                                  -fx-font-weight: 600;"/>
                                 </VBox>
 
                                 <VBox spacing="6" GridPane.rowIndex="2" GridPane.columnIndex="1">
@@ -259,6 +289,12 @@
                                                       -fx-border-color: #dbe7f5;
                                                       -fx-pref-height: 38px;
                                                       -fx-padding: 0 12;"/>
+                                    <Label fx:id="energieErrorLabel"
+                                           text=""
+                                           wrapText="true"
+                                           style="-fx-text-fill: #dc2626;
+                                                  -fx-font-size: 11px;
+                                                  -fx-font-weight: 600;"/>
                                 </VBox>
                             </GridPane>
 
@@ -275,9 +311,15 @@
                                                  -fx-border-radius: 12;
                                                  -fx-border-color: #dbe7f5;
                                                  -fx-padding: 8 10;"/>
+                                <Label fx:id="journalErrorLabel"
+                                       text=""
+                                       wrapText="true"
+                                       style="-fx-text-fill: #dc2626;
+                                              -fx-font-size: 11px;
+                                              -fx-font-weight: 600;"/>
                             </VBox>
 
-                            <VBox spacing="6">
+                            <VBox spacing="6" visible="false" managed="false">
                                 <Label text="🎯 Objectif lié"
                                        style="-fx-text-fill: #1e3a5f;
                                               -fx-font-size: 13px;

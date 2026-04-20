@@ -123,6 +123,25 @@ public class ServiceSuiviMentale implements IService<SuiviMentale> {
         return null;
     }
 
+    public boolean hasSuiviToday(int userId) {
+        String req = "SELECT COUNT(*) FROM suivi_mentale WHERE user_id = ? AND date_de_suivi = CURDATE()";
+
+        try {
+            PreparedStatement ps = cnx.prepareStatement(req);
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Erreur vérification suivi du jour : " + e.getMessage());
+        }
+
+        return false;
+    }
+
     @Override
     public void update(SuiviMentale s) {
         String req = "UPDATE suivi_mentale SET " +

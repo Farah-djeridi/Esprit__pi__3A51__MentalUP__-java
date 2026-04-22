@@ -33,6 +33,6 @@ build/
 
 ### VS Code ###
 .vscode/
-groq.roperties
+src/main/resources/groq.properties
 ### Mac OS ###
 .DS_Store

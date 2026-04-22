@@ -146,6 +146,50 @@
                     <VBox fx:id="ajoutSection" spacing="4" style="-fx-padding: 0;">
 
                         <VBox spacing="8"
+                              style="-fx-background-color: linear-gradient(to right, #f8fbff, #eef6ff);
+                                     -fx-background-radius: 18;
+                                     -fx-border-color: #dbe7f5;
+                                     -fx-border-radius: 18;
+                                     -fx-effect: dropshadow(gaussian, rgba(30,58,95,0.05), 8, 0, 0, 2);
+                                     -fx-padding: 14;">
+
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <Label text="💡" style="-fx-font-size: 22px;"/>
+                                <Label text="Citation bien-être du jour"
+                                       style="-fx-text-fill: #1e3a5f;
+                                              -fx-font-size: 17px;
+                                              -fx-font-weight: 900;"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Button text="🔄 Actualiser"
+                                        onAction="#actualiserCitationSeulement"
+                                        style="-fx-background-color: #eaf3ff;
+                                               -fx-text-fill: #234b7d;
+                                               -fx-font-size: 12px;
+                                               -fx-font-weight: 800;
+                                               -fx-background-radius: 18;
+                                               -fx-padding: 8 14;
+                                               -fx-cursor: hand;"/>
+                            </HBox>
+
+                            <Label text="Un message bien-être et des citations inspirantes pour accompagner votre suivi d’aujourd’hui"
+                                   style="-fx-text-fill: #7f8c9f;
+                                          -fx-font-size: 12px;
+                                          -fx-font-weight: 500;"/>
+
+                            <Label fx:id="conseilLabel"
+                                   text="Chargement du message bien-être..."
+                                   wrapText="true"
+                                   style="-fx-background-color: white;
+                                          -fx-background-radius: 14;
+                                          -fx-border-color: #dbe7f5;
+                                          -fx-border-radius: 14;
+                                          -fx-padding: 12 14;
+                                          -fx-text-fill: #475569;
+                                          -fx-font-size: 14px;
+                                          -fx-font-weight: 600;"/>
+                        </VBox>
+
+                        <VBox spacing="8"
                               style="-fx-background-color: white;
                                      -fx-background-radius: 18;
                                      -fx-effect: dropshadow(gaussian, rgba(30,58,95,0.05), 8, 0, 0, 2);
@@ -646,12 +690,6 @@
                                 </yAxis>
                             </LineChart>
 
-                            <Label fx:id="conseilLabel"
-                                   text=""
-                                   wrapText="true"
-                                   style="-fx-text-fill: #64748b;
-                                          -fx-font-size: 13px;
-                                          -fx-font-weight: 600;"/>
                         </VBox>
                     </VBox>
                 </content>

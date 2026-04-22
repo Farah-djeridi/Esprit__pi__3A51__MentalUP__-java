@@ -142,6 +142,26 @@ public class ServiceSuiviMentale implements IService<SuiviMentale> {
         return false;
     }
 
+    public SuiviMentale getDernierSuiviParUser(int userId) {
+        List<SuiviMentale> suivis = getByUser(userId);
+
+        if (suivis == null || suivis.isEmpty()) {
+            return null;
+        }
+
+        SuiviMentale dernier = suivis.get(0);
+
+        for (SuiviMentale s : suivis) {
+            if (s.getDateDeSuivi() != null && dernier.getDateDeSuivi() != null) {
+                if (s.getDateDeSuivi().after(dernier.getDateDeSuivi())) {
+                    dernier = s;
+                }
+            }
+        }
+
+        return dernier;
+    }
+
     @Override
     public void update(SuiviMentale s) {
         String req = "UPDATE suivi_mentale SET " +

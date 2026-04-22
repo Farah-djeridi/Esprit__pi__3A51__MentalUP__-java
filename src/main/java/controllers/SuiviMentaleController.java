@@ -1,7 +1,5 @@
 package controllers;
 
-import services.NotificationService;
-import services.ExportPdfService;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,12 +14,21 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 import models.Objectif;
 import models.SuiviMentale;
+import services.CitationFilterService;
+import services.ConseilThemeService;
+import services.ExportPdfService;
+import services.MyMemoryTranslationService;
+import services.NotificationService;
 import services.ServiceObjectif;
 import services.ServiceSuiviMentale;
+import services.ZenQuotesService;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.sql.Date;
 import java.time.LocalDate;
@@ -99,9 +106,15 @@ public class SuiviMentaleController {
     private final ServiceObjectif objectifService = new ServiceObjectif();
     private final NotificationService notificationService = new NotificationService();
     private final ExportPdfService exportPdfService = new ExportPdfService();
+    private final ZenQuotesService zenQuotesService = new ZenQuotesService();
+    private final CitationFilterService citationFilterService = new CitationFilterService();
+    private final ConseilThemeService conseilThemeService = new ConseilThemeService();
+    private final MyMemoryTranslationService translationService = new MyMemoryTranslationService();
 
     private Integer editingSuiviId = null;
+    private String derniereCitationAffichee = "";
     private final int currentUserId = 1;
+    private long dernierRefreshCitation = 0;
 
     @FXML
     public void initialize() {
@@ -154,9 +167,7 @@ public class SuiviMentaleController {
             });
         }
 
-        if (xAxisMoyennes != null) {
-            xAxisMoyennes.setAnimated(false);
-        }
+        if (xAxisMoyennes != null) xAxisMoyennes.setAnimated(false);
         if (yAxisMoyennes != null) {
             yAxisMoyennes.setAnimated(false);
             yAxisMoyennes.setAutoRanging(true);
@@ -185,16 +196,164 @@ public class SuiviMentaleController {
             pieChartHumeursStats.setLabelsVisible(true);
         }
 
-        if (conseilLabel != null) {
-            conseilLabel.setText("Prenez quelques minutes pour respirer profondément aujourd’hui.");
-        }
-
         resetValidationMessages();
         refreshAll();
         verifierAjoutAutorise();
         afficherObjectifLie();
         showAjouterSection();
         verifierRappelQuotidien();
+
+        if (conseilLabel != null) {
+            conseilLabel.setText("Chargement du message bien-être...");
+            chargerConseilDuJour();
+        }
+    }
+
+    @FXML
+    public void chargerConseilDuJour() {
+        if (conseilLabel != null) {
+            conseilLabel.setText("Chargement du message bien-être...");
+        }
+
+        new Thread(() -> {
+            String texteFinal = chargerCitationInitialeLieeAuSuivi();
+
+            Platform.runLater(() -> {
+                if (conseilLabel != null) {
+                    conseilLabel.setText(finaliserAffichageTexte(texteFinal));
+                }
+            });
+        }).start();
+    }
+
+    @FXML
+    public void actualiserCitationSeulement() {
+        long maintenant = System.currentTimeMillis();
+
+        if (maintenant - dernierRefreshCitation < 5000) {
+            if (conseilLabel != null) {
+                conseilLabel.setText("Veuillez attendre quelques secondes avant de réactualiser.");
+            }
+            return;
+        }
+
+        dernierRefreshCitation = maintenant;
+
+        if (conseilLabel != null) {
+            conseilLabel.setText("Chargement d'une nouvelle citation...");
+        }
+
+        new Thread(() -> {
+            String texteFinal = chargerCitationRandomSimple();
+
+            Platform.runLater(() -> {
+                if (conseilLabel != null) {
+                    conseilLabel.setText(finaliserAffichageTexte(texteFinal));
+                }
+            });
+        }).start();
+    }
+
+    private String chargerCitationInitialeLieeAuSuivi() {
+        try {
+            SuiviMentale dernierSuivi = suiviService.getDernierSuiviParUser(currentUserId);
+            String theme = conseilThemeService.detecterTheme(dernierSuivi);
+
+            String[] data = zenQuotesService.getRandomQuote();
+            String citation = data[0];
+            String auteur = data[1];
+
+            if ("__RATE_LIMIT__".equals(citation)) {
+                return conseilThemeService.getMessageLocal(theme);
+            }
+
+            boolean okGenerale = citationFilterService.estAppropriee(citation);
+            boolean okTheme = citationFilterService.correspondAuTheme(citation, theme);
+            boolean nouvelleCitation = citation != null
+                    && !citation.isBlank()
+                    && !citation.equalsIgnoreCase(derniereCitationAffichee);
+
+            if (okGenerale && okTheme && nouvelleCitation) {
+                derniereCitationAffichee = citation;
+                return formaterCitation(citation, auteur);
+            }
+
+            return conseilThemeService.getMessageLocal(theme);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Prenez un moment pour respirer, ralentir et écouter vos besoins aujourd’hui.";
+        }
+    }
+
+    private String chargerCitationRandomSimple() {
+        try {
+            String[] data = zenQuotesService.getRandomQuote();
+            String citation = data[0];
+            String auteur = data[1];
+
+            if ("__RATE_LIMIT__".equals(citation)) {
+                return citationLocaleSecours();
+            }
+
+            if (citation != null && !citation.isBlank()) {
+                if (!citation.equalsIgnoreCase(derniereCitationAffichee)) {
+                    derniereCitationAffichee = citation;
+                }
+                return formaterCitation(citation, auteur);
+            }
+
+            return citationLocaleSecours();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return citationLocaleSecours();
+        }
+    }
+
+    private String formaterCitation(String citation, String auteur) {
+        try {
+            String citationTraduite = translationService.traduireAnglaisVersFrancais(citation);
+
+            if (citationTraduite == null || citationTraduite.isBlank()) {
+                citationTraduite = citation;
+            }
+
+            if (auteur != null && !auteur.isBlank()) {
+                return "\"" + citationTraduite + "\"\n- " + auteur;
+            } else {
+                return "\"" + citationTraduite + "\"";
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            if (auteur != null && !auteur.isBlank()) {
+                return "\"" + citation + "\"\n- " + auteur;
+            } else {
+                return "\"" + citation + "\"";
+            }
+        }
+    }
+
+    private String citationLocaleSecours() {
+        String[] citations = {
+                "\"Prenez soin de vous un jour à la fois.\"",
+                "\"Chaque petit progrès compte.\"",
+                "\"Respirez profondément, vous faites de votre mieux.\"",
+                "\"Le repos est aussi une forme de force.\"",
+                "\"Votre bien-être mérite de l’attention chaque jour.\""
+        };
+
+        int index = (int) (System.currentTimeMillis() % citations.length);
+        return citations[index];
+    }
+
+    private String finaliserAffichageTexte(String texte) {
+        if (texte == null || texte.isBlank()) {
+            return "\"Prenez soin de vous un jour à la fois.\"";
+        }
+        return texte;
     }
 
     private void verifierRappelQuotidien() {
@@ -249,18 +408,10 @@ public class SuiviMentaleController {
 
     @FXML
     public void resetFiltresHistorique() {
-        if (searchDateSuiviPicker != null) {
-            searchDateSuiviPicker.setValue(null);
-        }
-        if (searchHumeurCombo != null) {
-            searchHumeurCombo.setValue("Toutes");
-        }
-        if (searchQualiteSommeilCombo != null) {
-            searchQualiteSommeilCombo.setValue("Toutes");
-        }
-        if (searchJournalField != null) {
-            searchJournalField.clear();
-        }
+        if (searchDateSuiviPicker != null) searchDateSuiviPicker.setValue(null);
+        if (searchHumeurCombo != null) searchHumeurCombo.setValue("Toutes");
+        if (searchQualiteSommeilCombo != null) searchQualiteSommeilCombo.setValue("Toutes");
+        if (searchJournalField != null) searchJournalField.clear();
         refreshHistorique();
     }
 
@@ -1065,6 +1216,8 @@ public class SuiviMentaleController {
                     somme += s.getNiveauDenergie();
                     break;
                 case "score_mentale":
+                case "score mentale":
+                case "scoremental":
                     somme += s.getScoreMentale();
                     break;
                 default:
@@ -1093,15 +1246,18 @@ public class SuiviMentaleController {
     }
 
     private int calculerScoreMental(String humeur, String qualite, int stress, int energie, double sommeil) {
-        int scoreHumeur = switch (humeur.toLowerCase()) {
-            case "très mal" -> 20;
+        String humeurSafe = humeur == null ? "" : humeur.toLowerCase();
+        String qualiteSafe = qualite == null ? "" : qualite.toLowerCase();
+
+        int scoreHumeur = switch (humeurSafe) {
+            case "très mal", "tres mal" -> 20;
             case "neutre" -> 50;
             case "bien" -> 75;
-            case "très bien" -> 100;
+            case "très bien", "tres bien" -> 100;
             default -> 50;
         };
 
-        int scoreQualite = switch (qualite.toLowerCase()) {
+        int scoreQualite = switch (qualiteSafe) {
             case "terrible" -> 20;
             case "mauvais" -> 35;
             case "moyen" -> 60;
@@ -1152,7 +1308,39 @@ public class SuiviMentaleController {
                 return;
             }
 
-            File pdf = exportPdfService.exporterSuivisUtilisateurEnPdf(suivis, currentUserId);
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Enregistrer le PDF");
+            fileChooser.setInitialFileName("suivis_utilisateur_" + currentUserId + ".pdf");
+
+            File downloadsFolder = new File(System.getProperty("user.home"), "Downloads");
+            if (downloadsFolder.exists()) {
+                fileChooser.setInitialDirectory(downloadsFolder);
+            }
+
+            fileChooser.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter("Fichiers PDF", "*.pdf")
+            );
+
+            Stage stage = (Stage) pdfButton.getScene().getWindow();
+            File selectedFile = fileChooser.showSaveDialog(stage);
+
+            if (selectedFile == null) {
+                afficherGlobalMessage("Export annulé.", true);
+                return;
+            }
+
+            if (!selectedFile.getName().toLowerCase().endsWith(".pdf")) {
+                selectedFile = new File(selectedFile.getAbsolutePath() + ".pdf");
+            }
+
+            String nomUtilisateur = "Amal Ghazouani";
+
+            File pdf = exportPdfService.exporterSuivisUtilisateurEnPdfVersFichier(
+                    suivis,
+                    currentUserId,
+                    nomUtilisateur,
+                    selectedFile
+            );
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Export PDF");
@@ -1181,6 +1369,10 @@ public class SuiviMentaleController {
             }
 
             alert.showAndWait();
+
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(pdf);
+            }
 
             afficherGlobalMessage("Export PDF réalisé avec succès.", false);
 

@@ -359,6 +359,23 @@ public class ControllerForum {
 
         metaData.getChildren().addAll(authorLabel, dot, dateValue);
 
+        // 🔥 AJOUT DU BADGE TOXIQUE DANS LA MÊME LIGNE
+        if (sujet.isEstToxique() && sujet.getScoreToxicite() >= 0.5) {
+            Label toxicBadge = new Label("⚠ Toxique " + String.format("(%.0f%%)", sujet.getScoreToxicite() * 100));
+            toxicBadge.setStyle(
+                    "-fx-background-color: " + COLOR_DANGER_BG + ";" +
+                            "-fx-text-fill: " + COLOR_DANGER + ";" +
+                            "-fx-font-size: 11px;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-padding: 3 10;" +
+                            "-fx-background-radius: 20;"
+            );
+            // Ajouter un séparateur avant le badge
+            Label dot2 = new Label("•");
+            dot2.setStyle("-fx-text-fill: " + COLOR_TEXT_MUTED + ";");
+            metaData.getChildren().addAll(dot2, toxicBadge);
+        }
+
         String contentText = sujet.getContenu();
         if (contentText != null && contentText.length() > 120) {
             contentText = contentText.substring(0, 120) + "...";
@@ -403,7 +420,7 @@ public class ControllerForum {
         Button translateBtn = new Button("🌍 Traduire");
         Button cancelBtn = new Button("↩ Annuler");
 
-// style
+        // style
         translateBtn.setStyle(
                 "-fx-background-color: #E0F2FE;" +
                         "-fx-text-fill: #0369A1;" +
@@ -554,7 +571,6 @@ public class ControllerForum {
             onSujetClicked(sujet, true);
         });
 
-
         if (isTranslated.getOrDefault(sujet.getId(), false)) {
             actionsBox.getChildren().addAll(
                     likeBtn, dislikeBtn, commentBtn, translateBtn, cancelBtn
@@ -564,7 +580,6 @@ public class ControllerForum {
                     likeBtn, dislikeBtn, commentBtn, translateBtn
             );
         }
-
 
         if (isOwner) {
             MenuButton actionsMenu = new MenuButton("⋮");
@@ -599,7 +614,6 @@ public class ControllerForum {
 
         return card;
     }
-
 
     private void editSujet(Sujet sujet) {
         try {

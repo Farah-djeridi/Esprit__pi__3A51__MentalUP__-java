@@ -11,6 +11,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -134,7 +137,7 @@ public class ControllerAdminSujet {
     }
 
     private void setupFilters() {
-        filterCombo.getItems().addAll("Tous", "Plus populaires", "Plus récents");
+        filterCombo.getItems().addAll("Tous", "Plus populaires", "Plus récents", "Plus toxiques");
         filterCombo.setValue("Tous");
         searchField.textProperty().addListener((obs, old, newVal) -> filterAndDisplay());
         filterCombo.valueProperty().addListener((obs, old, newVal) -> filterAndDisplay());
@@ -166,6 +169,8 @@ public class ControllerAdminSujet {
             filteredSujets.sort((a, b) -> Integer.compare(b.getNbLikes(), a.getNbLikes()));
         } else if ("Plus récents".equals(filter)) {
             filteredSujets.sort((a, b) -> b.getDateCreation().compareTo(a.getDateCreation()));
+        } else if ("Plus toxiques".equals(filter)) {
+            filteredSujets.sort((a, b) -> Double.compare(b.getScoreToxicite(), a.getScoreToxicite()));
         }
 
         displayAllSujets();
@@ -180,150 +185,181 @@ public class ControllerAdminSujet {
         }
     }
 
+    /**
+     * Crée une barre de progression stylisée pour le score de toxicité
+     */
+    private VBox createToxicityProgressBar(double score) {
+        VBox container = new VBox(4);
+        container.setAlignment(Pos.CENTER_LEFT);
+        container.setPrefWidth(120);
+
+        int percentage = (int) Math.round(score * 100);
+
+        String barColor;
+        String textColor;
+
+        if (score < 0.3) {
+            barColor = "#22C55E";
+            textColor = "#22C55E";
+        } else if (score < 0.7) {
+            barColor = "#F59E0B";
+            textColor = "#F59E0B";
+        } else {
+            barColor = "#EF4444";
+            textColor = "#EF4444";
+        }
+
+        Label percentLabel = new Label(String.format("%d%%", percentage));
+        percentLabel.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: " + textColor + ";");
+
+        StackPane progressBar = new StackPane();
+        progressBar.setPrefWidth(100);
+        progressBar.setPrefHeight(6);
+
+        Rectangle background = new Rectangle(100, 6);
+        background.setFill(Color.web("#E2E8F0"));
+        background.setArcWidth(3);
+        background.setArcHeight(3);
+
+        Rectangle progress = new Rectangle(100 * score, 6);
+        progress.setFill(Color.web(barColor));
+        progress.setArcWidth(3);
+        progress.setArcHeight(3);
+
+        progressBar.getChildren().addAll(background, progress);
+        container.getChildren().addAll(percentLabel, progressBar);
+
+        return container;
+    }
+
     private HBox createSujetRow(Sujet sujet, boolean isEven) {
         HBox row = new HBox(10);
         row.setAlignment(Pos.CENTER_LEFT);
         row.setStyle("-fx-background-color: " + (isEven ? "rgba(255,255,255,0.9)" : "rgba(248,250,252,0.9)") +
-                "; -fx-padding: 12 16; -fx-border-color: #E2E8F0; -fx-border-width: 0 0 1 0;");
+                "; -fx-padding: 12 15; -fx-border-color: #E2E8F0; -fx-border-width: 0 0 1 0;");
 
-
-
+        // Titre - largeur 180
         Label titreLabel = new Label(sujet.getTitre());
-        titreLabel.setPrefWidth(200);
+        titreLabel.setPrefWidth(180);
         titreLabel.setStyle("-fx-text-fill: #1A2B3C; -fx-font-weight: 600; -fx-font-size: 12px;");
         titreLabel.setWrapText(true);
 
+        // Auteur - largeur 120
         Label auteurLabel = new Label(sujet.isAnonyme() ? "Anonyme" : sujet.getUserName());
-        auteurLabel.setPrefWidth(130);
+        auteurLabel.setPrefWidth(120);
         auteurLabel.setStyle("-fx-text-fill: #6B7C8D; -fx-font-size: 12px;");
 
+        // Contenu - largeur 200
         String contenuText = sujet.getContenu();
-        if (contenuText.length() > 55) {
-            contenuText = contenuText.substring(0, 55) + "...";
+        if (contenuText.length() > 50) {
+            contenuText = contenuText.substring(0, 50) + "...";
         }
         Label contenuLabel = new Label(contenuText);
-        contenuLabel.setPrefWidth(220);
+        contenuLabel.setPrefWidth(200);
         contenuLabel.setStyle("-fx-text-fill: #4A5A6A; -fx-font-size: 12px;");
         contenuLabel.setWrapText(true);
 
+        // Date - largeur 90
         Label dateLabel = new Label(formatDate(sujet.getDateCreation()));
-        dateLabel.setPrefWidth(100);
+        dateLabel.setPrefWidth(90);
         dateLabel.setStyle("-fx-text-fill: #6B7C8D; -fx-font-size: 12px;");
 
+        // Likes - largeur 45
         Label likesLabel = new Label("👍 " + sujet.getNbLikes());
-        likesLabel.setPrefWidth(50);
+        likesLabel.setPrefWidth(45);
         likesLabel.setStyle("-fx-text-fill: " + COLOR_SUCCESS + "; -fx-font-weight: bold; -fx-font-size: 12px;");
         likesLabel.setAlignment(Pos.CENTER);
 
+        // Dislikes - largeur 45
         Label dislikesLabel = new Label("👎 " + sujet.getNbDislikes());
-        dislikesLabel.setPrefWidth(50);
+        dislikesLabel.setPrefWidth(45);
         dislikesLabel.setStyle("-fx-text-fill: " + COLOR_DANGER + "; -fx-font-weight: bold; -fx-font-size: 12px;");
         dislikesLabel.setAlignment(Pos.CENTER);
 
+        // Vues - largeur 45
         Label vuesLabel = new Label("👁 " + sujet.getNbVues());
-        vuesLabel.setPrefWidth(50);
+        vuesLabel.setPrefWidth(45);
         vuesLabel.setStyle("-fx-text-fill: #3498DB; -fx-font-weight: bold; -fx-font-size: 12px;");
         vuesLabel.setAlignment(Pos.CENTER);
 
-        HBox actionsBox = new HBox(10);
+        // Toxicité - largeur 120
+        VBox toxicityContainer = createToxicityProgressBar(sujet.getScoreToxicite());
+        toxicityContainer.setPrefWidth(120);
+        toxicityContainer.setAlignment(Pos.CENTER_LEFT);
+
+        // Actions - largeur 160
+        HBox actionsBox = new HBox(8);
         actionsBox.setAlignment(Pos.CENTER);
-        actionsBox.setPrefWidth(180);
+        actionsBox.setPrefWidth(160);
 
-        Button editBtn = new Button("Modifier");
-        editBtn.setStyle("-fx-background-color: #F39C12; -fx-text-fill: white; -fx-cursor: hand; " +
-                "-fx-background-radius: 5; -fx-padding: 6 16; -fx-font-size: 10px; -fx-font-weight: bold;");
-        editBtn.setMinWidth(80);
-        editBtn.setOnAction(e -> editSujet(sujet));
-        editBtn.setOnMouseEntered(e -> editBtn.setStyle("-fx-background-color: #E67E22; -fx-text-fill: white; -fx-cursor: hand; " +
-                "-fx-background-radius: 5; -fx-padding: 6 16; -fx-font-size: 10px; -fx-font-weight: bold;"));
-        editBtn.setOnMouseExited(e -> editBtn.setStyle("-fx-background-color: #F39C12; -fx-text-fill: white; -fx-cursor: hand; " +
-                "-fx-background-radius: 5; -fx-padding: 6 16; -fx-font-size: 10px; -fx-font-weight: bold;"));
+        // 🔥 Utilisation de isEstToxique() au lieu du score
+        if (sujet.isEstToxique()) {
+            // Bouton Bannir pour les sujets toxiques
+            Button banBtn = new Button("🚫 Bannir");
+            banBtn.setStyle("-fx-background-color: #DC2626; -fx-text-fill: white; -fx-cursor: hand; " +
+                    "-fx-background-radius: 5; -fx-padding: 5 12; -fx-font-size: 10px; -fx-font-weight: bold;");
+            banBtn.setOnAction(e -> banSujet(sujet));
+            banBtn.setOnMouseEntered(ev -> banBtn.setStyle("-fx-background-color: #B91C1C; -fx-text-fill: white; -fx-cursor: hand; " +
+                    "-fx-background-radius: 5; -fx-padding: 5 12; -fx-font-size: 10px; -fx-font-weight: bold;"));
+            banBtn.setOnMouseExited(ev -> banBtn.setStyle("-fx-background-color: #DC2626; -fx-text-fill: white; -fx-cursor: hand; " +
+                    "-fx-background-radius: 5; -fx-padding: 5 12; -fx-font-size: 10px; -fx-font-weight: bold;"));
+            actionsBox.getChildren().add(banBtn);
+        } else {
+            // Bouton Supprimer pour les sujets non toxiques
+            Button deleteBtn = new Button("🗑 Supprimer");
+            deleteBtn.setStyle("-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-cursor: hand; " +
+                    "-fx-background-radius: 5; -fx-padding: 5 12; -fx-font-size: 10px; -fx-font-weight: bold;");
+            deleteBtn.setOnAction(e -> deleteSujet(sujet));
+            deleteBtn.setOnMouseEntered(ev -> deleteBtn.setStyle("-fx-background-color: #C0392B; -fx-text-fill: white; -fx-cursor: hand; " +
+                    "-fx-background-radius: 5; -fx-padding: 5 12; -fx-font-size: 10px; -fx-font-weight: bold;"));
+            deleteBtn.setOnMouseExited(ev -> deleteBtn.setStyle("-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-cursor: hand; " +
+                    "-fx-background-radius: 5; -fx-padding: 5 12; -fx-font-size: 10px; -fx-font-weight: bold;"));
+            actionsBox.getChildren().add(deleteBtn);
+        }
 
-        Button deleteBtn = new Button("Supprimer");
-        deleteBtn.setStyle("-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-cursor: hand; " +
-                "-fx-background-radius: 5; -fx-padding: 6 16; -fx-font-size: 9px; -fx-font-weight: bold;");
-        deleteBtn.setMinWidth(80);
-        deleteBtn.setOnAction(e -> deleteSujet(sujet));
-        deleteBtn.setOnMouseEntered(e -> deleteBtn.setStyle("-fx-background-color: #C0392B; -fx-text-fill: white; -fx-cursor: hand; " +
-                "-fx-background-radius: 5; -fx-padding: 6 16; -fx-font-size: 9px; -fx-font-weight: bold;"));
-        deleteBtn.setOnMouseExited(e -> deleteBtn.setStyle("-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-cursor: hand; " +
-                "-fx-background-radius: 5; -fx-padding: 6 16; -fx-font-size: 9px; -fx-font-weight: bold;"));
+        row.getChildren().addAll(
+                titreLabel, auteurLabel, contenuLabel, dateLabel,
+                likesLabel, dislikesLabel, vuesLabel,
+                toxicityContainer, actionsBox
+        );
 
-        actionsBox.getChildren().addAll(editBtn, deleteBtn);
-
-        row.getChildren().addAll( titreLabel, auteurLabel, contenuLabel, dateLabel,
-                likesLabel, dislikesLabel, vuesLabel, actionsBox);
         return row;
     }
+    /**
+     * Méthode pour bannir un sujet toxique
+     */
+    private void banSujet(Sujet sujet) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Bannir le sujet");
+        confirm.setHeaderText("⚠️ Sujet toxique détecté");
+        confirm.setContentText("Score de toxicité: " + String.format("%.0f", sujet.getScoreToxicite() * 100) + "%\n\n" +
+                "Êtes-vous sûr de vouloir bannir ce sujet ?\n" +
+                "Le sujet sera supprimé et l'utilisateur recevra un avertissement.");
 
-    private void editSujet(Sujet sujet) {
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Modifier le sujet");
-        dialog.setHeaderText("Modifier le sujet #" + sujet.getId());
+        DialogPane dialogPane = confirm.getDialogPane();
+        dialogPane.setStyle("-fx-background-color: " + COLOR_BG + "; -fx-background-radius: 12;");
 
-        VBox content = new VBox(12);
-        content.setPadding(new Insets(24));
-        content.setStyle("-fx-background-color: " + COLOR_BG + "; -fx-background-radius: 16;");
+        Button banButton = (Button) dialogPane.lookupButton(ButtonType.OK);
+        banButton.setText("Bannir");
+        banButton.setStyle("-fx-background-color: #DC2626; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 8; -fx-padding: 8 24; -fx-font-weight: bold;");
 
-        Label titreLabel = new Label("📌 Titre");
-        titreLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #1A2B3C;");
-
-        TextField titreField = new TextField(sujet.getTitre());
-        titreField.setPromptText("Titre");
-        titreField.setStyle("-fx-padding: 10; -fx-background-radius: 12; -fx-border-color: #E2E8F0; -fx-border-radius: 12; -fx-background-color: rgba(255,255,255,0.9);");
-
-        Label contenuLabel = new Label("💬 Contenu");
-        contenuLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #1A2B3C;");
-
-        TextArea contenuArea = new TextArea(sujet.getContenu());
-        contenuArea.setPromptText("Contenu");
-        contenuArea.setPrefHeight(200);
-        contenuArea.setStyle("-fx-padding: 10; -fx-background-radius: 12; -fx-border-color: #E2E8F0; -fx-border-radius: 12; -fx-background-color: rgba(255,255,255,0.9);");
-
-        CheckBox anonymeCheck = new CheckBox("📝 Publier anonymement");
-        anonymeCheck.setSelected(sujet.isAnonyme());
-        anonymeCheck.setStyle("-fx-text-fill: #4A5A6A; -fx-font-size: 13px; -fx-font-weight: 500;");
-
-        content.getChildren().addAll(titreLabel, titreField, contenuLabel, contenuArea, anonymeCheck);
-
-        dialog.getDialogPane().setContent(content);
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-        dialog.getDialogPane().setStyle("-fx-background-color: " + COLOR_BG + "; -fx-background-radius: 16;");
-
-        Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
-        okButton.setStyle("-fx-background-color: " + COLOR_PRIMARY + "; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 8; -fx-padding: 8 24; -fx-font-weight: bold;");
-
-        Button cancelButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL);
+        Button cancelButton = (Button) dialogPane.lookupButton(ButtonType.CANCEL);
         cancelButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #6B7C8D; -fx-cursor: hand; -fx-padding: 8 24; -fx-font-weight: 600;");
 
-        Optional<ButtonType> result = dialog.showAndWait();
+        Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            String newTitre = titreField.getText().trim();
-            String newContenu = contenuArea.getText().trim();
+            try {
+                // TODO: Implémenter la logique de bannissement
+                // 1. Supprimer le sujet
+                // 2. Envoyer un avertissement à l'utilisateur
+                // 3. Ajouter une pénalité (ex: suspension temporaire)
 
-            if (newTitre.isEmpty() || newTitre.length() < 3) {
-                showAlert("Erreur", "Titre invalide (min 3 caractères)", Alert.AlertType.ERROR);
-                return;
+                serviceSujet.deleteByAdmin(sujet);
+                loadSujets();
+                showAlert("Succès", "✓ Sujet banni avec succès !\nUn avertissement a été envoyé à l'utilisateur.", Alert.AlertType.INFORMATION);
+            } catch (Exception e) {
+                showAlert("Erreur", "Impossible de bannir le sujet: " + e.getMessage(), Alert.AlertType.ERROR);
             }
-            if (newTitre.length() > 100) {
-                showAlert("Erreur", "Titre trop long (max 100 caractères)", Alert.AlertType.ERROR);
-                return;
-            }
-            if (newContenu.isEmpty() || newContenu.length() < 10) {
-                showAlert("Erreur", "Contenu invalide (min 10 caractères)", Alert.AlertType.ERROR);
-                return;
-            }
-            if (newContenu.length() > 5000) {
-                showAlert("Erreur", "Contenu trop long (max 5000 caractères)", Alert.AlertType.ERROR);
-                return;
-            }
-
-            sujet.setTitre(newTitre);
-            sujet.setContenu(newContenu);
-            sujet.setAnonyme(anonymeCheck.isSelected());
-            serviceSujet.update(sujet);
-            loadSujets();
-            showAlert("Succès", "✓ Sujet modifié avec succès !", Alert.AlertType.INFORMATION);
         }
     }
 

@@ -6,6 +6,10 @@ import javafx.stage.Stage;
 import models.Sujet;
 import services.ProfanityFilterService;
 import services.ServiceSujet;
+import services.ToxicityAnalysisService;
+
+import java.time.LocalDate;
+import java.sql.Date;
 
 public class ControllerEditSujet {
 
@@ -20,6 +24,7 @@ public class ControllerEditSujet {
     private ServiceSujet serviceSujet;
     private Sujet sujet;
     private ProfanityFilterService profanityFilter;
+    private ToxicityAnalysisService toxicityService;
 
     private static final int TITRE_MIN = 3;
     private static final int TITRE_MAX = 100;
@@ -41,6 +46,9 @@ public class ControllerEditSujet {
     public void initialize() {
         setupValidation();
         setupButtonStyles();
+
+        // Initialiser le service de toxicité
+        toxicityService = new ToxicityAnalysisService();
 
         submitButton.setOnAction(e -> updateDiscussion());
         cancelButton.setOnAction(e -> closeWindow());
@@ -200,6 +208,13 @@ public class ControllerEditSujet {
             return;
         }
 
+        // 🔥 ANALYSE DE TOXICITÉ (sans avertissement)
+        double scoreToxicite = toxicityService.analyze(contenu);
+        boolean estToxique = toxicityService.isToxic(contenu);
+
+        // Log simple pour debug (optionnel)
+        System.out.println("Modification - Score toxicité: " + scoreToxicite);
+
         boolean hasChanges = !titre.equals(sujet.getTitre()) ||
                 !contenu.equals(sujet.getContenu()) ||
                 anonymeCheckBox.isSelected() != sujet.isAnonyme();
@@ -210,9 +225,14 @@ public class ControllerEditSujet {
             return;
         }
 
+        // Mettre à jour les champs avec les nouvelles valeurs
         sujet.setTitre(titre);
         sujet.setContenu(contenu);
         sujet.setAnonyme(anonymeCheckBox.isSelected());
+
+        // 🔥 METTRE À JOUR LES SCORES DE TOXICITÉ
+        sujet.setScoreToxicite(scoreToxicite);
+        sujet.setEstToxique(estToxique);
 
         try {
             serviceSujet.update(sujet);
@@ -220,6 +240,7 @@ public class ControllerEditSujet {
             closeWindow();
         } catch (Exception e) {
             showAlert("Erreur", "Impossible de modifier la discussion: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace();
         }
     }
 

@@ -7,6 +7,7 @@ import javafx.scene.layout.VBox;
 import models.Sujet;
 import services.ProfanityFilterService;
 import services.ServiceSujet;
+import services.ToxicityAnalysisService;
 
 import java.time.LocalDate;
 import java.sql.Date;
@@ -23,6 +24,7 @@ public class ControllerNouvelleDiscussion {
     private ServiceSujet serviceSujet;
     private int userId;
     private ProfanityFilterService profanityFilter;
+    private ToxicityAnalysisService toxicityService;
 
     private static final int TITRE_MIN = 3;
     private static final int TITRE_MAX = 100;
@@ -42,8 +44,31 @@ public class ControllerNouvelleDiscussion {
         setupValidation();
         setupButtonStyles();
 
+        toxicityService = new ToxicityAnalysisService();
+
         submitButton.setOnAction(e -> submitDiscussion());
         cancelButton.setOnAction(e -> closeWindow());
+    }
+
+    private void testToxicityService() {
+        System.out.println("\n=== TEST SERVICE TOXICITÉ CORRIGÉ ===");
+
+        String[] testPhrases = {
+                "je déteste les gens comme toi",
+                "tu es vraiment stupide et inutile",
+                "j'aime beaucoup ce film",
+                "merci pour ton aide précieuse"
+        };
+
+        for (String phrase : testPhrases) {
+            double score = toxicityService.analyze(phrase);
+            boolean toxique = toxicityService.isToxic(phrase);
+            System.out.println("Phrase: \"" + phrase + "\"");
+            System.out.println("Score: " + score);
+            System.out.println("Toxique: " + toxique);
+            System.out.println("---");
+        }
+        System.out.println("=== FIN TEST ===\n");
     }
 
     public void setProfanityFilter(ProfanityFilterService filter) {
@@ -202,6 +227,13 @@ public class ControllerNouvelleDiscussion {
             return;
         }
 
+        // 🔥 ANALYSE TOXICITÉ (NE BLOQUE PAS)
+        double scoreToxicite = toxicityService.analyze(contenu);
+        boolean estToxique = toxicityService.isToxic(contenu);
+
+// (option debug)
+        System.out.println("Score toxicité: " + scoreToxicite);
+
         Sujet sujet = new Sujet();
         sujet.setTitre(titre);
         sujet.setContenu(contenu);
@@ -211,8 +243,8 @@ public class ControllerNouvelleDiscussion {
         sujet.setNbLikes(0);
         sujet.setNbDislikes(0);
         sujet.setNbVues(0);
-        sujet.setScoreToxicite(0.0);
-        sujet.setEstToxique(false);
+        sujet.setScoreToxicite(scoreToxicite);
+        sujet.setEstToxique(estToxique);
 
         try {
             serviceSujet.add(sujet);

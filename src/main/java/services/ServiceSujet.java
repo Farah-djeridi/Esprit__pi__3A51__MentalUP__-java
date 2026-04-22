@@ -114,19 +114,24 @@ public class ServiceSujet implements IService<Sujet> {
 
     @Override
     public void update(Sujet s) {
-
-
-        String req = "UPDATE sujet SET titre=?, contenu=?, is_anonyme=? WHERE id=?";
+        String req = "UPDATE sujet SET titre=?, contenu=?, is_anonyme=?, score_toxicite=?, est_toxique=? WHERE id=?";
         try {
             PreparedStatement pstm = cnx.prepareStatement(req);
             pstm.setString(1, s.getTitre());
             pstm.setString(2, s.getContenu());
             pstm.setBoolean(3, s.isAnonyme());
-            pstm.setInt(4, s.getId());
-            pstm.executeUpdate();
-            System.out.println("Sujet modifié par l'utilisateur ID: " + CURRENT_USER_ID);
+            pstm.setDouble(4, s.getScoreToxicite());  // 🔥 Ajout du score de toxicité
+            pstm.setBoolean(5, s.isEstToxique());     // 🔥 Ajout du flag toxique
+            pstm.setInt(6, s.getId());
+
+            int rowsAffected = pstm.executeUpdate();
+            System.out.println("Sujet modifié - ID: " + s.getId() +
+                    ", Score toxicité: " + s.getScoreToxicite() +
+                    ", Toxique: " + s.isEstToxique() +
+                    ", Lignes affectées: " + rowsAffected);
         } catch (SQLException e) {
             System.out.println("Erreur lors de la modification: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

@@ -4,12 +4,12 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.image.ImageView?>
-
 <?import javafx.scene.image.Image?>
+
 <BorderPane xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="Controllors.ControllerAdminSujet"
-            prefWidth="1024" prefHeight="650"
+            prefWidth="1100" prefHeight="650"
             style="-fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #F4F8FF, #E8F0FE);">
 
     <left>
@@ -202,7 +202,7 @@
     </left>
 
     <center>
-        <VBox spacing="0" prefWidth="764" prefHeight="700"
+        <VBox spacing="0" prefWidth="840" prefHeight="700"
               style="-fx-background-color: #F4F8FF;">
 
             <HBox alignment="CENTER_LEFT" spacing="12"
@@ -294,16 +294,19 @@
                 <VBox spacing="0" style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);"
                       VBox.vgrow="ALWAYS">
 
+                    <!-- En-tête du tableau avec la colonne Toxicité -->
+                    <!-- En-tête du tableau avec largeurs corrigées -->
                     <HBox spacing="10" alignment="CENTER_LEFT"
                           style="-fx-background-color: #2C3E50; -fx-background-radius: 16 16 0 0; -fx-padding: 14 15;">
-                        <Label text="Titre" prefWidth="200" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
-                        <Label text="Auteur" prefWidth="130" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
-                        <Label text="Contenu" prefWidth="220" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
-                        <Label text="Date" prefWidth="100" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
-                        <Label text="👍" prefWidth="50" style="-fx-text-fill: white; -fx-font-weight: bold;" alignment="CENTER"/>
-                        <Label text="👎" prefWidth="50" style="-fx-text-fill: white; -fx-font-weight: bold;" alignment="CENTER"/>
-                        <Label text="Vues" prefWidth="50" style="-fx-text-fill: white; -fx-font-weight: bold;" alignment="CENTER"/>
-                        <Label text="Actions" prefWidth="130" style="-fx-text-fill: white; -fx-font-weight: bold;" alignment="CENTER"/>
+                        <Label text="Titre" prefWidth="180" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                        <Label text="Auteur" prefWidth="120" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                        <Label text="Contenu" prefWidth="200" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                        <Label text="Date" prefWidth="90" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                        <Label text="👍" prefWidth="45" style="-fx-text-fill: white; -fx-font-weight: bold;" alignment="CENTER"/>
+                        <Label text="👎" prefWidth="45" style="-fx-text-fill: white; -fx-font-weight: bold;" alignment="CENTER"/>
+                        <Label text="Vues" prefWidth="45" style="-fx-text-fill: white; -fx-font-weight: bold;" alignment="CENTER"/>
+                        <Label text="⚠ Toxicité" prefWidth="120" style="-fx-text-fill: white; -fx-font-weight: bold;" alignment="CENTER"/>
+                        <Label text="Actions" prefWidth="160" style="-fx-text-fill: white; -fx-font-weight: bold;" alignment="CENTER"/>
                     </HBox>
 
                     <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 0;">

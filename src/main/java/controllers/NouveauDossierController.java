@@ -16,11 +16,20 @@ import javafx.stage.Stage;
 import utils.MyDataBase;
 
 
+import java.io.InputStream;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.scene.input.MouseEvent;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.Properties;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 
@@ -139,18 +148,124 @@ public class NouveauDossierController {
         clearFields();
     }
 
+
+
+    private String extractContent(String json) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(json);
+
+            // 🔴 CHECK ERROR FIRST
+            if (root.has("error")) {
+                return "API Error: " + root.path("error").path("message").asText();
+            }
+
+            // 🔴 CHECK STRUCTURE SAFELY
+            JsonNode choices = root.path("choices");
+
+            if (!choices.isArray() || choices.isEmpty()) {
+                return "Erreur: réponse IA invalide (pas de choices)";
+            }
+
+            JsonNode message = choices.get(0).path("message");
+            JsonNode content = message.path("content");
+
+            if (content.isMissingNode() || content.asText().isEmpty()) {
+                return "Erreur: contenu IA vide";
+            }
+
+            return content.asText();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Erreur parsing JSON IA";
+        }
+    }
+
+
+
     @FXML
     void handleGenerateIA(ActionEvent event) {
+
         String notes = notesField.getText();
+
         if (notes == null || notes.trim().length() < 50) {
-            showAlert("Action impossible", "Les notes doivent contenir au moins 50 caractères pour être résumées par l'IA.");
+            showAlert("Action impossible",
+                    "Les notes doivent contenir au moins 50 caractères pour générer un résumé IA.");
             return;
         }
 
-        // Simuler un résumé strict
-        generatedSummary = "RÉSUMÉ : " + (notes.length() > 100 ? notes.substring(0, 100) + "..." : notes);
-        aiSummaryArea.setText(generatedSummary);
+        // appel IA
+        callGroqAI(notes);
     }
+
+    private String getGroqApiKey() {
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("groq.properties")) {
+
+            if (input == null) {
+                System.out.println("Fichier groq.properties introuvable !");
+                return null;
+            }
+
+            Properties props = new Properties();
+            props.load(input);
+            return props.getProperty("groq.api.key");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private void callGroqAI(String notes) {
+        try {
+            String apiKey = getGroqApiKey();
+
+            String prompt = "Résume ce dossier médical de manière claire et concise :\n"
+                    + notes;
+
+            String body = """
+        {
+          "model": "llama-3.3-70b-versatile",
+          "messages": [
+            {
+              "role": "user",
+              "content": "%s"
+            }
+          ],
+          "temperature": 0.3
+        }
+        """.formatted(
+                    prompt.replace("\\", "\\\\")
+                            .replace("\"", "\\\"")
+                            .replace("\n", "\\n")
+            );
+
+            HttpClient client = HttpClient.newHttpClient();
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://api.groq.com/openai/v1/chat/completions"))
+                    .header("Authorization", "Bearer " + apiKey)
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(body))
+                    .build();
+
+            HttpResponse<String> response =
+                    client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            String result = response.body();
+
+            String summary = extractContent(result);
+
+            generatedSummary = summary;
+            aiSummaryArea.setText(summary);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Erreur IA", "Impossible de générer le résumé IA.");
+        }
+    }
+
 
     @FXML
     void handleCancel() {

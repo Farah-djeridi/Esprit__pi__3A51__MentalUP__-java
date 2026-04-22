@@ -17,6 +17,14 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.io.InputStream;
+import java.util.Properties;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ConsulterDossiersController {
 
@@ -181,8 +189,67 @@ public class ConsulterDossiersController {
         }
     }
 
+
+    private String extractContent(String json) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(json);
+
+            // 🔴 Cas erreur API Groq
+            if (root.has("error")) {
+                JsonNode error = root.path("error");
+
+                // parfois "message", parfois "error.message"
+                String msg = error.has("message")
+                        ? error.path("message").asText()
+                        : error.asText();
+
+                return "API Error: " + msg;
+            }
+
+            // 🔵 Vérifier choices
+            JsonNode choices = root.path("choices");
+
+            if (!choices.isArray() || choices.isEmpty()) {
+                return "Erreur IA: réponse vide\n\n" + json;
+            }
+
+            JsonNode message = choices.get(0).path("message");
+            JsonNode content = message.path("content");
+
+            if (content.isMissingNode() || content.asText().isEmpty()) {
+                return "Erreur IA: contenu introuvable\n\n" + json;
+            }
+
+            return content.asText();
+
+        } catch (Exception e) {
+            return "Erreur parsing IA: " + e.getMessage();
+        }
+    }
+
+    private String getGroqApiKey() {
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("groq.properties")) {
+
+            if (input == null) {
+                System.out.println("Fichier groq.properties introuvable !");
+                return null;
+            }
+
+            Properties props = new Properties();
+            props.load(input);
+            return props.getProperty("groq.api.key");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
     @FXML
     public void genererIA(ActionEvent event) {
+
         if (selected == null) {
             showAlert("Erreur", "Sélectionnez un dossier d'abord !");
             return;
@@ -191,21 +258,73 @@ public class ConsulterDossiersController {
         String notes = notesArea.getText();
         String risque = niveauRisqueBox.getValue();
 
-        if (notes == null || notes.trim().length() < 50) {
-            showAlert("Attention", "Le dossier doit contenir au moins 50 caractères de notes pour être résumé par l'IA.");
+        if (notes == null || notes.trim().length() < 20) {
+            showAlert("Attention", "Notes trop courtes pour générer un résumé IA.");
             return;
         }
 
-        // Simulation d'un résumé IA strict et concis
-        String summary = "RÉSUMÉ IA (" + (risque != null ? risque.toUpperCase() : "N/A") + ") : " 
-                         + (notes.length() > 150 ? notes.substring(0, 150) + "..." : notes);
+        try {
+            String apiKey = getGroqApiKey();
 
-        selected.setNotesGenerales(notes);
-        selected.setAiSummary(summary);
-        service.update(selected);
+            if (apiKey == null || apiKey.isEmpty()) {
+                showAlert("Erreur", "Clé API Groq introuvable !");
+                return;
+            }
 
-        if (aiSummaryArea != null) {
+            String prompt = """
+                   
+                             Tu es un assistant médical.
+                             Résume uniquement le dossier médical suivant de manière claire, neutre et professionnelle et brieve.
+                             Ne donne aucune recommandation, aucun conseil, aucune interprétation.
+                    
+                             Niveau de risque: %s
+                             Notes: %s
+                            
+        """.formatted(risque, notes);
+
+            String body = """
+        {
+          "model": "llama-3.3-70b-versatile",
+          "messages": [
+            {
+              "role": "user",
+              "content": "%s"
+            }
+          ],
+          "temperature": 0.3
+        }
+        """.formatted(
+                    prompt.replace("\\", "\\\\")
+                            .replace("\"", "\\\"")
+                            .replace("\n", "\\n")
+            );
+
+            HttpClient client = HttpClient.newHttpClient();
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://api.groq.com/openai/v1/chat/completions"))
+                    .header("Authorization", "Bearer " + apiKey)
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(body))
+                    .build();
+
+            HttpResponse<String> response =
+                    client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            String result = response.body();
+
+            System.out.println("GROQ RESPONSE = " + result); // 🔥 DEBUG IMPORTANT
+
+            String summary = extractContent(result);
+
+            selected.setAiSummary(summary);
+            service.update(selected);
+
             aiSummaryArea.setText(summary);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Erreur IA", "Impossible de générer le résumé.");
         }
     }
 

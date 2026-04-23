@@ -18,23 +18,31 @@ public class ServiceReservation {
     }
 
     private void creerTableSiNecessaire() {
-        String sql = "CREATE TABLE IF NOT EXISTS reservation (" +
-                     "id_reservation INT AUTO_INCREMENT PRIMARY KEY, " +
-                     "id_activite INT NOT NULL, " +
-                     "nom_etudiant VARCHAR(100) NOT NULL, " +
-                     "place VARCHAR(10) NOT NULL, " +
-                     "date_reservation DATE NOT NULL)";
         try (Statement st = connection.createStatement()) {
+            // Créer la table si elle n'existe pas
+            st.executeUpdate(
+                "CREATE TABLE IF NOT EXISTS reservation (" +
+                "id_reservation INT AUTO_INCREMENT PRIMARY KEY, " +
+                "id_activite INT NOT NULL, " +
+                "nom_etudiant VARCHAR(100) NOT NULL, " +
+                "place VARCHAR(10) NOT NULL, " +
+                "date_reservation DATE NOT NULL, " +
+                "statut VARCHAR(20) DEFAULT 'EN_ATTENTE')");
+            // Ajouter la colonne statut si elle n'existe pas encore
             try {
-                st.executeQuery("SELECT id_activite FROM reservation LIMIT 1");
-            } catch (SQLException e) {
-                st.executeUpdate("DROP TABLE IF EXISTS reservation");
-                st.executeUpdate(sql);
-                System.out.println("Table reservation créée avec succès!");
-            }
+                st.executeUpdate("ALTER TABLE reservation ADD COLUMN statut VARCHAR(20) DEFAULT 'EN_ATTENTE'");
+            } catch (SQLException ignored) {} // colonne déjà existante
         } catch (SQLException e) {
             System.err.println("Erreur création table reservation: " + e.getMessage());
         }
+    }
+
+    public void mettreAJourStatut(int idReservation, String statut) throws SQLException {
+        String sql = "UPDATE reservation SET statut = ? WHERE id_reservation = ?";
+        PreparedStatement ps = connection.prepareStatement(sql);
+        ps.setString(1, statut);
+        ps.setInt(2, idReservation);
+        ps.executeUpdate();
     }
 
     public void ajouterReservation(Reservation r) throws SQLException {
@@ -79,6 +87,7 @@ public class ServiceReservation {
             r.setPlace(rs.getString("place"));
             r.setDateReservation(rs.getDate("date_reservation").toLocalDate());
             r.setTitreActivite(rs.getString("titre_activite"));
+            try { r.setStatut(rs.getString("statut")); } catch (Exception ignored) {}
             list.add(r);
         }
         return list;

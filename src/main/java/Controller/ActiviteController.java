@@ -159,7 +159,7 @@ public class ActiviteController implements Initializable {
 
     private void ouvrirPopupModification(Activite activite) {
         ouvrirPopupFormulaire(activite);
-    }
+    } 
 
     private void ouvrirPopupFormulaire(Activite activite) {
         boolean isModif = activite != null;
@@ -173,39 +173,110 @@ public class ActiviteController implements Initializable {
         Label titre = new Label(isModif ? "✏ Modifier l'activité" : "＋ Nouvelle activité");
         titre.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2d3748;");
 
-        // Champs
-        TextField tfTitre = champ("Titre de l'activité");
-        TextArea tfDesc   = new TextArea();
+        // Champs avec leurs labels d'erreur
+        TextField tfTitre   = champ("Titre de l'activité");
+        Label errTitre      = errLabel();
+
+        TextArea tfDesc = new TextArea();
         tfDesc.setPromptText("Description de l'activité");
         tfDesc.setPrefRowCount(3); tfDesc.setWrapText(true);
         tfDesc.setStyle("-fx-font-size: 13px; -fx-border-color: #e2e8f0; -fx-border-width: 2; " +
                         "-fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: white;");
-        TextField tfType    = champ("Type (sport, culturel, créatif...)");
+        Label errDesc       = errLabel();
+
+        ComboBox<String> tfType = new ComboBox<>();
+        tfType.setItems(FXCollections.observableArrayList(
+                "⚽ Sport", "🎭 Culturel", "🎨 Créatif", "🎵 Musique", "🌿 Nature", "👥 Social"));
+        tfType.setPromptText("Choisir un type...");
+        tfType.setMaxWidth(Double.MAX_VALUE);
+        tfType.setStyle("-fx-font-size: 13px; -fx-background-color: white; " +
+                        "-fx-border-color: #e2e8f0; -fx-border-width: 2; " +
+                        "-fx-border-radius: 8; -fx-background-radius: 8;");
+        Label errType       = errLabel();
+
         TextField tfAdresse = champ("Adresse / Lieu");
+        Label errAdresse    = errLabel();
+
+        // Champs latitude / longitude (auto-remplis par géocodage)
+        TextField tfLat = champ("Latitude (auto)");
+        tfLat.setEditable(false);
+        tfLat.setStyle("-fx-padding: 10; -fx-font-size: 12px; -fx-border-color: #e2e8f0; " +
+                       "-fx-border-width: 2; -fx-border-radius: 8; -fx-background-radius: 8; " +
+                       "-fx-background-color: #f7fafc; -fx-text-fill: #718096;");
+        TextField tfLon = champ("Longitude (auto)");
+        tfLon.setEditable(false);
+        tfLon.setStyle("-fx-padding: 10; -fx-font-size: 12px; -fx-border-color: #e2e8f0; " +
+                       "-fx-border-width: 2; -fx-border-radius: 8; -fx-background-radius: 8; " +
+                       "-fx-background-color: #f7fafc; -fx-text-fill: #718096;");
+        Label lblGeoStatus = new Label("");
+        lblGeoStatus.setStyle("-fx-font-size: 11px; -fx-text-fill: #718096;");
+
+        // Géocodage automatique après 800ms de pause dans la saisie
+        final javafx.animation.PauseTransition geoPause = new javafx.animation.PauseTransition(
+                javafx.util.Duration.millis(800));
+        tfAdresse.textProperty().addListener((obs, ov, nv) -> {
+            geoPause.stop();
+            if (nv != null && nv.trim().length() > 4) {
+                geoPause.setOnFinished(ev -> geocoderAdresse(nv.trim(), tfLat, tfLon, lblGeoStatus));
+                geoPause.play();
+            } else {
+                tfLat.clear(); tfLon.clear(); lblGeoStatus.setText("");
+            }
+        });
+
         DatePicker dpDebut  = new DatePicker();
-        DatePicker dpFin    = new DatePicker();
         dpDebut.setMaxWidth(Double.MAX_VALUE);
-        dpFin.setMaxWidth(Double.MAX_VALUE);
         dpDebut.setStyle("-fx-font-size: 13px; -fx-background-color: white;");
+        Label errDebut      = errLabel();
+
+        DatePicker dpFin    = new DatePicker();
+        dpFin.setMaxWidth(Double.MAX_VALUE);
         dpFin.setStyle("-fx-font-size: 13px; -fx-background-color: white;");
+        Label errFin        = errLabel();
 
         if (isModif) {
             tfTitre.setText(activite.getTitre());
             tfDesc.setText(activite.getDescription());
-            tfType.setText(activite.getType());
+            // Trouver l'option correspondante dans la ComboBox
+            String typeVal = activite.getType();
+            tfType.getItems().stream()
+                    .filter(item -> item.toLowerCase().contains(typeVal != null ? typeVal.toLowerCase().replaceAll("[^a-zéèàùâêîôûç ]", "").trim() : ""))
+                    .findFirst()
+                    .ifPresentOrElse(tfType::setValue, () -> tfType.setValue(typeVal));
             tfAdresse.setText(activite.getAdresse());
             dpDebut.setValue(activite.getDateDebut());
             dpFin.setValue(activite.getDateFin());
+            if (activite.getLatitude() != 0.0) tfLat.setText(String.valueOf(activite.getLatitude()));
+            if (activite.getLongitude() != 0.0) tfLon.setText(String.valueOf(activite.getLongitude()));
         }
 
         GridPane grid = new GridPane();
-        grid.setHgap(15); grid.setVgap(12);
-        grid.add(label("Titre:"),        0, 0); grid.add(tfTitre,   1, 0);
-        grid.add(label("Description:"),  0, 1); grid.add(tfDesc,    1, 1);
-        grid.add(label("Type:"),         0, 2); grid.add(tfType,    1, 2);
-        grid.add(label("Adresse:"),      0, 3); grid.add(tfAdresse, 1, 3);
-        grid.add(label("Date Début:"),   0, 4); grid.add(dpDebut,   1, 4);
-        grid.add(label("Date Fin:"),     0, 5); grid.add(dpFin,     1, 5);
+        grid.setHgap(15); grid.setVgap(6);
+
+        // Ligne 0: Titre
+        grid.add(label("Titre:"),   0, 0); grid.add(tfTitre,   1, 0);
+        grid.add(errTitre,          1, 1);
+        // Ligne 2: Description
+        grid.add(label("Description:"), 0, 2); grid.add(tfDesc, 1, 2);
+        grid.add(errDesc,               1, 3);
+        // Ligne 4: Type
+        grid.add(label("Type:"),    0, 4); grid.add(tfType,    1, 4);
+        grid.add(errType,           1, 5);
+        // Ligne 6: Adresse
+        grid.add(label("Adresse:"), 0, 6); grid.add(tfAdresse, 1, 6);
+        grid.add(errAdresse,        1, 7);
+        // Ligne 8: Lat/Lon
+        HBox coordBox = new HBox(8, tfLat, tfLon);
+        HBox.setHgrow(tfLat, Priority.ALWAYS); HBox.setHgrow(tfLon, Priority.ALWAYS);
+        grid.add(label("Coordonnées:"), 0, 8); grid.add(coordBox, 1, 8);
+        grid.add(lblGeoStatus,          1, 9);
+        // Ligne 10: Date Début
+        grid.add(label("Date Début:"), 0, 10); grid.add(dpDebut, 1, 10);
+        grid.add(errDebut,             1, 11);
+        // Ligne 12: Date Fin
+        grid.add(label("Date Fin:"), 0, 12); grid.add(dpFin,   1, 12);
+        grid.add(errFin,             1, 13);
+
         ColumnConstraints c1 = new ColumnConstraints(100);
         ColumnConstraints c2 = new ColumnConstraints(); c2.setHgrow(Priority.ALWAYS);
         grid.getColumnConstraints().addAll(c1, c2);
@@ -220,22 +291,77 @@ public class ActiviteController implements Initializable {
         Button btnSave = new Button(labelBtn);
         btnSave.setStyle("-fx-background-color: #4a5568; -fx-text-fill: white; -fx-font-size: 13px; " +
                          "-fx-font-weight: bold; -fx-padding: 10 25; -fx-cursor: hand; -fx-background-radius: 8;");
-        btnSave.setOnAction(e -> {
-            // Validation
-            if (tfTitre.getText().trim().length() < 3) { alerte("Validation", "Titre: min 3 caractères.", Alert.AlertType.ERROR); return; }
-            if (tfDesc.getText().trim().length() < 40)  { alerte("Validation", "Description: min 40 caractères.", Alert.AlertType.ERROR); return; }
-            if (tfType.getText().trim().isEmpty())       { alerte("Validation", "Type obligatoire.", Alert.AlertType.ERROR); return; }
-            if (tfAdresse.getText().trim().isEmpty())    { alerte("Validation", "Adresse obligatoire.", Alert.AlertType.ERROR); return; }
-            if (dpDebut.getValue() == null)              { alerte("Validation", "Date début obligatoire.", Alert.AlertType.ERROR); return; }
-            if (dpFin.getValue() == null)                { alerte("Validation", "Date fin obligatoire.", Alert.AlertType.ERROR); return; }
-            if (dpDebut.getValue().isAfter(dpFin.getValue())) { alerte("Validation", "Date début doit être avant date fin.", Alert.AlertType.ERROR); return; }
 
-            // Détection de changements (seulement en mode modification)
+        btnSave.setOnAction(e -> {
+            // Reset tous les styles et erreurs
+            resetChamp(tfTitre, errTitre);
+            resetChamp(tfDesc,  errDesc);
+            // Reset type
+            tfType.setStyle("-fx-font-size: 13px; -fx-background-color: white; " +
+                            "-fx-border-color: #e2e8f0; -fx-border-width: 2; " +
+                            "-fx-border-radius: 8; -fx-background-radius: 8;");
+            errType.setText("");
+            resetChamp(tfAdresse, errAdresse);
+            dpDebut.setStyle("-fx-font-size: 13px; -fx-background-color: white;");
+            dpFin.setStyle("-fx-font-size: 13px; -fx-background-color: white;");
+            errDebut.setText(""); errFin.setText("");
+
+            // Valider TOUS les champs et collecter les erreurs
+            boolean valide = true;
+
+            if (tfTitre.getText().trim().length() < 3) {
+                marquerErreur(tfTitre, errTitre, "Le titre doit contenir au moins 3 caractères.");
+                valide = false;
+            }
+            if (tfDesc.getText().trim().length() < 40) {
+                marquerErreurArea(tfDesc, errDesc, "La description doit contenir au moins 40 caractères.");
+                valide = false;
+            } else if (tfDesc.getText().trim().length() > 1000) {
+                marquerErreurArea(tfDesc, errDesc, "La description ne doit pas dépasser 1000 caractères.");
+                valide = false;
+            }
+            if (tfType.getValue() == null || tfType.getValue().trim().isEmpty()) {
+                tfType.setStyle("-fx-font-size: 13px; -fx-background-color: white; " +
+                                "-fx-border-color: #e53e3e; -fx-border-width: 2; " +
+                                "-fx-border-radius: 8; -fx-background-radius: 8;");
+                errType.setText("⚠ Le type est obligatoire.");
+                valide = false;
+            }
+            if (tfAdresse.getText().trim().isEmpty()) {
+                marquerErreur(tfAdresse, errAdresse, "L'adresse est obligatoire.");
+                valide = false;
+            }
+            if (dpDebut.getValue() == null) {
+                dpDebut.setStyle("-fx-font-size: 13px; -fx-background-color: white; -fx-border-color: #e53e3e; -fx-border-width: 2;");
+                errDebut.setText("⚠ La date de début est obligatoire.");
+                valide = false;
+            }
+            if (dpFin.getValue() == null) {
+                dpFin.setStyle("-fx-font-size: 13px; -fx-background-color: white; -fx-border-color: #e53e3e; -fx-border-width: 2;");
+                errFin.setText("⚠ La date de fin est obligatoire.");
+                valide = false;
+            }
+            if (dpDebut.getValue() != null && dpFin.getValue() != null
+                    && dpDebut.getValue().isAfter(dpFin.getValue())) {
+                dpDebut.setStyle("-fx-font-size: 13px; -fx-background-color: white; -fx-border-color: #e53e3e; -fx-border-width: 2;");
+                dpFin.setStyle("-fx-font-size: 13px; -fx-background-color: white; -fx-border-color: #e53e3e; -fx-border-width: 2;");
+                errFin.setText("⚠ La date de début doit être avant la date de fin.");
+                valide = false;
+            }
+
+            if (!valide) return;
+
+            // Extraire le type sans l'emoji (ex: "⚽ Sport" → "Sport")
+            String typeChoisi = tfType.getValue() != null
+                    ? tfType.getValue().replaceAll("^[^a-zA-ZÀ-ÿ]+", "").trim()
+                    : "";
+
+            // Détection de changements en mode modification
             if (isModif) {
                 boolean aucunChangement =
                         tfTitre.getText().trim().equals(activite.getTitre()) &&
                         tfDesc.getText().trim().equals(activite.getDescription()) &&
-                        tfType.getText().trim().equals(activite.getType()) &&
+                        typeChoisi.equals(activite.getType()) &&
                         tfAdresse.getText().trim().equals(activite.getAdresse()) &&
                         dpDebut.getValue().equals(activite.getDateDebut()) &&
                         dpFin.getValue().equals(activite.getDateFin());
@@ -249,17 +375,25 @@ public class ActiviteController implements Initializable {
                 if (isModif) {
                     activite.setTitre(tfTitre.getText().trim());
                     activite.setDescription(tfDesc.getText().trim());
-                    activite.setType(tfType.getText().trim());
+                    activite.setType(typeChoisi);
                     activite.setAdresse(tfAdresse.getText().trim());
                     activite.setDateDebut(dpDebut.getValue());
                     activite.setDateFin(dpFin.getValue());
+                    try { activite.setLatitude(Double.parseDouble(tfLat.getText())); } catch (Exception ignored) {}
+                    try { activite.setLongitude(Double.parseDouble(tfLon.getText())); } catch (Exception ignored) {}
                     serviceActivite.modifierActivite(activite);
                     alerte("Succès", "Activité modifiée avec succès!", Alert.AlertType.INFORMATION);
                 } else {
-                    serviceActivite.ajouterActivite(new Activite(
+                    double newLat = 0.0, newLon = 0.0;
+                    try { newLat = Double.parseDouble(tfLat.getText()); } catch (Exception ignored) {}
+                    try { newLon = Double.parseDouble(tfLon.getText()); } catch (Exception ignored) {}
+                    Activite nouvelleActivite = new Activite(
                             tfTitre.getText().trim(), tfDesc.getText().trim(),
-                            tfType.getText().trim(), tfAdresse.getText().trim(),
-                            dpDebut.getValue(), dpFin.getValue()));
+                            typeChoisi, tfAdresse.getText().trim(),
+                            dpDebut.getValue(), dpFin.getValue());
+                    nouvelleActivite.setLatitude(newLat);
+                    nouvelleActivite.setLongitude(newLon);
+                    serviceActivite.ajouterActivite(nouvelleActivite);
                     alerte("Succès", "Activité ajoutée avec succès!", Alert.AlertType.INFORMATION);
                 }
                 popup.close();
@@ -273,8 +407,39 @@ public class ActiviteController implements Initializable {
         footer.setAlignment(Pos.CENTER_RIGHT);
 
         root.getChildren().addAll(titre, grid, footer);
-        popup.setScene(new Scene(root, 500, 460));
+        popup.setScene(new Scene(root, 520, 640));
         popup.showAndWait();
+    }
+
+    private Label errLabel() {
+        Label l = new Label("");
+        l.setStyle("-fx-text-fill: #e53e3e; -fx-font-size: 11px;");
+        l.setWrapText(true);
+        return l;
+    }
+
+    private void marquerErreur(TextField tf, Label err, String msg) {
+        tf.setStyle("-fx-padding: 10; -fx-font-size: 13px; -fx-border-color: #e53e3e; " +
+                    "-fx-border-width: 2; -fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: white;");
+        err.setText("⚠ " + msg);
+    }
+
+    private void marquerErreurArea(TextArea ta, Label err, String msg) {
+        ta.setStyle("-fx-font-size: 13px; -fx-border-color: #e53e3e; -fx-border-width: 2; " +
+                    "-fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: white;");
+        err.setText("⚠ " + msg);
+    }
+
+    private void resetChamp(TextField tf, Label err) {
+        tf.setStyle("-fx-padding: 10; -fx-font-size: 13px; -fx-border-color: #e2e8f0; " +
+                    "-fx-border-width: 2; -fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: white;");
+        err.setText("");
+    }
+
+    private void resetChamp(TextArea ta, Label err) {
+        ta.setStyle("-fx-font-size: 13px; -fx-border-color: #e2e8f0; -fx-border-width: 2; " +
+                    "-fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: white;");
+        err.setText("");
     }
 
     private void supprimerActivite(Activite activite) {
@@ -452,6 +617,67 @@ public class ActiviteController implements Initializable {
         fade.setToValue(0.0);
         fade.setOnFinished(e -> toast.close());
         fade.play();
+    }
+
+    // ─── Géocodage Nominatim ─────────────────────────────────────────────────
+
+    private void geocoderAdresse(String adresse, TextField tfLat, TextField tfLon, Label lblStatus) {
+        lblStatus.setText("🔍 Recherche en cours...");
+        lblStatus.setStyle("-fx-font-size: 11px; -fx-text-fill: #718096;");
+        Thread thread = new Thread(() -> {
+            try {
+                String encoded = java.net.URLEncoder.encode(adresse, java.nio.charset.StandardCharsets.UTF_8);
+                java.net.URL url = new java.net.URL(
+                        "https://nominatim.openstreetmap.org/search?q=" + encoded + "&format=json&limit=1");
+                java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
+                conn.setRequestProperty("User-Agent", "MentalUpApp/1.0");
+                conn.setConnectTimeout(5000);
+                conn.setReadTimeout(5000);
+
+                java.io.BufferedReader reader = new java.io.BufferedReader(
+                        new java.io.InputStreamReader(conn.getInputStream()));
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) sb.append(line);
+                reader.close();
+
+                String json = sb.toString();
+                // Parse simple sans librairie JSON
+                if (json.contains("\"lat\"")) {
+                    String lat = json.replaceAll(".*\"lat\":\"([^\"]+)\".*", "$1").split(",")[0];
+                    String lon = json.replaceAll(".*\"lon\":\"([^\"]+)\".*", "$1").split(",")[0];
+                    // Prendre seulement le premier résultat
+                    lat = lat.replaceAll("\\[\\{.*?\"lat\":\"", "").replaceAll("\".*", "");
+                    lon = lon.replaceAll(".*\"lon\":\"", "").replaceAll("\".*", "");
+                    // Re-parse proprement
+                    int latIdx = json.indexOf("\"lat\":\"") + 7;
+                    int latEnd = json.indexOf("\"", latIdx);
+                    int lonIdx = json.indexOf("\"lon\":\"") + 7;
+                    int lonEnd = json.indexOf("\"", lonIdx);
+                    final String latVal = json.substring(latIdx, latEnd);
+                    final String lonVal = json.substring(lonIdx, lonEnd);
+                    javafx.application.Platform.runLater(() -> {
+                        tfLat.setText(latVal);
+                        tfLon.setText(lonVal);
+                        lblStatus.setText("📍 Coordonnées trouvées");
+                        lblStatus.setStyle("-fx-font-size: 11px; -fx-text-fill: #27ae60;");
+                    });
+                } else {
+                    javafx.application.Platform.runLater(() -> {
+                        tfLat.clear(); tfLon.clear();
+                        lblStatus.setText("⚠ Adresse introuvable");
+                        lblStatus.setStyle("-fx-font-size: 11px; -fx-text-fill: #ed8936;");
+                    });
+                }
+            } catch (Exception e) {
+                javafx.application.Platform.runLater(() -> {
+                    lblStatus.setText("⚠ Erreur de géocodage");
+                    lblStatus.setStyle("-fx-font-size: 11px; -fx-text-fill: #e53e3e;");
+                });
+            }
+        });
+        thread.setDaemon(true);
+        thread.start();
     }
 
     private String getIconeType(String type) {

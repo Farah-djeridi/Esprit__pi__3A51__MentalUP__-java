@@ -102,8 +102,9 @@
 
     <!-- Main Content Area -->
     <center>
-        <ScrollPane fitToWidth="true" style="-fx-background: #e8f4f8; -fx-background-color: #e8f4f8;">
-            <VBox spacing="25" style="-fx-padding: 30; -fx-background-color: #e8f4f8;">
+        <StackPane>
+            <ScrollPane fitToWidth="true" style="-fx-background: #e8f4f8; -fx-background-color: #e8f4f8;">
+                <VBox spacing="25" style="-fx-padding: 30; -fx-background-color: #e8f4f8;">
 
                 <!-- Header avec titre et date -->
                 <VBox spacing="5">
@@ -139,11 +140,39 @@
 
                     <!-- Grid des activités -->
                     <GridPane fx:id="activitesGrid" hgap="20" vgap="20">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50"/>
+                            <ColumnConstraints percentWidth="50"/>
+                        </columnConstraints>
                     </GridPane>
                 </VBox>
 
             </VBox>
         </ScrollPane>
+
+        <!-- Bouton flottant Assistant -->
+        <Button fx:id="btnAssistant" text="🤖" onAction="#ouvrirAssistant"
+                style="-fx-background-color: #5a8a9f; -fx-text-fill: white; -fx-font-size: 22px;
+                       -fx-pref-width: 56; -fx-pref-height: 56; -fx-background-radius: 50%;
+                       -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 3);"
+                StackPane.alignment="BOTTOM_RIGHT">
+            <StackPane.margin>
+                <Insets bottom="25" right="25"/>
+            </StackPane.margin>
+        </Button>
+
+        <!-- Bouton flottant Micro -->
+        <Button fx:id="btnMicro" text="🎤" onAction="#ouvrirAssistantVocal"
+                style="-fx-background-color: #e53e3e; -fx-text-fill: white; -fx-font-size: 22px;
+                       -fx-pref-width: 56; -fx-pref-height: 56; -fx-background-radius: 50%;
+                       -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 3);"
+                StackPane.alignment="BOTTOM_RIGHT">
+            <StackPane.margin>
+                <Insets bottom="95" right="25"/>
+            </StackPane.margin>
+        </Button>
+
+        </StackPane>
     </center>
 
 </BorderPane>

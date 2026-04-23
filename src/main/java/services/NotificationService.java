@@ -3,6 +3,7 @@ package services;
 import javafx.scene.control.Alert;
 import models.Notification;
 import utils.MyDataBase;
+import models.TipData;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -73,6 +74,59 @@ public class NotificationService {
         }
 
         return list;
+    }
+    public void notifierMicroExercice(TipData tip, int userId, Integer objectifId, Integer suiviId) {
+        if (tip == null) {
+            return;
+        }
+
+        String title = tip.getTitle() != null && !tip.getTitle().isBlank()
+                ? tip.getTitle()
+                : "Conseil bien-être";
+
+        String text = tip.getText() != null ? tip.getText().trim() : "";
+        String exercise = tip.getExercise() != null ? tip.getExercise().trim() : "";
+        String source = tip.getSource() != null ? tip.getSource().trim() : "";
+        String url = tip.getUrl() != null ? tip.getUrl().trim() : "";
+
+        StringBuilder messageBuilder = new StringBuilder();
+
+        if (!text.isBlank()) {
+            messageBuilder.append(text);
+        }
+
+        if (!exercise.isBlank()) {
+            if (messageBuilder.length() > 0) {
+                messageBuilder.append("\n\n");
+            }
+            messageBuilder.append("Micro-exercice : ").append(exercise);
+        }
+
+        if (!source.isBlank()) {
+            if (messageBuilder.length() > 0) {
+                messageBuilder.append("\n\n");
+            }
+            messageBuilder.append("Source : ").append(source);
+        }
+
+        if (!url.isBlank()) {
+            messageBuilder.append("\n").append(url);
+        }
+
+        String message = messageBuilder.toString().trim();
+
+        if (message.length() > 700) {
+            message = message.substring(0, 700);
+        }
+
+        ajouterNotification(
+                "micro_exercice",
+                "🧠 " + title,
+                message,
+                userId,
+                objectifId,
+                suiviId
+        );
     }
 
     public List<Notification> getNotificationsByUserAndType(int userId, String type) {

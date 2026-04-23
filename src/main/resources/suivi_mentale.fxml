@@ -96,6 +96,7 @@
 
                     <Button fx:id="chatTabButton"
                             text="💬 Chat"
+
                             onAction="#showChatSection"
                             style="-fx-background-color: #f8fbff;
                                    -fx-text-fill: #234b7d;
@@ -704,17 +705,67 @@
 
                 <VBox spacing="8"
                       style="-fx-background-color: white;
-                             -fx-background-radius: 18;
-                             -fx-effect: dropshadow(gaussian, rgba(30,58,95,0.05), 8, 0, 0, 2);
-                             -fx-padding: 14;">
-                    <Label text="💬 Chat"
-                           style="-fx-text-fill: #1e3a5f;
-                                  -fx-font-size: 18px;
-                                  -fx-font-weight: 900;"/>
-                    <Label text="Section chat en cours de connexion."
+                 -fx-background-radius: 18;
+                 -fx-effect: dropshadow(gaussian, rgba(30,58,95,0.05), 8, 0, 0, 2);
+                 -fx-padding: 14;">
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="💬" style="-fx-font-size: 22px;"/>
+                        <Label text="Chat bien-être"
+                               style="-fx-text-fill: #1e3a5f;
+                          -fx-font-size: 18px;
+                          -fx-font-weight: 900;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label text="Gemini AI"
+                               style="-fx-text-fill: #1e3a5f;
+                          -fx-font-size: 10px;
+                          -fx-font-weight: 800;
+                          -fx-background-color: #eaf3ff;
+                          -fx-background-radius: 14;
+                          -fx-padding: 4 11;"/>
+                    </HBox>
+
+                    <Label text="Exprimez votre état, vos pensées ou vos difficultés du moment."
                            style="-fx-text-fill: #64748b;
-                                  -fx-font-size: 13px;
-                                  -fx-font-weight: 600;"/>
+                      -fx-font-size: 13px;
+                      -fx-font-weight: 600;"/>
+
+                    <TextArea fx:id="chatArea"
+                              editable="false"
+                              wrapText="true"
+                              prefHeight="360"
+                              style="-fx-background-color: #f8fbff;
+                         -fx-background-radius: 16;
+                         -fx-border-color: #dbe7f5;
+                         -fx-border-radius: 16;
+                         -fx-padding: 12;
+                         -fx-font-size: 14px;
+                         -fx-text-fill: #334155;"/>
+
+                    <HBox spacing="10">
+                        <TextField fx:id="chatInputField"
+                                   HBox.hgrow="ALWAYS"
+                                   promptText="Écrivez votre message ici..."
+                                   onAction="#envoyerMessageChat"
+                                   style="-fx-background-color: #fbfdff;
+                              -fx-background-radius: 14;
+                              -fx-border-radius: 14;
+                              -fx-border-color: #dbe7f5;
+                              -fx-pref-height: 42px;
+                              -fx-padding: 0 14;
+                              -fx-font-size: 13px;"/>
+
+                        <Button fx:id="sendChatButton"
+                                text="Envoyer"
+                                onAction="#envoyerMessageChat"
+                                style="-fx-background-color: linear-gradient(to right, #234b7d, #2f5d97);
+                           -fx-text-fill: white;
+                           -fx-font-size: 13px;
+                           -fx-font-weight: 900;
+                           -fx-background-radius: 16;
+                           -fx-padding: 10 20;
+                           -fx-cursor: hand;"/>
+                    </HBox>
                 </VBox>
             </VBox>
 

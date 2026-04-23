@@ -5,6 +5,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.concurrent.Task;
+import models.TipData;
+import services.OpenRouterChatService;
+import services.WellbeingTipService;
 import javafx.scene.Node;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
@@ -50,7 +54,9 @@ public class SuiviMentaleController {
     @FXML private ScrollPane ajoutSectionScroll;
     @FXML private ScrollPane historiqueSectionScroll;
     @FXML private ScrollPane statistiquesSectionScroll;
-
+    @FXML private TextArea chatArea;
+    @FXML private TextField chatInputField;
+    @FXML private Button sendChatButton;
     @FXML private VBox ajoutSection;
     @FXML private VBox historiqueSection;
     @FXML private VBox statistiquesSection;
@@ -101,7 +107,7 @@ public class SuiviMentaleController {
     @FXML private LineChart<String, Number> lineChartEvolutionScore;
     @FXML private CategoryAxis xAxisEvolution;
     @FXML private NumberAxis yAxisEvolution;
-
+    private final WellbeingTipService wellbeingTipService = new WellbeingTipService();
     private final ServiceSuiviMentale suiviService = new ServiceSuiviMentale();
     private final ServiceObjectif objectifService = new ServiceObjectif();
     private final NotificationService notificationService = new NotificationService();
@@ -110,7 +116,7 @@ public class SuiviMentaleController {
     private final CitationFilterService citationFilterService = new CitationFilterService();
     private final ConseilThemeService conseilThemeService = new ConseilThemeService();
     private final MyMemoryTranslationService translationService = new MyMemoryTranslationService();
-
+    private final OpenRouterChatService chatService = new OpenRouterChatService();
     private Integer editingSuiviId = null;
     private String derniereCitationAffichee = "";
     private final int currentUserId = 1;
@@ -207,8 +213,17 @@ public class SuiviMentaleController {
             conseilLabel.setText("Chargement du message bien-être...");
             chargerConseilDuJour();
         }
-    }
 
+        if (chatArea != null) {
+            chatArea.setText("🤖 Coach : Bonjour, je suis là pour vous écouter. Comment vous sentez-vous aujourd'hui ?\n\n");
+            chatArea.setWrapText(true);
+            chatArea.setEditable(false);
+        }
+
+        if (chatInputField != null) {
+            chatInputField.setOnAction(event -> envoyerMessageChat());
+        }
+    }
     @FXML
     public void chargerConseilDuJour() {
         if (conseilLabel != null) {
@@ -354,6 +369,71 @@ public class SuiviMentaleController {
             return "\"Prenez soin de vous un jour à la fois.\"";
         }
         return texte;
+    }
+    @FXML
+    public void envoyerMessageChat() {
+        if (chatInputField == null || chatArea == null) {
+            return;
+        }
+
+        String userMessage = chatInputField.getText() == null ? "" : chatInputField.getText().trim();
+
+        if (userMessage.isEmpty()) {
+            return;
+        }
+
+        chatArea.appendText("👤 Vous : " + userMessage + "\n\n");
+        chatInputField.clear();
+
+        if (sendChatButton != null) {
+            sendChatButton.setDisable(true);
+        }
+
+        final String placeholder = "🤖 Coach : réflexion en cours...\n\n";
+        chatArea.appendText(placeholder);
+
+        Task<String> task = new Task<>() {
+            @Override
+            protected String call() {
+                return chatService.envoyerMessage(userMessage);
+            }
+        };
+
+        task.setOnSucceeded(event -> {
+            String response = task.getValue();
+
+            String currentText = chatArea.getText();
+            if (currentText.endsWith(placeholder)) {
+                chatArea.setText(currentText.substring(0, currentText.length() - placeholder.length()));
+            }
+
+            chatArea.appendText("🤖 Coach : " + response + "\n\n");
+
+            if (sendChatButton != null) {
+                sendChatButton.setDisable(false);
+            }
+        });
+
+        task.setOnFailed(event -> {
+            String currentText = chatArea.getText();
+            if (currentText.endsWith(placeholder)) {
+                chatArea.setText(currentText.substring(0, currentText.length() - placeholder.length()));
+            }
+
+            chatArea.appendText("🤖 Coach : Erreur lors de la communication avec le chatbot.\n\n");
+
+            if (sendChatButton != null) {
+                sendChatButton.setDisable(false);
+            }
+
+            if (task.getException() != null) {
+                task.getException().printStackTrace();
+            }
+        });
+
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
     }
 
     private void verifierRappelQuotidien() {
@@ -722,6 +802,18 @@ public class SuiviMentaleController {
                     null
             );
 
+            // Notification micro-exercice
+            TipData tip = wellbeingTipService.getTipForSuivi(s);
+
+            if (tip != null) {
+                notificationService.notifierMicroExercice(
+                        tip,
+                        currentUserId,
+                        objectifLie.getId(),
+                        null
+                );
+            }
+
             clearForm();
             refreshAll();
             verifierAjoutAutorise();
@@ -733,7 +825,6 @@ public class SuiviMentaleController {
             e.printStackTrace();
         }
     }
-
     @FXML
     public void clearForm() {
         editingSuiviId = null;

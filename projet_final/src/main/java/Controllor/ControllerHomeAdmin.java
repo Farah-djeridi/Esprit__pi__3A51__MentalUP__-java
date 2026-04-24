@@ -37,12 +37,12 @@ public class ControllerHomeAdmin {
 
         submenuSuivi.setVisible(false); submenuSuivi.setManaged(false);
         submenuForum.setVisible(false); submenuForum.setManaged(false);
-        arrowSuivi.setText("▶"); arrowForum.setText("▶");
+        arrowSuivi.setText("â–¶"); arrowForum.setText("â–¶");
 
         try { logoImage.setImage(new Image(getClass().getResourceAsStream("/Images/logo.png"))); }
         catch (Exception ignored) {}
 
-        // Infos admin connecté
+        // Infos admin connectÃ©
         User user = SessionManager.getInstance().getCurrentUser();
         if (user != null) {
             labelUserName.setText(user.getPrenom() + " " + user.getNom());
@@ -52,7 +52,7 @@ public class ControllerHomeAdmin {
             avatarInitials.setText(init.toUpperCase());
         }
 
-        // Stats réelles depuis la base
+        // Stats rÃ©elles depuis la base
         try {
             int totalUsers = service.getAll().size();
             statUsers.setText(String.valueOf(totalUsers));
@@ -62,16 +62,16 @@ public class ControllerHomeAdmin {
     @FXML void toggleSuiviMenu(MouseEvent event) {
         suiviOpen = !suiviOpen;
         submenuSuivi.setVisible(suiviOpen); submenuSuivi.setManaged(suiviOpen);
-        arrowSuivi.setText(suiviOpen ? "▼" : "▶");
+        arrowSuivi.setText(suiviOpen ? "â–¼" : "â–¶");
     }
 
     @FXML void toggleForumMenu(MouseEvent event) {
         forumOpen = !forumOpen;
         submenuForum.setVisible(forumOpen); submenuForum.setManaged(forumOpen);
-        arrowForum.setText(forumOpen ? "▼" : "▶");
+        arrowForum.setText(forumOpen ? "â–¼" : "â–¶");
     }
 
-    // ✅ Navigation vers CRUD Utilisateurs
+    // âœ… Navigation vers CRUD Utilisateurs
     @FXML void onNavUtilisateursClicked(MouseEvent event) {
         SceneManager.switchTo("AdminUsers.fxml", "Gestion des Utilisateurs");
     }
@@ -107,7 +107,7 @@ public class ControllerHomeAdmin {
 
     @FXML private void onNotifications(ActionEvent event) { System.out.println("Notifications"); }
 
-    // ✅ Déconnexion
+    // âœ… DÃ©connexion
     @FXML private void onLogout(ActionEvent event) {
         SessionManager.getInstance().logout();
         SceneManager.goToLogin();
@@ -116,8 +116,8 @@ public class ControllerHomeAdmin {
     @FXML private void onAddUser(ActionEvent event) {
         SceneManager.switchTo("AdminUsers.fxml", "Gestion des Utilisateurs");
     }
-    @FXML private void onCreateRdv(ActionEvent event)    { System.out.println("Créer RDV"); }
-    @FXML private void onModerateForum(ActionEvent event){ System.out.println("Modérer forum"); }
+    @FXML private void onCreateRdv(ActionEvent event)    { System.out.println("CrÃ©er RDV"); }
+    @FXML private void onModerateForum(ActionEvent event){ System.out.println("ModÃ©rer forum"); }
     @FXML private void onExportData(ActionEvent event)   { System.out.println("Exporter"); }
 
     private void setActiveNav(HBox active) {

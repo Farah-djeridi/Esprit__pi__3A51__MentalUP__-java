@@ -44,7 +44,7 @@ public class RegisterController {
             error("Email invalide."); return;
         }
         if (pass.length() < 8) {
-            error("Le mot de passe doit contenir au moins 8 caractères."); return;
+            error("Le mot de passe doit contenir au moins 8 caractÃ¨res."); return;
         }
         if (!pass.equals(confirm)) {
             error("Les mots de passe ne correspondent pas."); return;
@@ -56,12 +56,12 @@ public class RegisterController {
         user.setPrenom(prenom);
         user.setNom(nom);
         user.setEmail(email);
-        user.setMotDePasse(pass);   // hashé dans service.register()
+        user.setMotDePasse(pass);   // hashÃ© dans service.register()
         user.setRole(role);
         user.setRoles("[\"" + roleSymfony + "\"]");
 
         if (!service.register(user)) {
-            error("Cet email est déjà utilisé."); return;
+            error("Cet email est dÃ©jÃ  utilisÃ©."); return;
         }
 
         SceneManager.goToLogin();

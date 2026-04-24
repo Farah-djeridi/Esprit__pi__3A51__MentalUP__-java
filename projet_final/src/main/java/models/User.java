@@ -18,6 +18,9 @@ public class User {
     private Date createdAt;
     private String githubUsername;
     private String telephone;
+    private Date deletedAt;
+    private int failedLoginAttempts;
+    private Date lockedUntil;
 
     // Constructeur par défaut
     public User() {
@@ -27,7 +30,8 @@ public class User {
     public User(int id, String prenom, String nom, String email, String motDePasse,
                 String role, String roles, String resetToken, Date resetTokenExpiresAt,
                 String avatarFilename, Date updatedAt, Date createdAt,
-                String githubUsername, String telephone) {
+                String githubUsername, String telephone, Date deletedAt,
+                int failedLoginAttempts, Date lockedUntil) {
         this.id = id;
         this.prenom = prenom;
         this.nom = nom;
@@ -42,6 +46,9 @@ public class User {
         this.createdAt = createdAt;
         this.githubUsername = githubUsername;
         this.telephone = telephone;
+        this.deletedAt = deletedAt;
+        this.failedLoginAttempts = failedLoginAttempts;
+        this.lockedUntil = lockedUntil;
     }
 
     // Getters et Setters
@@ -157,6 +164,30 @@ public class User {
         this.telephone = telephone;
     }
 
+    public Date getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(Date deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public int getFailedLoginAttempts() {
+        return failedLoginAttempts;
+    }
+
+    public void setFailedLoginAttempts(int failedLoginAttempts) {
+        this.failedLoginAttempts = failedLoginAttempts;
+    }
+
+    public Date getLockedUntil() {
+        return lockedUntil;
+    }
+
+    public void setLockedUntil(Date lockedUntil) {
+        this.lockedUntil = lockedUntil;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -174,6 +205,9 @@ public class User {
                 ", createdAt=" + createdAt +
                 ", githubUsername='" + githubUsername + '\'' +
                 ", telephone='" + telephone + '\'' +
+                ", deletedAt=" + deletedAt +
+                ", failedLoginAttempts=" + failedLoginAttempts +
+                ", lockedUntil=" + lockedUntil +
                 "}\n";
     }
 }

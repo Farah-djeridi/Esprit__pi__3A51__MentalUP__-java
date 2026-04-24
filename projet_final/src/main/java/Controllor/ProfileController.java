@@ -5,14 +5,17 @@ import javafx.scene.control.*;
 import javafx.scene.image.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import models.User;
 import services.ServiceUser;
+import utils.AvatarService;
 import utils.PasswordUtils;
 import utils.SceneManager;
 import utils.SessionManager;
 
 import java.io.File;
+import java.util.Optional;
 
 public class ProfileController {
 
@@ -38,60 +41,93 @@ public class ProfileController {
 
     @FXML
     public void initialize() {
-        try { logoImage.setImage(new Image(getClass().getResourceAsStream("/Images/logo.png"))); }
-        catch (Exception ignored) {}
+        // Logo
+        try {
+            logoImage.setImage(new Image(getClass().getResourceAsStream("/Images/logo.png")));
+        } catch (Exception ignored) {}
+
+        // Clip circulaire sur l'avatar (centrer sur les dimensions reelles de l'ImageView)
+        applyCircleClip();
 
         User user = SessionManager.getInstance().getCurrentUser();
-        if (user == null) { SceneManager.goToLogin(); return; }
+        if (user == null) {
+            SceneManager.goToLogin();
+            return;
+        }
 
         // Remplir les champs
         txtPrenom.setText(user.getPrenom() != null ? user.getPrenom() : "");
-        txtNom.setText(user.getNom() != null ? user.getNom() : "");
-        txtEmail.setText(user.getEmail() != null ? user.getEmail() : "");
+        txtNom.setText(user.getNom()    != null ? user.getNom()    : "");
+        txtEmail.setText(user.getEmail()  != null ? user.getEmail()  : "");
 
-        // Banner
+        // Banniere
         String fullName = (user.getPrenom() != null ? user.getPrenom() : "") + " " +
-                (user.getNom() != null ? user.getNom() : "");
+                          (user.getNom()    != null ? user.getNom()    : "");
         lblBannerName.setText(fullName.trim());
         lblBannerEmail.setText(user.getEmail() != null ? user.getEmail() : "");
         lblNavName.setText(fullName.trim());
-        lblNavRole.setText(user.getRole() != null ? user.getRole() : "Étudiant");
+        lblNavRole.setText(user.getRole() != null ? user.getRole() : "Etudiant");
 
         // Initiales avatar
         String initials = "";
         if (user.getPrenom() != null && !user.getPrenom().isEmpty()) initials += user.getPrenom().charAt(0);
-        if (user.getNom() != null && !user.getNom().isEmpty()) initials += user.getNom().charAt(0);
+        if (user.getNom()    != null && !user.getNom().isEmpty())    initials += user.getNom().charAt(0);
         avatarInitials.setText(initials.toUpperCase());
 
-        // Charger avatar si existe
-        if (user.getAvatarFilename() != null && !user.getAvatarFilename().isEmpty()) {
-            try {
-                File f = new File(user.getAvatarFilename());
-                if (f.exists()) {
-                    avatarImage.setImage(new Image(f.toURI().toString()));
-                    avatarInitials.setVisible(false);
-                }
-            } catch (Exception ignored) {}
-        }
+        // Charger avatar s'il existe deja
+        loadAvatarFromPath(user.getAvatarFilename());
 
-        // Menu contextuel 3 points
+        // Menu contextuel
         contextMenu = new ContextMenu();
-        MenuItem modProfil = new MenuItem("✏️  Modifier mon profil");
-        modProfil.setStyle("-fx-font-size: 13px; -fx-padding: 8 16;");
-        modProfil.setOnAction(e -> {});  // déjà sur la page profil
 
-        MenuItem deconnexion = new MenuItem("🚪  Déconnexion");
+        MenuItem modProfil = new MenuItem("  Modifier mon profil");
+        modProfil.setStyle("-fx-font-size: 13px; -fx-padding: 8 16;");
+        modProfil.setOnAction(e -> {});
+
+        MenuItem genAvatar = new MenuItem("  Generer avatar IA");
+        genAvatar.setStyle("-fx-font-size: 13px; -fx-padding: 8 16;");
+        genAvatar.setOnAction(e -> handleGenerateAvatar());
+
+        MenuItem choisirPhoto = new MenuItem("  Choisir une photo");
+        choisirPhoto.setStyle("-fx-font-size: 13px; -fx-padding: 8 16;");
+        choisirPhoto.setOnAction(e -> handleAvatarClick(null));
+
+        MenuItem deconnexion = new MenuItem("  Deconnexion");
         deconnexion.setStyle("-fx-font-size: 13px; -fx-padding: 8 16; -fx-text-fill: #E74C3C;");
         deconnexion.setOnAction(e -> handleLogout());
 
-        contextMenu.getItems().addAll(modProfil, deconnexion);
+        contextMenu.getItems().addAll(modProfil, genAvatar, choisirPhoto, deconnexion);
 
-        // Hover sur avatar
+        // Hover sur l'avatar
         avatarImage.setOnMouseEntered(e -> cameraOverlay.setOpacity(1));
         avatarImage.setOnMouseExited(e -> cameraOverlay.setOpacity(0));
     }
 
-    // Clic sur avatar → choisir une image
+    /** Applique un clip circulaire en utilisant les dimensions reelles de l'ImageView */
+    private void applyCircleClip() {
+        double w = avatarImage.getFitWidth()  > 0 ? avatarImage.getFitWidth()  : 100;
+        double h = avatarImage.getFitHeight() > 0 ? avatarImage.getFitHeight() : 100;
+        double r = Math.min(w, h) / 2.0;
+        Circle clip = new Circle(w / 2.0, h / 2.0, r);
+        avatarImage.setClip(clip);
+    }
+
+    /** Charge une image avatar depuis un chemin de fichier */
+    private void loadAvatarFromPath(String path) {
+        if (path == null || path.isEmpty()) return;
+        try {
+            File f = new File(path);
+            if (f.exists()) {
+                Image img = new Image(f.toURI().toString());
+                avatarImage.setImage(img);
+                applyCircleClip();
+                avatarInitials.setVisible(false);
+            }
+        } catch (Exception e) {
+            System.err.println("Impossible de charger l'avatar: " + e.getMessage());
+        }
+    }
+
     @FXML
     public void handleAvatarClick(MouseEvent event) {
         FileChooser chooser = new FileChooser();
@@ -100,10 +136,9 @@ public class ProfileController {
                 new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg", "*.gif"));
         File file = chooser.showOpenDialog(avatarImage.getScene().getWindow());
         if (file != null) {
-            Image img = new Image(file.toURI().toString());
-            avatarImage.setImage(img);
+            avatarImage.setImage(new Image(file.toURI().toString()));
+            applyCircleClip();
             avatarInitials.setVisible(false);
-            // Sauvegarder le chemin dans l'utilisateur
             User user = SessionManager.getInstance().getCurrentUser();
             if (user != null) {
                 user.setAvatarFilename(file.getAbsolutePath());
@@ -132,32 +167,45 @@ public class ProfileController {
         String confirm = txtConfirmPassword.getText();
 
         if (prenom.isEmpty() || nom.isEmpty() || email.isEmpty()) {
-            msg("Prénom, nom et email sont obligatoires.", false); return; }
+            msg("Prenom, nom et email sont obligatoires.", false); return;
+        }
         if (!email.contains("@") || !email.contains(".")) {
-            msg("Email invalide.", false); return; }
+            msg("Email invalide.", false); return;
+        }
         if (!email.equals(user.getEmail()) && service.emailExistsForOther(email, user.getId())) {
-            msg("Cet email est déjà utilisé.", false); return; }
+            msg("Cet email est deja utilise.", false); return;
+        }
 
         String newPassToSave = null;
         if (!newPass.isEmpty()) {
-            if (current.isEmpty()) { msg("Saisissez votre mot de passe actuel.", false); return; }
+            if (current.isEmpty()) {
+                msg("Saisissez votre mot de passe actuel.", false); return;
+            }
             if (!PasswordUtils.verifyPassword(current, user.getMotDePasse())) {
-                msg("Mot de passe actuel incorrect.", false); return; }
-            if (!newPass.equals(confirm)) { msg("Les mots de passe ne correspondent pas.", false); return; }
-            if (newPass.length() < 8) { msg("Minimum 8 caractères.", false); return; }
+                msg("Mot de passe actuel incorrect.", false); return;
+            }
+            if (!newPass.equals(confirm)) {
+                msg("Les mots de passe ne correspondent pas.", false); return;
+            }
+            if (newPass.length() < 8) {
+                msg("Minimum 8 caracteres.", false); return;
+            }
             newPassToSave = newPass;
         }
 
-        user.setPrenom(prenom); user.setNom(nom); user.setEmail(email);
+        user.setPrenom(prenom);
+        user.setNom(nom);
+        user.setEmail(email);
 
         if (service.updateProfile(user, newPassToSave)) {
             SessionManager.getInstance().setCurrentUser(user);
-            // Mettre à jour la bannière
             lblBannerName.setText(prenom + " " + nom);
             lblBannerEmail.setText(email);
             lblNavName.setText(prenom + " " + nom);
-            msg("Profil modifié avec succès !", true);
-            txtCurrentPassword.clear(); txtNewPassword.clear(); txtConfirmPassword.clear();
+            msg("Profil modifie avec succes !", true);
+            txtCurrentPassword.clear();
+            txtNewPassword.clear();
+            txtConfirmPassword.clear();
         } else {
             msg("Erreur lors de la sauvegarde.", false);
         }
@@ -167,6 +215,55 @@ public class ProfileController {
     public void handleLogout() {
         SessionManager.getInstance().logout();
         SceneManager.goToLogin();
+    }
+
+    @FXML
+    public void handleGenerateAvatar() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Generer Avatar IA");
+        dialog.setHeaderText("Decrivez votre avatar en quelques mots");
+        dialog.setContentText("Ex: jeune femme aux cheveux roux, style cartoon:");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(prompt -> {
+            if (!prompt.trim().isEmpty()) {
+                msg("Generation en cours (30-60 sec)...", true);
+
+                String finalPrompt = prompt.trim();
+                Thread t = new Thread(() -> {
+                    String filePath = AvatarService.generateAvatarFromPrompt(finalPrompt);
+
+                    javafx.application.Platform.runLater(() -> {
+                        if (filePath != null) {
+                            try {
+                                File imageFile = new File(filePath);
+                                if (imageFile.exists()) {
+                                    avatarImage.setImage(new Image(imageFile.toURI().toString()));
+                                    applyCircleClip();
+                                    avatarInitials.setVisible(false);
+
+                                    User user = SessionManager.getInstance().getCurrentUser();
+                                    if (user != null) {
+                                        user.setAvatarFilename(filePath);
+                                        service.update(user);
+                                    }
+                                    msg("Avatar genere avec succes !", true);
+                                } else {
+                                    msg("Fichier image non trouve.", false);
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                msg("Erreur chargement image: " + e.getMessage(), false);
+                            }
+                        } else {
+                            msg("Generation echouee. Verifiez votre token Hugging Face.", false);
+                        }
+                    });
+                });
+                t.setDaemon(true);
+                t.start();
+            }
+        });
     }
 
     private void msg(String text, boolean success) {

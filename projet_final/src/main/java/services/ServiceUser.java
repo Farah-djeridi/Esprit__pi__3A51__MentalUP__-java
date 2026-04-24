@@ -7,6 +7,8 @@ import utils.PasswordUtils;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class ServiceUser implements IService<User> {
@@ -22,7 +24,37 @@ public class ServiceUser implements IService<User> {
     public User login(String email, String plainPassword) {
         User user = getUserByEmail(email);
         if (user == null) return null;
-        return PasswordUtils.verifyPassword(plainPassword, user.getMotDePasse()) ? user : null;
+
+        // Check if account is locked
+        if (user.getLockedUntil() != null && user.getLockedUntil().after(new Date())) {
+            return null; // Account is locked
+        }
+
+        boolean passwordValid = PasswordUtils.verifyPassword(plainPassword, user.getMotDePasse());
+        if (passwordValid) {
+            // Successful login, reset failed attempts
+            user.setFailedLoginAttempts(0);
+            user.setLockedUntil(null);
+            update(user);
+            return user;
+        } else {
+            // Failed login, increment attempts
+            int attempts = user.getFailedLoginAttempts() + 1;
+            user.setFailedLoginAttempts(attempts);
+            if (attempts >= 3) {
+                // Lock account for 2 minutes
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.MINUTE, 2);
+                user.setLockedUntil(cal.getTime());
+            }
+            update(user);
+            return null;
+        }
+    }
+
+    public boolean isAccountLocked(String email) {
+        User user = getUserByEmail(email);
+        return user != null && user.getLockedUntil() != null && user.getLockedUntil().after(new Date());
     }
 
     public boolean register(User user) {
@@ -48,7 +80,7 @@ public class ServiceUser implements IService<User> {
     public void add(User u) {
         String req = "INSERT INTO `user`(`prenom`,`nom`,`email`,`mot_de_passe`,`role`,`roles`," +
                 "`reset_token`,`reset_token_expires_at`,`avatar_filename`,`updated_at`," +
-                "`created_at`,`github_username`,`telephone`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                "`created_at`,`github_username`,`telephone`,`deleted_at`,`failed_login_attempts`,`locked_until`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try {
             PreparedStatement pstm = cnx.prepareStatement(req);
             pstm.setString(1, u.getPrenom());
@@ -64,6 +96,9 @@ public class ServiceUser implements IService<User> {
             pstm.setTimestamp(11, u.getCreatedAt() != null ? new Timestamp(u.getCreatedAt().getTime()) : null);
             pstm.setString(12, u.getGithubUsername());
             pstm.setString(13, u.getTelephone());
+            pstm.setTimestamp(14, u.getDeletedAt() != null ? new Timestamp(u.getDeletedAt().getTime()) : null);
+            pstm.setInt(15, u.getFailedLoginAttempts());
+            pstm.setTimestamp(16, u.getLockedUntil() != null ? new Timestamp(u.getLockedUntil().getTime()) : null);
             pstm.executeUpdate();
         } catch (SQLException e) { System.out.println("Erreur add: " + e.getMessage()); }
     }
@@ -72,7 +107,13 @@ public class ServiceUser implements IService<User> {
     public List<User> getAll() {
         List<User> users = new ArrayList<>();
         try {
-            ResultSet rs = cnx.createStatement().executeQuery("SELECT * FROM `user`");
+            // Check if deleted_at column exists
+            ResultSet rsCheck = cnx.getMetaData().getColumns(null, null, "user", "deleted_at");
+            String query = "SELECT * FROM `user`";
+            if (rsCheck.next()) {
+                query += " WHERE `deleted_at` IS NULL";
+            }
+            ResultSet rs = cnx.createStatement().executeQuery(query);
             while (rs.next()) users.add(map(rs));
         } catch (SQLException e) { System.out.println("Erreur getAll: " + e.getMessage()); }
         return users;
@@ -83,7 +124,7 @@ public class ServiceUser implements IService<User> {
         String req = "UPDATE `user` SET `prenom`=?,`nom`=?,`email`=?,`mot_de_passe`=?," +
                 "`role`=?,`roles`=?,`reset_token`=?,`reset_token_expires_at`=?," +
                 "`avatar_filename`=?,`updated_at`=?,`created_at`=?,`github_username`=?," +
-                "`telephone`=? WHERE `id`=?";
+                "`telephone`=?,`deleted_at`=?,`failed_login_attempts`=?,`locked_until`=? WHERE `id`=?";
         try {
             PreparedStatement pstm = cnx.prepareStatement(req);
             pstm.setString(1, u.getPrenom());
@@ -99,7 +140,10 @@ public class ServiceUser implements IService<User> {
             pstm.setTimestamp(11, u.getCreatedAt() != null ? new Timestamp(u.getCreatedAt().getTime()) : null);
             pstm.setString(12, u.getGithubUsername());
             pstm.setString(13, u.getTelephone());
-            pstm.setInt(14, u.getId());
+            pstm.setTimestamp(14, u.getDeletedAt() != null ? new Timestamp(u.getDeletedAt().getTime()) : null);
+            pstm.setInt(15, u.getFailedLoginAttempts());
+            pstm.setTimestamp(16, u.getLockedUntil() != null ? new Timestamp(u.getLockedUntil().getTime()) : null);
+            pstm.setInt(17, u.getId());
             pstm.executeUpdate();
         } catch (SQLException e) { System.out.println("Erreur update: " + e.getMessage()); }
     }
@@ -107,10 +151,23 @@ public class ServiceUser implements IService<User> {
     @Override
     public void delete(User u) {
         try {
-            PreparedStatement pstm = cnx.prepareStatement("DELETE FROM `user` WHERE `id`=?");
+            PreparedStatement pstm = cnx.prepareStatement("UPDATE `user` SET `deleted_at` = NOW() WHERE `id`=?");
             pstm.setInt(1, u.getId());
             pstm.executeUpdate();
         } catch (SQLException e) { System.out.println("Erreur delete: " + e.getMessage()); }
+    }
+
+    public List<User> getDeletedUsers() {
+        List<User> users = new ArrayList<>();
+        try {
+            // Check if deleted_at column exists
+            ResultSet rsCheck = cnx.getMetaData().getColumns(null, null, "user", "deleted_at");
+            if (rsCheck.next()) {
+                ResultSet rs = cnx.createStatement().executeQuery("SELECT * FROM `user` WHERE `deleted_at` IS NOT NULL");
+                while (rs.next()) users.add(map(rs));
+            }
+        } catch (SQLException e) { System.out.println("Erreur getDeletedUsers: " + e.getMessage()); }
+        return users;
     }
 
     public boolean updateProfile(User u, String newPlainPassword) {
@@ -144,14 +201,18 @@ public class ServiceUser implements IService<User> {
 
     public User getUserByEmail(String email) {
         try {
-            PreparedStatement pstm = cnx.prepareStatement("SELECT * FROM `user` WHERE `email`=?");
+            String query = "SELECT * FROM `user` WHERE `email`=?";
+            PreparedStatement pstm = cnx.prepareStatement(query);
             pstm.setString(1, email);
             ResultSet rs = pstm.executeQuery();
-            if (rs.next()) return map(rs);
-        } catch (SQLException e) { System.out.println("Erreur getUserByEmail: " + e.getMessage()); }
+            if (rs.next()) {
+                return map(rs);
+            }
+        } catch (SQLException e) {
+            System.err.println("Erreur getUserByEmail: " + e.getMessage());
+        }
         return null;
     }
-
     private User map(ResultSet rs) throws SQLException {
         User u = new User();
         u.setId(rs.getInt("id"));
@@ -168,6 +229,50 @@ public class ServiceUser implements IService<User> {
         u.setCreatedAt(rs.getTimestamp("created_at"));
         u.setGithubUsername(rs.getString("github_username"));
         u.setTelephone(rs.getString("telephone"));
+        try {
+            u.setDeletedAt(rs.getTimestamp("deleted_at"));
+        } catch (SQLException e) {
+            u.setDeletedAt(null);
+        }
+        try {
+            u.setFailedLoginAttempts(rs.getInt("failed_login_attempts"));
+        } catch (SQLException e) {
+            u.setFailedLoginAttempts(0);
+        }
+        try {
+            u.setLockedUntil(rs.getTimestamp("locked_until"));
+        } catch (SQLException e) {
+            u.setLockedUntil(null);
+        }
         return u;
     }
+    public void restore(User u) {
+        try {
+            PreparedStatement pstm = cnx.prepareStatement(
+                    "UPDATE `user` SET `deleted_at` = NULL WHERE `id`=?");
+            pstm.setInt(1, u.getId());
+            pstm.executeUpdate();
+        } catch (SQLException e) { System.out.println("Erreur restore: " + e.getMessage()); }
+    }
+    public User getUserByEmailAdmin(String email) {
+        try {
+            PreparedStatement pstm = cnx.prepareStatement(
+                    "SELECT * FROM `user` WHERE `email`=?");
+            pstm.setString(1, email);
+            ResultSet rs = pstm.executeQuery();
+            if (rs.next()) return map(rs);
+        } catch (SQLException e) { System.out.println(e.getMessage()); }
+        return null;
+    }
+
+
+    // Methode ajoutee pour l'inscription Google OAuth
+    // (pas de hachage du mot de passe - deja hache dans GoogleAuthService)
+    public boolean registerGoogleUser(User user) {
+        if (getUserByEmail(user.getEmail()) != null) return false;
+        // Le mot de passe est deja hache (genere aleatoirement dans GoogleAuthService)
+        add(user);
+        return true;
+    }
+
 }

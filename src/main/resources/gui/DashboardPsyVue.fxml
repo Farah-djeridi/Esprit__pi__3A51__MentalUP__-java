@@ -165,9 +165,24 @@
     </left>
 
 
-    <!-- ================= CONTENU PRINCIPAL ================= -->
     <center>
         <VBox spacing="0" style="-fx-background-color: #F0F4F8;">
+            <!-- TOP BAR / ACTION BAR -->
+            <HBox alignment="CENTER_LEFT" spacing="20" 
+                  style="-fx-background-color: white; -fx-padding: 15 32; -fx-border-color: #E8ECF0; -fx-border-width: 0 0 1 0;">
+                <VBox spacing="2">
+                    <Label text="Tableau de Bord" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1a4a5f;"/>
+                    <Label text="Vue d'ensemble de votre activité" style="-fx-font-size: 11px; -fx-text-fill: #94a3b8;"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <MenuButton text="📄 Exporter" 
+                            style="-fx-background-color: #1a4a5f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 5 15; -fx-cursor: hand;">
+                    <items>
+                        <MenuItem text="Dossier Médical (Patient)" onAction="#handleExportPatientPDF"/>
+                        <MenuItem text="Rapport des Rendez-vous" onAction="#handleExportPlanningPDF"/>
+                    </items>
+                </MenuButton>
+            </HBox>
 
 
 

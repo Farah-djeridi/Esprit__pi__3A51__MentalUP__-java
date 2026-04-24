@@ -174,19 +174,47 @@ public class ServiceRendezVous {
         }
     }
 
-    public boolean reserverCreneau(int rdvId, int etudiantId, String mode) {
-        // Map mode to lieu
-        String sql = "UPDATE rendez_vous SET etudiant_id = ?, statut = 'en attente', lieu = ? " +
-                "WHERE id = ? AND (statut = 'libre' OR statut = 'disponible')";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, etudiantId);
-            ps.setString(2, mode);
-            ps.setInt(3, rdvId);
-            int rows = ps.executeUpdate();
-            return rows > 0;
-        } catch (SQLException e) {
-            System.err.println("[reserverCreneau] " + e.getMessage());
-            return false;
+    public boolean reserverCreneau(RendezVous r, int etudiantId, String mode, String telephone) {
+        if (r.getId() != -1) {
+            // Créneau réel existant
+            String sql = "UPDATE rendez_vous SET etudiant_id = ?, statut = 'en attente', lieu = ?, telephone = ? " +
+                    "WHERE id = ? AND (statut = 'libre' OR statut = 'disponible')";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, etudiantId);
+                ps.setString(2, mode);
+                ps.setString(3, telephone);
+                ps.setInt(4, r.getId());
+                int rows = ps.executeUpdate();
+                return rows > 0;
+            } catch (SQLException e) {
+                System.err.println("[reserverCreneau UPDATE] " + e.getMessage());
+                return false;
+            }
+        } else {
+            // Créneau virtuel -> INSERT
+            String sql = "INSERT INTO rendez_vous (date, heure_debut, heure_fin, type_rdv, statut, psychologue_id, etudiant_id, lieu, telephone) " +
+                    "VALUES (?, ?, ?, ?, 'en attente', ?, ?, ?, ?)";
+            try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                ps.setDate(1, r.getDate());
+                ps.setTime(2, r.getHeureDebut());
+                ps.setTime(3, r.getHeureFin());
+                ps.setString(4, r.getTypeRdv() != null ? r.getTypeRdv() : "consultation");
+                ps.setInt(5, r.getPsychologueId());
+                ps.setInt(6, etudiantId);
+                ps.setString(7, mode);
+                ps.setString(8, telephone);
+                ps.executeUpdate();
+                
+                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        r.setId(generatedKeys.getInt(1));
+                    }
+                }
+                return true;
+            } catch (SQLException e) {
+                System.err.println("[reserverCreneau INSERT] " + e.getMessage());
+                return false;
+            }
         }
     }
 
@@ -265,11 +293,17 @@ public class ServiceRendezVous {
     }
 
     public void refuserRdv(int id) {
+        RendezVous r = getById(id);
         String sql = "UPDATE rendez_vous SET statut='libre', etudiant_id=NULL, lieu=NULL, lien_meet=NULL WHERE id=?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
+            
+            // Envoyer SMS auto
+            if (r != null && r.getTelephone() != null && !r.getTelephone().isEmpty()) {
+                SmsService.notifyRdvAnnulation(r.getTelephone(), r.getDate() != null ? r.getDate().toString() : "");
+            }
         } catch (SQLException e) {
             System.err.println(e.getMessage());
         }
@@ -332,15 +366,28 @@ public class ServiceRendezVous {
     }
 
     public void confirmerRdv(int id, String mode) {
-        // Map mode to lieu
+        RendezVous r = getById(id);
+        String lienMeet = null;
+        if ("En ligne".equalsIgnoreCase(mode)) {
+            // Générer un lien Jitsi Meet unique
+            String roomName = "MentalUP-" + UUID.randomUUID().toString().substring(0, 8);
+            lienMeet = "https://meet.jit.si/" + roomName;
+        }
 
         String sql = "UPDATE rendez_vous SET statut='confirmé', lieu=?, lien_meet=? WHERE id=?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, mode);
-            ps.setString(2, null);
+            ps.setString(2, lienMeet);
             ps.setInt(3, id);
             ps.executeUpdate();
+            
+            // Envoyer SMS de confirmation
+            if (r != null && r.getTelephone() != null && !r.getTelephone().isEmpty()) {
+                SmsService.notifyRdvConfirmation(r.getTelephone(), 
+                    r.getDate() != null ? r.getDate().toString() : "", 
+                    r.getHeureDebut() != null ? r.getHeureDebut().toString() : "");
+            }
         } catch (SQLException e) {
             System.err.println(e.getMessage());
         }

@@ -120,7 +120,7 @@ class RendezVousPreservationPropertyTest {
         assertEquals("libre", inserted.getStatut(), "Initial status should be 'libre'");
         
         // Reserve the appointment (simulating student clicking on libre slot and confirming)
-        boolean reserved = service.reserverCreneau(inserted.getId(), 1);
+        boolean reserved = service.reserverCreneau(inserted, 1, "Présentiel");
         
         assertTrue(reserved, "Reservation should succeed for 'libre' appointment");
         

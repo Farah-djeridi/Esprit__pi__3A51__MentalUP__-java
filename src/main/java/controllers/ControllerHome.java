@@ -3,6 +3,7 @@ package controllers;
 import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -14,12 +15,17 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import Services.ServiceRating;
 import utils.MyDataBase;
+import Models.RendezVous;
+import Services.ServiceRendezVous;
+import javafx.scene.control.Hyperlink;
 import java.sql.*;
+import java.util.List;
 
 public class ControllerHome {
 
@@ -32,12 +38,20 @@ public class ControllerHome {
     @FXML private Label badgeRdv, labelUserName, labelDate, avatarInitials;
     @FXML private HBox psyListContainer;
     @FXML private ImageView logoImage;
+    @FXML private VBox rdvHomeContainer;
     private final ServiceRating serviceRating = new ServiceRating();
+    private final ServiceRendezVous serviceRdv = new ServiceRendezVous();
+    private final int etudiantId = 2; // ID de l'étudiant connecté (simulé)
 
-    private void loadPage(String fxml, MouseEvent event) {
+    private void loadPage(String fxml, Event event) {
         try {
             Parent root = FXMLLoader.load(getClass().getResource(fxml));
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            Stage stage;
+            if (event != null && event.getSource() instanceof Node) {
+                stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            } else {
+                stage = (Stage) bannerBox.getScene().getWindow();
+            }
 
             // Animation de transition entre les pages
             Scene scene = new Scene(root);
@@ -87,6 +101,7 @@ public class ControllerHome {
         }
         logoImage.setImage(new Image(getClass().getResourceAsStream("/Images/logo.png")));
         chargerPsychologues();
+        chargerRendezVous();
     }
 
     private void chargerPsychologues() {
@@ -133,6 +148,75 @@ public class ControllerHome {
 
         card.getChildren().addAll(lblNom, stars, lblAvg);
         return card;
+    }
+
+    private void chargerRendezVous() {
+        if (rdvHomeContainer == null) return;
+        rdvHomeContainer.getChildren().clear();
+
+        // Récupérer les RDV aujourd'hui et à venir
+        List<RendezVous> aujourdhui = serviceRdv.getRdvAujourdhui(etudiantId);
+        List<RendezVous> avenir = serviceRdv.getRdvAvenir(etudiantId);
+
+        if (aujourdhui.isEmpty() && avenir.isEmpty()) {
+            Label noRdv = new Label("Vous n'avez aucun rendez-vous de prévu.");
+            noRdv.setStyle("-fx-text-fill: #64748B; -fx-font-size: 13px; -fx-font-style: italic;");
+            rdvHomeContainer.getChildren().add(noRdv);
+            return;
+        }
+
+        // Afficher max 3 rendez-vous
+        int count = 0;
+        for (RendezVous r : aujourdhui) {
+            if (count >= 3) break;
+            rdvHomeContainer.getChildren().add(createRdvRow(r, "Aujourd'hui"));
+            count++;
+        }
+        for (RendezVous r : avenir) {
+            if (count >= 3) break;
+            rdvHomeContainer.getChildren().add(createRdvRow(r, r.getDate().toString()));
+            count++;
+        }
+    }
+
+    private HBox createRdvRow(RendezVous r, String dateStr) {
+        HBox row = new HBox(15);
+        row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        row.setStyle("-fx-background-color: #F8FBFF; -fx-background-radius: 10; -fx-padding: 12; -fx-border-color: #E2E8F0; -fx-border-radius: 10;");
+
+        Label icon = new Label("📅");
+        icon.setStyle("-fx-font-size: 18px;");
+
+        VBox info = new VBox(2);
+        Label lblDate = new Label(dateStr + " • " + r.getHeureDebut());
+        lblDate.setStyle("-fx-text-fill: #2C5F8A; -fx-font-weight: bold; -fx-font-size: 12px;");
+        
+        Label lblType = new Label(r.getTypeRdv() + " (" + r.getLieu() + ")");
+        lblType.setStyle("-fx-text-fill: #2C3E50; -fx-font-weight: bold; -fx-font-size: 13px;");
+        
+        info.getChildren().addAll(lblDate, lblType);
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
+
+        Label statusBadge = new Label(r.getStatut().toUpperCase());
+        String badgeStyle = "-fx-padding: 4 8; -fx-background-radius: 12; -fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: white;";
+        if ("confirmé".equalsIgnoreCase(r.getStatut())) {
+            badgeStyle += "-fx-background-color: #2ECC71;";
+        } else if ("en attente".equalsIgnoreCase(r.getStatut()) || "réservé".equalsIgnoreCase(r.getStatut())) {
+            badgeStyle += "-fx-background-color: #F1C40F;";
+        } else {
+            badgeStyle += "-fx-background-color: #94A3B8;";
+        }
+        statusBadge.setStyle(badgeStyle);
+
+        row.getChildren().addAll(icon, info, spacer, statusBadge);
+        return row;
+    }
+
+    @FXML
+    void onNavRdvClicked_Btn(ActionEvent event) {
+        loadPage("/gui/RendezVous_Etudiant.fxml", event);
     }
 
     // 🔹 Navigation

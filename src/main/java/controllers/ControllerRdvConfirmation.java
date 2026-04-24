@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -20,6 +21,7 @@ public class ControllerRdvConfirmation {
     @FXML private Label  labelHeure;
     @FXML private Label  labelType;
     @FXML private ComboBox<String> comboMode;
+    @FXML private TextField txtTelephone;
     @FXML private Button btnConfirmer;
 
 
@@ -76,7 +78,14 @@ public class ControllerRdvConfirmation {
         st.play();
 
         String selectedMode = comboMode.getValue();
-        boolean ok = serviceRdv.reserverCreneau(rdv.getId(), etudiantId, selectedMode);
+        String telephone = txtTelephone.getText().trim();
+        
+        if (telephone.isEmpty()) {
+            txtTelephone.setStyle("-fx-border-color: #e74c3c; -fx-border-radius: 10; -fx-background-radius: 10;");
+            return;
+        }
+
+        boolean ok = serviceRdv.reserverCreneau(rdv, etudiantId, selectedMode, telephone);
 
         if (ok) {
 

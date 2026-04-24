@@ -16,11 +16,18 @@ import javafx.stage.Stage;
 import javafx.scene.chart.PieChart;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import Services.ServiceRendezVous;
-import Services.ServiceDossier;
 import Models.RendezVous;
 import Models.Dossier;
+import Services.PDFService;
+import Services.ServiceRendezVous;
+import Services.ServiceDossier;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.TreeMap;
+import java.util.Locale;
+import java.time.format.DateTimeFormatter;
+import javafx.scene.control.Alert;
 
 public class ControllerHomeAdmin {
 
@@ -97,6 +104,57 @@ public class ControllerHomeAdmin {
         // Mock for missing services (Patients / Psychologues)
         statPatients.setText("1,234");
         statPsychologues.setText("45");
+    }
+
+    @FXML
+    void handleDownloadGlobalPDF(ActionEvent event) {
+        try {
+            PDFService pdfService = new PDFService();
+            Map<String, Object> stats = new HashMap<>();
+            
+            List<RendezVous> allRdvs = serviceRdv.getAll();
+            List<Dossier> allDossiers = serviceDossier.getAll();
+
+            stats.put("totalPatients", 1234); // Mock
+            
+            // RDV par mois
+            Map<String, Integer> rdvPerMonth = new TreeMap<>();
+            DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("MMMM yyyy", Locale.FRENCH);
+            for (RendezVous r : allRdvs) {
+                if (r.getDate() != null) {
+                    String month = r.getDate().toLocalDate().format(monthFormatter);
+                    rdvPerMonth.put(month, rdvPerMonth.getOrDefault(month, 0) + 1);
+                }
+            }
+            stats.put("rdvPerMonth", rdvPerMonth);
+            
+            // Taux d'annulation
+            long annulés = allRdvs.stream().filter(r -> "annulé".equalsIgnoreCase(r.getStatut())).count();
+            double rate = allRdvs.isEmpty() ? 0 : (annulés * 100.0 / allRdvs.size());
+            stats.put("cancellationRate", String.format("%.1f", rate));
+            
+            // Psys les plus sollicités (Mock)
+            List<String> topPsys = java.util.Arrays.asList("Dr. Ahmed Mansour", "Dr. Sarah Ben Salem", "Dr. Yassine Trabelsi");
+            stats.put("topPsys", topPsys);
+
+            String fileName = "Rapport_Statistique_Global.pdf";
+            String desktopPath = System.getProperty("user.home") + "\\Desktop\\" + fileName;
+
+            pdfService.generateGlobalStatsPDF(stats, desktopPath);
+            
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Succès");
+            alert.setHeaderText(null);
+            alert.setContentText("Le rapport statistique global a été généré sur votre bureau :\n" + desktopPath);
+            alert.showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erreur");
+            alert.setContentText("Impossible de générer le PDF : " + e.getMessage());
+            alert.showAndWait();
+        }
     }
 
 

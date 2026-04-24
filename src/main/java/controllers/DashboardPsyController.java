@@ -16,10 +16,17 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 import Services.ServiceRendezVous;
+import Services.ServiceDossier;
+import Services.PDFService;
+import Models.Dossier;
+import Models.RendezVous;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class DashboardPsyController {
 
@@ -51,6 +58,8 @@ public class DashboardPsyController {
 
     @FXML private ScrollPane mainScrollPane;
     private ServiceRendezVous serviceRdv = new ServiceRendezVous();
+    private ServiceDossier serviceDossier = new ServiceDossier();
+    private PDFService pdfService = new PDFService();
 
     // ===== INITIALIZE =====
     @FXML
@@ -262,6 +271,84 @@ public class DashboardPsyController {
     @FXML
     void logout(ActionEvent event) {
         System.out.println("Déconnexion...");
+    }
+
+    @FXML
+    void handleExportPatientPDF(ActionEvent event) {
+        List<Dossier> dossiers = serviceDossier.getAll();
+        if (dossiers.isEmpty()) {
+            showAlert("Info", "Aucun dossier patient trouvé.");
+            return;
+        }
+
+        ChoiceDialog<Dossier> dialog = new ChoiceDialog<>(dossiers.get(0), dossiers);
+        dialog.setTitle("Exporter Dossier Patient");
+        dialog.setHeaderText("Sélectionnez un patient à exporter");
+        dialog.setContentText("Patient :");
+
+        Optional<Dossier> result = dialog.showAndWait();
+        result.ifPresent(d -> {
+            try {
+                List<RendezVous> history = serviceRdv.getByEtudiantId(d.getPatientId());
+                String fileName = "Dossier_" + d.getPatientNom().replace(" ", "_") + ".pdf";
+                String path = System.getProperty("user.home") + "\\Desktop\\" + fileName;
+                pdfService.generatePatientDossierPDF(d, history, path);
+                showAlert("Succès", "Dossier exporté sur le bureau : " + fileName);
+            } catch (Exception e) {
+                e.printStackTrace();
+                showAlert("Erreur", "Erreur lors de l'export : " + e.getMessage());
+            }
+        });
+    }
+
+    @FXML
+    void handleExportPlanningPDF(ActionEvent event) {
+        List<String> choices = List.of("Aujourd'hui", "Cette Semaine", "Ce Mois");
+        ChoiceDialog<String> dialog = new ChoiceDialog<>("Aujourd'hui", choices);
+        dialog.setTitle("Exporter Planning");
+        dialog.setHeaderText("Choisissez la période d'export");
+        dialog.setContentText("Période :");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(period -> {
+            try {
+                List<RendezVous> all = serviceRdv.getByPsychologueId(6); // ID fixe pour démo
+                List<RendezVous> filtered;
+                LocalDate now = LocalDate.now();
+
+                if ("Aujourd'hui".equals(period)) {
+                    filtered = all.stream()
+                        .filter(r -> r.getDate() != null && r.getDate().toLocalDate().equals(now))
+                        .collect(Collectors.toList());
+                } else if ("Cette Semaine".equals(period)) {
+                    LocalDate weekEnd = now.plusDays(7);
+                    filtered = all.stream()
+                        .filter(r -> r.getDate() != null && !r.getDate().toLocalDate().isBefore(now) && r.getDate().toLocalDate().isBefore(weekEnd))
+                        .collect(Collectors.toList());
+                } else {
+                    LocalDate monthEnd = now.plusMonths(1);
+                    filtered = all.stream()
+                        .filter(r -> r.getDate() != null && !r.getDate().toLocalDate().isBefore(now) && r.getDate().toLocalDate().isBefore(monthEnd))
+                        .collect(Collectors.toList());
+                }
+
+                String fileName = "Planning_" + period.replace(" ", "_") + ".pdf";
+                String path = System.getProperty("user.home") + "\\Desktop\\" + fileName;
+                pdfService.generatePlanningPDF(filtered, period, path);
+                showAlert("Succès", "Planning exporté sur le bureau : " + fileName);
+            } catch (Exception e) {
+                e.printStackTrace();
+                showAlert("Erreur", "Erreur lors de l'export : " + e.getMessage());
+            }
+        });
+    }
+
+    private void showAlert(String title, String msg) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(msg);
+        alert.showAndWait();
     }
 
 

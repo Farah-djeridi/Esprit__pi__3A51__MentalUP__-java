@@ -179,7 +179,7 @@ class RendezVousNavigationBugExplorationTest {
         RendezVous inserted = list.get(list.size() - 1);
         
         // Try to reserve it - this SHOULD FAIL but will SUCCEED on unfixed code
-        boolean result = service.reserverCreneau(inserted.getId(), 1);
+        boolean result = service.reserverCreneau(inserted, 1, "Présentiel");
         
         // Clean up
         service.delete(inserted.getId());
@@ -206,7 +206,7 @@ class RendezVousNavigationBugExplorationTest {
         RendezVous inserted = list.get(list.size() - 1);
         
         // Try to confirm it - this SHOULD FAIL but will SUCCEED on unfixed code
-        service.confirmerRdv(inserted.getId());
+        service.confirmerRdv(inserted.getId(), "Présentiel");
         
         // Check if status was changed to "confirmé"
         List<RendezVous> updated = service.getByPsychologueId(2);
@@ -233,7 +233,7 @@ class RendezVousNavigationBugExplorationTest {
         // Expected behavior: should return boolean to indicate success/failure
         
         try {
-            Method confirmerRdvMethod = ServiceRendezVous.class.getDeclaredMethod("confirmerRdv", int.class);
+            Method confirmerRdvMethod = ServiceRendezVous.class.getDeclaredMethod("confirmerRdv", int.class, String.class);
             assertNotNull(confirmerRdvMethod, "confirmerRdv method should exist");
             
             // Check return type

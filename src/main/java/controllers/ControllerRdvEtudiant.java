@@ -25,6 +25,8 @@ import utils.MyDataBase;
 
 import java.sql.*;
 import java.util.List;
+import java.awt.Desktop;
+import java.net.URI;
 
 public class ControllerRdvEtudiant {
 
@@ -248,6 +250,17 @@ public class ControllerRdvEtudiant {
 
 
         card.getChildren().add(badge);
+        
+        if ("confirmé".equalsIgnoreCase(r.getStatut()) && r.getLienMeet() != null && !r.getLienMeet().isEmpty()) {
+            Button btnMeet = new Button("🎥 Meet");
+            btnMeet.setStyle(
+                    "-fx-background-color: #E3F2FD; -fx-text-fill: #1565C0; -fx-font-weight: bold;" +
+                    "-fx-font-size: 12px; -fx-background-radius: 7; -fx-padding: 6 14; -fx-cursor: hand;" +
+                    "-fx-border-color: rgba(21,101,192,0.3); -fx-border-radius: 7; -fx-border-width: 1;"
+            );
+            btnMeet.setOnAction(e -> openBrowser(r.getLienMeet()));
+            card.getChildren().add(btnMeet);
+        }
 
         if (canCancel && ("réservé".equalsIgnoreCase(r.getStatut()) || "en attente".equalsIgnoreCase(r.getStatut()))) {
             Button btnAnnuler = new Button("Annuler");
@@ -361,5 +374,17 @@ public class ControllerRdvEtudiant {
     private String formatTime(java.sql.Time time) {
         if (time == null) return "--:--";
         return time.toString().substring(0, 5);
+    }
+
+    private void openBrowser(String url) {
+        try {
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().browse(new URI(url));
+            } else {
+                Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

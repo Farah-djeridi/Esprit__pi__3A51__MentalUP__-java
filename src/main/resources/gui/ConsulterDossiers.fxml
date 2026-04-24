@@ -172,6 +172,12 @@
                            style="-fx-font-size: 12px; -fx-font-family: 'Segoe UI';"/>
                 </VBox>
                 <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="btnExporterTop" text="📄 Exporter" onAction="#handleExportPatientPDF"
+                        disable="true"
+                        style="-fx-background-color: white; -fx-text-fill: #0f2942;
+                               -fx-border-color: #0f2942; -fx-border-radius: 8;
+                               -fx-background-radius: 8; -fx-padding: 10 20;
+                               -fx-cursor: hand; -fx-font-size: 13px; -fx-font-family: 'Segoe UI';"/>
                 <Button text="+ Nouveau dossier" onAction="#goNouveauDossier"
                         style="-fx-background-color: #0f2942; -fx-text-fill: white;
                                -fx-background-radius: 8; -fx-padding: 10 20;

@@ -180,6 +180,10 @@
                            style="-fx-font-size: 12px; -fx-font-family: 'Segoe UI';"/>
                 </VBox>
                 <Region HBox.hgrow="ALWAYS"/>
+                <Button text="📄 Exporter" onAction="#handleExportPlanningPDF"
+                        style="-fx-background-color: #0f2942; -fx-text-fill: white;
+                               -fx-background-radius: 8; -fx-padding: 10 20;
+                               -fx-cursor: hand; -fx-font-size: 13px; -fx-font-family: 'Segoe UI';"/>
             </HBox>
 
             <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"

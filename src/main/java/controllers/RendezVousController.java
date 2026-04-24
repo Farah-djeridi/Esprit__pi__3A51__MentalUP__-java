@@ -2,9 +2,11 @@ package controllers;
 
 import Models.RendezVous;
 import Services.ServiceRendezVous;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
@@ -18,8 +20,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-import javafx.scene.Parent;
 import javafx.scene.Scene;
+import java.awt.Desktop;
+import java.net.URI;
+import java.util.Optional;
+import Services.PDFService;
+import Models.Dossier;
+import Services.ServiceDossier;
 
 
 public class RendezVousController {
@@ -43,6 +50,8 @@ public class RendezVousController {
     @FXML private Label arrowDossiers;
 
     private ServiceRendezVous service = new ServiceRendezVous();
+    private ServiceDossier serviceDossier = new ServiceDossier();
+    private PDFService pdfService = new PDFService();
     private List<RendezVous> allRdv;
 
     private static final DateTimeFormatter DATE_FMT =
@@ -229,6 +238,27 @@ public class RendezVousController {
 
 
 
+        if ("confirmé".equalsIgnoreCase(r.getStatut()) && r.getTelephone() != null && !r.getTelephone().isEmpty()) {
+            Button btnSms = new Button("📲 Notifier");
+            btnSms.setStyle("-fx-background-color: #fef3c7; -fx-text-fill: #92400e; -fx-background-radius: 6; "
+                    + "-fx-padding: 7 14; -fx-cursor: hand; -fx-font-size: 12px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';");
+            btnSms.setOnAction(e -> {
+                Services.SmsService.sendSms(r.getTelephone(), 
+                    "Rappel : Votre rendez-vous MentalUp est prévu pour le " + r.getDate() + " à " + r.getHeureDebut() + ".");
+                btnSms.setText("✅ Envoyé");
+                btnSms.setDisable(true);
+            });
+            actions.getChildren().add(0, btnSms);
+        }
+
+        if (("confirmé".equalsIgnoreCase(r.getStatut()) || "en cours".equalsIgnoreCase(r.getStatut())) && r.getLienMeet() != null && !r.getLienMeet().isEmpty()) {
+            Button btnMeet = new Button("🎥 Rejoindre Meet");
+            btnMeet.setStyle("-fx-background-color: #e3f2fd; -fx-text-fill: #1565c0; -fx-background-radius: 6; "
+                    + "-fx-padding: 7 14; -fx-cursor: hand; -fx-font-size: 12px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';");
+            btnMeet.setOnAction(e -> openBrowser(r.getLienMeet()));
+            actions.getChildren().add(0, btnMeet);
+        }
+
         actions.getChildren().addAll(btnConfirm, btnDelete);
 
         card.getChildren().addAll(indicator, dateBox, typeBox, spacer, statutLabel, actions);
@@ -369,5 +399,104 @@ public class RendezVousController {
 
     @FXML public void nouveauRendezVous() {
         System.out.println("Nouveau RDV (popup)");
+    }
+
+    @FXML
+    void handleExportPlanningPDF(ActionEvent event) {
+        List<String> choices = List.of("Aujourd'hui", "Cette Semaine", "Ce Mois");
+        ChoiceDialog<String> dialog = new ChoiceDialog<>("Aujourd'hui", choices);
+        dialog.setTitle("Exporter Planning");
+        dialog.setHeaderText("Choisissez la période d'export");
+        dialog.setContentText("Période :");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(period -> {
+            try {
+                List<RendezVous> filtered;
+                LocalDate now = LocalDate.now();
+
+                if ("Aujourd'hui".equals(period)) {
+                    filtered = allRdv.stream()
+                        .filter(r -> r.getDate() != null && r.getDate().toLocalDate().equals(now))
+                        .collect(Collectors.toList());
+                } else if ("Cette Semaine".equals(period)) {
+                    LocalDate weekEnd = now.plusDays(7);
+                    filtered = allRdv.stream()
+                        .filter(r -> r.getDate() != null && !r.getDate().toLocalDate().isBefore(now) && r.getDate().toLocalDate().isBefore(weekEnd))
+                        .collect(Collectors.toList());
+                } else {
+                    LocalDate monthEnd = now.plusMonths(1);
+                    filtered = allRdv.stream()
+                        .filter(r -> r.getDate() != null && !r.getDate().toLocalDate().isBefore(now) && r.getDate().toLocalDate().isBefore(monthEnd))
+                        .collect(Collectors.toList());
+                }
+
+                String fileName = "Planning_" + period.replace(" ", "_") + ".pdf";
+                String path = System.getProperty("user.home") + "\\Desktop\\" + fileName;
+                pdfService.generatePlanningPDF(filtered, period, path);
+                
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Succès");
+                alert.setHeaderText(null);
+                alert.setContentText("Planning exporté sur le bureau : " + fileName);
+                alert.showAndWait();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Erreur");
+                alert.setContentText("Erreur lors de l'export : " + e.getMessage());
+                alert.showAndWait();
+            }
+        });
+    }
+
+    @FXML
+    void handleExportPatientPDF(ActionEvent event) {
+        List<Dossier> dossiers = serviceDossier.getAll();
+        if (dossiers.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setContentText("Aucun dossier patient trouvé.");
+            alert.showAndWait();
+            return;
+        }
+
+        ChoiceDialog<Dossier> dialog = new ChoiceDialog<>(dossiers.get(0), dossiers);
+        dialog.setTitle("Exporter Dossier Patient");
+        dialog.setHeaderText("Sélectionnez un patient à exporter");
+        dialog.setContentText("Patient :");
+
+        Optional<Dossier> result = dialog.showAndWait();
+        result.ifPresent(d -> {
+            try {
+                List<RendezVous> history = service.getByEtudiantId(d.getPatientId());
+                String fileName = "Dossier_" + d.getPatientNom().replace(" ", "_") + ".pdf";
+                String path = System.getProperty("user.home") + "\\Desktop\\" + fileName;
+                pdfService.generatePatientDossierPDF(d, history, path);
+                
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Succès");
+                alert.setContentText("Dossier exporté sur le bureau : " + fileName);
+                alert.showAndWait();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Erreur");
+                alert.setContentText("Erreur lors de l'export : " + e.getMessage());
+                alert.showAndWait();
+            }
+        });
+    }
+
+    private void openBrowser(String url) {
+        try {
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().browse(new URI(url));
+            } else {
+                // Fallback for some systems
+                Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

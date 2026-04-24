@@ -296,6 +296,25 @@
 
                 </HBox>
 
+                <!-- Section Mes Rendez-vous -->
+                <VBox spacing="12"
+                      style="-fx-background-color: white;
+                             -fx-background-radius: 16;
+                             -fx-padding: 22 25;
+                             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 10, 0, 0, 2);">
+                    <HBox alignment="CENTER_LEFT">
+                        <Label text="Mes Prochains Rendez-vous"
+                               style="-fx-font-size: 17px; -fx-font-weight: bold;
+                                      -fx-text-fill: #2C3E50;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Hyperlink text="Voir tout" onAction="#onNavRdvClicked_Btn"
+                                   style="-fx-text-fill: #2C5F8A; -fx-font-weight: bold; -fx-cursor: hand; -fx-underline: false;"/>
+                    </HBox>
+                    <VBox fx:id="rdvHomeContainer" spacing="10">
+                        <Label text="Chargement de vos rendez-vous..." style="-fx-text-fill: #94A3B8; -fx-font-size: 13px;"/>
+                    </VBox>
+                </VBox>
+
                 <!-- Section avantages -->
                 <VBox spacing="12"
                       style="-fx-background-color: white;

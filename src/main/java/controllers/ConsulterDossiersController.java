@@ -1,7 +1,10 @@
 package controllers;
 
 import Models.Dossier;
+import Models.RendezVous;
+import Services.PDFService;
 import Services.ServiceDossier;
+import Services.ServiceRendezVous;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -9,6 +12,8 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import java.util.Optional;
+import java.util.List;
 import javafx.collections.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -22,6 +27,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Properties;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,8 +52,11 @@ public class ConsulterDossiersController {
     @FXML private VBox submenuDossiers;
     @FXML private Label arrowRdv;
     @FXML private Label arrowDossiers;
+    @FXML private Button btnExporterTop;
 
     private ServiceDossier service = new ServiceDossier();
+    private PDFService pdfService = new PDFService();
+    private ServiceRendezVous serviceRdv = new ServiceRendezVous();
     private Dossier selected;
 
     @FXML
@@ -66,9 +75,14 @@ public class ConsulterDossiersController {
 
         loadData();
 
-        dossierList.getSelectionModel()
-                .selectedItemProperty()
-                .addListener((obs, oldVal, newVal) -> showDetails(newVal));
+        dossierList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                if (btnExporterTop != null) btnExporterTop.setDisable(false);
+                showDetails(newVal);
+            } else {
+                if (btnExporterTop != null) btnExporterTop.setDisable(true);
+            }
+        });
 
         // Style de la liste
         dossierList.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
@@ -246,6 +260,52 @@ public class ConsulterDossiersController {
         }
     }
 
+
+    @FXML
+    public void handleExportPatientPDF() {
+        if (selected == null) {
+            showAlert("Erreur", "Sélectionnez un dossier d'abord !");
+            return;
+        }
+
+        try {
+            List<RendezVous> history = serviceRdv.getByEtudiantId(selected.getPatientId());
+            String fileName = "Dossier_" + selected.getPatientNom().replace(" ", "_") + ".pdf";
+            String path = System.getProperty("user.home") + "\\Desktop\\" + fileName;
+            
+            pdfService.generatePatientDossierPDF(selected, history, path);
+            showAlert("Succès", "Le dossier de " + selected.getPatientNom() + " a été exporté sur votre bureau.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Impossible de générer le PDF : " + e.getMessage());
+        }
+    }
+
+    @FXML
+    public void handleDownloadPDF() {
+        if (selected == null) {
+            showAlert("Erreur", "Sélectionnez un dossier d'abord !");
+            return;
+        }
+
+        try {
+            // Récupérer l'historique des RDV pour ce patient
+            List<RendezVous> history = serviceRdv.getByEtudiantId(selected.getPatientId());
+            
+            String patientName = selected.getPatientNom() != null ? selected.getPatientNom() : "Patient_" + selected.getPatientId();
+            String fileName = "Dossier_" + patientName.replace(" ", "_") + ".pdf";
+            
+            // Pour Windows, on met sur le Bureau
+            String desktopPath = System.getProperty("user.home") + "\\Desktop\\" + fileName;
+
+            pdfService.generatePatientDossierPDF(selected, history, desktopPath);
+            showAlert("Succès", "Le dossier PDF a été généré sur votre bureau :\n" + desktopPath);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Impossible de générer le PDF : " + e.getMessage());
+        }
+    }
 
     @FXML
     public void genererIA(ActionEvent event) {

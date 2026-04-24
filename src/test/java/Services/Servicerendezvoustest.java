@@ -249,7 +249,7 @@ class ServiceRendezVousTest {
         assertFalse(list.isEmpty());
         RendezVous insere = list.get(list.size() - 1);
 
-        boolean ok = service.reserverCreneau(insere.getId(), 1);
+        boolean ok = service.reserverCreneau(insere, 1, "Présentiel");
         assertTrue(ok, "La réservation doit réussir sur un créneau libre.");
 
         // Nettoyage
@@ -268,7 +268,7 @@ class ServiceRendezVousTest {
         var list = service.getByPsychologueId(2);
         RendezVous insere = list.get(list.size() - 1);
 
-        boolean ok = service.reserverCreneau(insere.getId(), 1);
+        boolean ok = service.reserverCreneau(insere, 1, "Présentiel");
         assertFalse(ok, "La réservation doit échouer sur un créneau déjà réservé.");
 
         // Nettoyage

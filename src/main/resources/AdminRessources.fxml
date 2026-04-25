@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="Controllor.ControllerAdminRessources"
+            prefWidth="1100" prefHeight="700"
+            style="-fx-background-color: #ECF0F1;"
+            stylesheets="@css/ressources.css">
+
+    <!-- SIDEBAR -->
+    <left>
+        <VBox prefWidth="240" prefHeight="700" styleClass="admin-sidebar">
+            <HBox alignment="CENTER_LEFT" spacing="10"
+                  style="-fx-padding: 22 16 18 16; -fx-border-color: transparent transparent rgba(255,255,255,0.1) transparent; -fx-border-width: 0 0 1 0;">
+                <ImageView fx:id="logoImage" fitWidth="40" fitHeight="40" preserveRatio="true"/>
+                <VBox spacing="2">
+                    <Label text="MentalUp Admin" style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                    <Label text="Administration" style="-fx-text-fill: rgba(255,255,255,0.5); -fx-font-size: 11px;"/>
+                </VBox>
+            </HBox>
+
+            <VBox spacing="2" style="-fx-padding: 14 10 0 10;" VBox.vgrow="ALWAYS">
+
+                <HBox alignment="CENTER_LEFT" spacing="12" onMouseClicked="#goToDashboard"
+                      style="-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 12; -fx-cursor: hand;"
+                      onMouseEntered="#onHoverEnter" onMouseExited="#onHoverExit">
+                    <Label text="Tableau de bord" style="-fx-text-fill: rgba(255,255,255,0.75); -fx-font-size: 13px;"/>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="12" onMouseClicked="#goToUsers"
+                      style="-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 12; -fx-cursor: hand;"
+                      onMouseEntered="#onHoverEnter" onMouseExited="#onHoverExit">
+                    <Label text="Utilisateurs" style="-fx-text-fill: rgba(255,255,255,0.75); -fx-font-size: 13px;"/>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="12" onMouseClicked="#goToDashboard"
+                      style="-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 12; -fx-cursor: hand;"
+                      onMouseEntered="#onHoverEnter" onMouseExited="#onHoverExit">
+                    <Label text="Rendez-vous" style="-fx-text-fill: rgba(255,255,255,0.75); -fx-font-size: 13px;"/>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="12" onMouseClicked="#goToDashboard"
+                      style="-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 12; -fx-cursor: hand;"
+                      onMouseEntered="#onHoverEnter" onMouseExited="#onHoverExit">
+                    <Label text="Forum" style="-fx-text-fill: rgba(255,255,255,0.75); -fx-font-size: 13px;"/>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="12" onMouseClicked="#goToDashboard"
+                      style="-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 12; -fx-cursor: hand;"
+                      onMouseEntered="#onHoverEnter" onMouseExited="#onHoverExit">
+                    <Label text="Dossiers medicaux" style="-fx-text-fill: rgba(255,255,255,0.75); -fx-font-size: 13px;"/>
+                </HBox>
+                
+                <HBox alignment="CENTER_LEFT" spacing="12"
+                      style="-fx-background-color: #8E44AD; -fx-background-radius: 8; -fx-padding: 10 12; -fx-cursor: hand;">
+                    <Label text="Ressources" style="-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="12" onMouseClicked="#goToStats"
+                      style="-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 12; -fx-cursor: hand;"
+                      onMouseEntered="#onHoverEnter" onMouseExited="#onHoverExit">
+                    <Label text="Statistiques" style="-fx-text-fill: rgba(255,255,255,0.75); -fx-font-size: 13px;"/>
+                </HBox>
+
+            </VBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="10" onMouseClicked="#handleLogout"
+                  style="-fx-padding: 16 14; -fx-cursor: hand; -fx-border-color: rgba(255,255,255,0.1) transparent transparent transparent; -fx-border-width: 1 0 0 0;">
+                <Label text="Deconnexion" style="-fx-text-fill: rgba(255,255,255,0.6); -fx-font-size: 13px;"/>
+            </HBox>
+        </VBox>
+    </left>
+
+    <!-- CONTENU PRINCIPAL -->
+    <center>
+        <VBox spacing="0" style="-fx-background-color: #F4F8FF;">
+            <!-- Barre titre -->
+            <HBox alignment="CENTER_LEFT" spacing="12"
+                  style="-fx-background-color: white; -fx-padding: 18 28; -fx-border-color: transparent transparent #E8EFF6 transparent; -fx-border-width: 0 0 1 0;">
+                <VBox spacing="3">
+                    <Label text="Gestion des Ressources"
+                           style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;"/>
+                    <Label text="Gérer les catégories et les ressources"
+                           style="-fx-text-fill: #7A8C9A; -fx-font-size: 13px;"/>
+                </VBox>
+            </HBox>
+
+            <TabPane style="-fx-background-color: transparent;" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+                <!-- ONGLET RESSOURCES -->
+                <Tab text="Ressources">
+                    <HBox spacing="20" style="-fx-padding: 20;">
+                        <!-- Formulaire -->
+                        <VBox spacing="10" prefWidth="300" styleClass="form-card">
+                            <Label text="Détails de la ressource" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                            <TextField fx:id="resTitre" promptText="Titre" styleClass="modern-text-field"/>
+                            <TextArea fx:id="resDescription" promptText="Description" prefRowCount="3" styleClass="modern-text-field"/>
+                            <ComboBox fx:id="resType" promptText="Type" prefWidth="300" styleClass="modern-text-field"/>
+                            <TextField fx:id="resLien" promptText="Lien URL" styleClass="modern-text-field"/>
+                            <TextField fx:id="resImage" promptText="Image URL" styleClass="modern-text-field"/>
+                            <ComboBox fx:id="resCategorie" promptText="Catégorie" prefWidth="300" styleClass="modern-text-field"/>
+                            
+                            <HBox spacing="10" style="-fx-padding: 10 0 0 0;">
+                                <Button text="Ajouter" onAction="#addRessource" styleClass="admin-btn-primary" HBox.hgrow="ALWAYS" maxWidth="Infinity" prefHeight="35"/>
+                                <Button text="Modifier" onAction="#updateRessource" styleClass="admin-btn-warning" HBox.hgrow="ALWAYS" maxWidth="Infinity" prefHeight="35"/>
+                            </HBox>
+                            <Button text="Supprimer" onAction="#deleteRessource" styleClass="admin-btn-danger" maxWidth="Infinity" prefHeight="35"/>
+                            <Button text="Vider" onAction="#clearResForm" styleClass="admin-btn-secondary" maxWidth="Infinity" prefHeight="35"/>
+                        </VBox>
+                        
+                        <!-- Table -->
+                        <VBox spacing="10" HBox.hgrow="ALWAYS" styleClass="form-card">
+                            <TextField fx:id="searchResField" promptText="Rechercher..." styleClass="modern-text-field"/>
+                            <TableView fx:id="tableRessources" VBox.vgrow="ALWAYS">
+                                <columns>
+                                    <TableColumn fx:id="colResId" text="ID" prefWidth="50"/>
+                                    <TableColumn fx:id="colResTitre" text="Titre" prefWidth="150"/>
+                                    <TableColumn fx:id="colResType" text="Type" prefWidth="100"/>
+                                    <TableColumn fx:id="colResCat" text="Catégorie" prefWidth="120"/>
+                                    <TableColumn fx:id="colResVues" text="Vues" prefWidth="60"/>
+                                </columns>
+                            </TableView>
+                        </VBox>
+                    </HBox>
+                </Tab>
+
+                <!-- ONGLET CATEGORIES -->
+                <Tab text="Catégories">
+                    <HBox spacing="20" style="-fx-padding: 20;">
+                        <!-- Formulaire -->
+                        <VBox spacing="10" prefWidth="300" styleClass="form-card">
+                            <Label text="Détails de la catégorie" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                            <TextField fx:id="catNom" promptText="Nom" styleClass="modern-text-field"/>
+                            <TextArea fx:id="catDescription" promptText="Description" prefRowCount="3" styleClass="modern-text-field"/>
+                            
+                            <HBox spacing="10" style="-fx-padding: 10 0 0 0;">
+                                <Button text="Ajouter" onAction="#addCategorie" styleClass="admin-btn-primary" HBox.hgrow="ALWAYS" maxWidth="Infinity" prefHeight="35"/>
+                                <Button text="Modifier" onAction="#updateCategorie" styleClass="admin-btn-warning" HBox.hgrow="ALWAYS" maxWidth="Infinity" prefHeight="35"/>
+                            </HBox>
+                            <Button text="Supprimer" onAction="#deleteCategorie" styleClass="admin-btn-danger" maxWidth="Infinity" prefHeight="35"/>
+                            <Button text="Vider" onAction="#clearCatForm" styleClass="admin-btn-secondary" maxWidth="Infinity" prefHeight="35"/>
+                        </VBox>
+                        
+                        <!-- Table -->
+                        <VBox spacing="10" HBox.hgrow="ALWAYS" styleClass="form-card">
+                            <TableView fx:id="tableCategories" VBox.vgrow="ALWAYS">
+                                <columns>
+                                    <TableColumn fx:id="colCatId" text="ID" prefWidth="50"/>
+                                    <TableColumn fx:id="colCatNom" text="Nom" prefWidth="200"/>
+                                    <TableColumn fx:id="colCatDesc" text="Description" prefWidth="300"/>
+                                    <TableColumn fx:id="colCatDate" text="Date de création" prefWidth="150"/>
+                                </columns>
+                            </TableView>
+                        </VBox>
+                    </HBox>
+                </Tab>
+            </TabPane>
+
+        </VBox>
+    </center>
+
+</BorderPane>

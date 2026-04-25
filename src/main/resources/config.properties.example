@@ -1,0 +1,25 @@
+# ============================================================
+# EXEMPLE DE CONFIGURATION — Copier en config.properties
+# et remplir avec vos vraies valeurs
+# ============================================================
+
+# --- Base de donnees MySQL ---
+db.url=jdbc:mysql://127.0.0.1:3306/nom_de_votre_base
+db.username=root
+db.password=
+
+# --- Email SMTP (Gmail App Password) ---
+# Activer "App Passwords" sur votre compte Google
+email.from=votre.email@gmail.com
+email.password=xxxx xxxx xxxx xxxx
+
+# --- Hugging Face (generation avatar IA) ---
+# Token gratuit : https://huggingface.co/settings/tokens
+# Cocher "Make calls to Inference Providers"
+huggingface.token=hf_VOTRE_TOKEN_ICI
+
+# --- Google OAuth2 (connexion avec Google) ---
+# Console : https://console.cloud.google.com > APIs & Services > Credentials
+# Type : Desktop app | Redirect URI : http://localhost:8989/callback
+google.client.id=VOTRE_CLIENT_ID.apps.googleusercontent.com
+google.client.secret=VOTRE_CLIENT_SECRET

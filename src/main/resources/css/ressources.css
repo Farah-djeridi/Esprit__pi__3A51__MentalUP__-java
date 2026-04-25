@@ -1,0 +1,128 @@
+/* Palette Administrateur */
+.admin-sidebar {
+    -fx-background-color: #2C3E50;
+}
+.admin-btn-primary {
+    -fx-background-color: #27AE60;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+.admin-btn-primary:hover {
+    -fx-background-color: #219653;
+}
+.admin-btn-warning {
+    -fx-background-color: #F39C12;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+.admin-btn-warning:hover {
+    -fx-background-color: #D68910;
+}
+.admin-btn-danger {
+    -fx-background-color: #E74C3C;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+.admin-btn-danger:hover {
+    -fx-background-color: #C0392B;
+}
+.admin-btn-secondary {
+    -fx-background-color: #95A5A6;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+.admin-btn-secondary:hover {
+    -fx-background-color: #7F8C8D;
+}
+.form-card {
+    -fx-background-color: white;
+    -fx-padding: 20;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);
+}
+.modern-text-field {
+    -fx-background-color: #F5F7FA;
+    -fx-border-color: #D0DDE8;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 8;
+}
+.modern-text-field:focused {
+    -fx-border-color: #27AE60;
+}
+
+/* TableView Administrateur */
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: #ECF0F1;
+    -fx-border-radius: 8;
+}
+.table-view .column-header-background {
+    -fx-background-color: #ECF0F1;
+}
+.table-view .column-header, .table-view .filler {
+    -fx-size: 35;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: #D0DDE8;
+    -fx-background-color: transparent;
+}
+.table-view .column-header .label {
+    -fx-text-fill: #2C3E50;
+    -fx-font-weight: bold;
+}
+.table-view .table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #F5F7FA transparent;
+    -fx-border-width: 0 0 1 0;
+}
+.table-view .table-row-cell:odd {
+    -fx-background-color: #F9FBFC;
+}
+.table-view .table-row-cell:selected {
+    -fx-background-color: rgba(39, 174, 96, 0.2);
+}
+.table-view .table-row-cell:hover {
+    -fx-background-color: rgba(39, 174, 96, 0.1);
+}
+
+/* Palette Etudiant */
+.student-bg {
+    -fx-background-color: #F5F7FA;
+}
+.student-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-padding: 16;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);
+}
+.student-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(74, 144, 226, 0.3), 15, 0, 0, 4);
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+}
+.student-btn-primary {
+    -fx-background-color: #4A90E2;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.student-btn-primary:hover {
+    -fx-background-color: #357ABD;
+}
+.badge-type {
+    -fx-background-color: #E8F0FE;
+    -fx-text-fill: #2C5F8A;
+    -fx-padding: 4 8;
+    -fx-background-radius: 10;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}

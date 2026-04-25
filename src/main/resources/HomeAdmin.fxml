@@ -126,6 +126,14 @@
                             <Label text="Commentaires"
                                    style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 13px; -fx-font-weight: 500;"/>
                         </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="10"
+                              fx:id="navBans"
+                              onMouseClicked="#onNavBansClicked"
+                              style="-fx-background-radius: 6; -fx-padding: 8 12; -fx-cursor: hand;">
+                            <Label text="🚫" style="-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.55);"/>
+                            <Label text="Bannissements"
+                                   style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 13px; -fx-font-weight: 500;"/>
+                        </HBox>
                     </VBox>
                 </VBox>
 

@@ -8,7 +8,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="Controllors.ControllerAdminCommentaire"
+            fx:controller="Controllors.ControllerAdminBan"
             prefWidth="1100" prefHeight="650"
             style="-fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #F4F8FF, #E8F0FE);">
 
@@ -102,18 +102,18 @@
                         <HBox alignment="CENTER_LEFT" spacing="10"
                               fx:id="navCommentaires"
                               onMouseClicked="#onNavCommentairesClicked"
-                              style="-fx-background-color: #3D5A73; -fx-background-radius: 6; -fx-padding: 8 12; -fx-cursor: hand;">
-                            <Label text="💬" style="-fx-font-size: 13px; -fx-text-fill: white;"/>
+                              style="-fx-background-radius: 6; -fx-padding: 8 12; -fx-cursor: hand;">
+                            <Label text="💬" style="-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.55);"/>
                             <Label text="Commentaires"
-                                   style="-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                                   style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 13px; -fx-font-weight: 500;"/>
                         </HBox>
                         <HBox alignment="CENTER_LEFT" spacing="10"
                               fx:id="navBans"
                               onMouseClicked="#onNavBansClicked"
-                              style="-fx-background-radius: 6; -fx-padding: 8 12; -fx-cursor: hand;">
-                            <Label text="🚫" style="-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.55);"/>
+                              style="-fx-background-color: #3D5A73; -fx-background-radius: 6; -fx-padding: 8 12; -fx-cursor: hand;">
+                            <Label text="🚫" style="-fx-font-size: 13px; -fx-text-fill: white;"/>
                             <Label text="Bannissements"
-                                   style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 13px; -fx-font-weight: 500;"/>
+                                   style="-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;"/>
                         </HBox>
                     </VBox>
                 </VBox>
@@ -218,7 +218,7 @@
                          -fx-border-color: transparent transparent #E8EEF4 transparent;
                          -fx-border-width: 0 0 1 0;">
                 <VBox spacing="2">
-                    <Label text="💬 Gestion des commentaires"
+                    <Label text="🚫 Gestion des bannissements"
                            style="-fx-font-size: 18px; -fx-font-weight: bold;
                                   -fx-text-fill: #2C3E50;"/>
                     <Label fx:id="labelDate" text=""
@@ -246,18 +246,29 @@
                              -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5);"
                       alignment="CENTER_LEFT">
                     <VBox spacing="8" HBox.hgrow="ALWAYS">
-                        <Label text="💬 Gestion des commentaires"
+                        <Label text="🚫 Gestion des bannissements"
                                style="-fx-text-fill: white; -fx-font-size: 22px;
                                       -fx-font-weight: bold;"/>
-                        <Label text="Modérez les commentaires du forum"
+                        <Label text="Consultez et gérez les utilisateurs bannis du forum"
                                style="-fx-text-fill: rgba(255,255,255,0.75);
                                       -fx-font-size: 13px;"/>
                     </VBox>
-                    <Label text="💬" style="-fx-font-size: 60px; -fx-opacity: 0.12;"
+                    <Label text="🚫" style="-fx-font-size: 60px; -fx-opacity: 0.12;"
                            HBox.hgrow="NEVER"/>
                 </HBox>
 
-                <!-- Barre de recherche et filtre -->
+                <!-- Statistiques -->
+                <HBox spacing="15">
+                    <HBox spacing="10" alignment="CENTER_LEFT"
+                          style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 12 18;">
+                        <Label text="🚫" style="-fx-font-size: 20px;"/>
+                        <Label text="Bannissements actifs :" style="-fx-text-fill: #5A6C7D;"/>
+                        <Label fx:id="totalBansLabel" text="0" style="-fx-font-weight: bold; -fx-text-fill: #DC2626; -fx-font-size: 18px;"/>
+                    </HBox>
+                    <Region HBox.hgrow="ALWAYS"/>
+                </HBox>
+
+                <!-- Barre de recherche -->
                 <HBox spacing="15" alignment="CENTER_LEFT"
                       style="-fx-background-color: white;
                              -fx-background-radius: 15;
@@ -271,11 +282,10 @@
                                  -fx-border-radius: 10;
                                  -fx-border-width: 1;">
                         <Label text="🔍" style="-fx-font-size: 14px;"/>
-                        <TextField fx:id="searchField" promptText="Rechercher un commentaire..."
+                        <TextField fx:id="searchField" promptText="Rechercher un utilisateur banni..."
                                    style="-fx-background-color: transparent; -fx-font-size: 13px;"
                                    HBox.hgrow="ALWAYS"/>
                     </HBox>
-                    <!-- ComboBox pour filtrer par toxicité -->
                     <ComboBox fx:id="filterCombo" prefWidth="140"
                               style="-fx-background-color: #F8FAFE;
                                      -fx-background-radius: 10;
@@ -288,32 +298,29 @@
                                    -fx-background-radius: 10;
                                    -fx-padding: 6 18;
                                    -fx-cursor: hand;"/>
+                    <Button text="🔄 Actualiser" onAction="#onRefresh"
+                            style="-fx-background-color: #2C5F8A;
+                                   -fx-text-fill: white;
+                                   -fx-font-weight: bold;
+                                   -fx-background-radius: 10;
+                                   -fx-padding: 6 18;
+                                   -fx-cursor: hand;"/>
                 </HBox>
 
-                <HBox spacing="15">
-                    <HBox spacing="10" alignment="CENTER_LEFT"
-                          style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 12 18;">
-                        <Label text="📊" style="-fx-font-size: 20px;"/>
-                        <Label text="Total commentaires :" style="-fx-text-fill: #5A6C7D;"/>
-                        <Label fx:id="totalCommentairesLabel" text="0" style="-fx-font-weight: bold; -fx-text-fill: #2C3E50; -fx-font-size: 18px;"/>
-                    </HBox>
-                    <Region HBox.hgrow="ALWAYS"/>
-                </HBox>
-
+                <!-- Tableau des bannissements -->
                 <VBox spacing="0" style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);"
                       VBox.vgrow="ALWAYS">
 
-                    <!-- En-tête du tableau avec colonne Toxicité -->
+                    <!-- En-tête du tableau -->
                     <HBox spacing="10" alignment="CENTER_LEFT"
                           style="-fx-background-color: #2C3E50; -fx-background-radius: 16 16 0 0; -fx-padding: 14 15;">
-                        <Label text="Contenu" prefWidth="250" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
-                        <Label text="Auteur" prefWidth="120" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
-                        <Label text="Sujet" prefWidth="150" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
-                        <Label text="Date" prefWidth="90" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
-                        <Label text="👍" prefWidth="50" style="-fx-text-fill: white; -fx-font-weight: bold;" alignment="CENTER"/>
-                        <Label text="👎" prefWidth="50" style="-fx-text-fill: white; -fx-font-weight: bold;" alignment="CENTER"/>
-                        <Label text="⚠ Toxicité" prefWidth="110" style="-fx-text-fill: white; -fx-font-weight: bold;" alignment="CENTER"/>
-                        <Label text="Actions" prefWidth="120" style="-fx-text-fill: white; -fx-font-weight: bold;" alignment="CENTER"/>
+                        <Label text="Utilisateur" prefWidth="180" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                        <Label text="Date du ban" prefWidth="120" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                        <Label text="Expire le" prefWidth="120" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                        <Label text="Durée" prefWidth="80" style="-fx-text-fill: white; -fx-font-weight: bold;" alignment="CENTER"/>
+                        <Label text="Raison" prefWidth="250" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                        <Label text="Banni par" prefWidth="120" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                        <Label text="Actions" prefWidth="100" style="-fx-text-fill: white; -fx-font-weight: bold;" alignment="CENTER"/>
                     </HBox>
 
                     <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 0;">

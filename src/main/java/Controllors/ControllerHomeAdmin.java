@@ -91,6 +91,7 @@ public class ControllerHomeAdmin {
     private void onNavCommentairesClicked(MouseEvent event) {
         navigateTo("/AdminCommentaire.fxml");
     }
+    @FXML private void onNavBansClicked() { navigateTo("/AdminBan.fxml"); }
 
     @FXML
     private void onNavRdvClicked(MouseEvent event) {

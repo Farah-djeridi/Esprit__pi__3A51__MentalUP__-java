@@ -25,6 +25,8 @@ import java.util.Locale;
 import java.util.Optional;
 
 import models.Sujet;
+import models.Ban;
+import services.ServiceBan;
 import services.ServiceSujet;
 import services.ServiceCommentaire;
 
@@ -46,12 +48,16 @@ public class ControllerAdminSujet {
     @FXML private ComboBox<String> filterCombo;
     @FXML private Label totalSujetsLabel;
 
+
     @FXML private VBox cardsContainer;
 
     private ServiceSujet serviceSujet;
     private ServiceCommentaire serviceCommentaire;
     private List<Sujet> allSujets;
     private List<Sujet> filteredSujets;
+
+    private ServiceBan serviceBan;
+    private int adminId = 1;
 
     private boolean suiviOpen = false;
     private boolean forumOpen = true;
@@ -81,6 +87,8 @@ public class ControllerAdminSujet {
         serviceCommentaire = new ServiceCommentaire();
         allSujets = new ArrayList<>();
         filteredSujets = new ArrayList<>();
+
+        serviceBan = new ServiceBan();
 
         setupFilters();
         loadSujets();
@@ -328,37 +336,375 @@ public class ControllerAdminSujet {
     /**
      * Méthode pour bannir un sujet toxique
      */
+    /**
+     * Méthode pour bannir un sujet toxique
+     */
     private void banSujet(Sujet sujet) {
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Bannir le sujet");
-        confirm.setHeaderText("⚠️ Sujet toxique détecté");
-        confirm.setContentText("Score de toxicité: " + String.format("%.0f", sujet.getScoreToxicite() * 100) + "%\n\n" +
-                "Êtes-vous sûr de vouloir bannir ce sujet ?\n" +
-                "Le sujet sera supprimé et l'utilisateur recevra un avertissement.");
+        // Vérifier si l'utilisateur est déjà banni
+        boolean isAlreadyBanned = serviceBan.isUserBanned(sujet.getIdUser());
+        Ban existingBan = serviceBan.getActiveBan(sujet.getIdUser());
 
-        DialogPane dialogPane = confirm.getDialogPane();
-        dialogPane.setStyle("-fx-background-color: " + COLOR_BG + "; -fx-background-radius: 12;");
+        if (isAlreadyBanned && existingBan != null) {
+            // L'utilisateur est déjà banni - Dialogue personnalisé
+            Dialog<ButtonType> dialog = new Dialog<>();
+            dialog.setTitle("Utilisateur déjà banni");
 
-        Button banButton = (Button) dialogPane.lookupButton(ButtonType.OK);
-        banButton.setText("Bannir");
-        banButton.setStyle("-fx-background-color: #DC2626; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 8; -fx-padding: 8 24; -fx-font-weight: bold;");
+            VBox content = new VBox(15);
+            content.setPadding(new Insets(20));
+            content.setStyle("-fx-background-color: " + COLOR_BG + "; -fx-background-radius: 12;");
 
-        Button cancelButton = (Button) dialogPane.lookupButton(ButtonType.CANCEL);
-        cancelButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #6B7C8D; -fx-cursor: hand; -fx-padding: 8 24; -fx-font-weight: 600;");
+            // Icône d'avertissement
+            Label iconLabel = new Label("⚠");
+            iconLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: #F59E0B;");
+            iconLabel.setAlignment(Pos.CENTER);
 
-        Optional<ButtonType> result = confirm.showAndWait();
+            // Titre
+            Label titleLabel = new Label("Utilisateur déjà banni");
+            titleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #F59E0B;");
+            titleLabel.setAlignment(Pos.CENTER);
+
+            // Carte des informations
+            VBox infoCard = new VBox(8);
+            infoCard.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 12; " +
+                    "-fx-border-color: #E2E8F0; -fx-border-radius: 10; -fx-border-width: 1;");
+
+            Label userName = new Label("👤 " + (sujet.isAnonyme() ? "Anonyme" : sujet.getUserName()));
+            userName.setStyle("-fx-font-weight: bold; -fx-text-fill: #2C3E50; -fx-font-size: 13px;");
+
+            Label expiryInfo = new Label("⏰ Banni jusqu'au: " + existingBan.getBanExpiryDate());
+            expiryInfo.setStyle("-fx-text-fill: #DC2626; -fx-font-size: 12px; -fx-font-weight: 500;");
+
+            Label reasonInfo = new Label("📝 Raison: " + existingBan.getBanReason());
+            reasonInfo.setStyle("-fx-text-fill: #6B7C8D; -fx-font-size: 12px;");
+            reasonInfo.setWrapText(true);
+
+            infoCard.getChildren().addAll(userName, expiryInfo, reasonInfo);
+
+            // Question
+            Label questionLabel = new Label("Que souhaitez-vous faire ?");
+            questionLabel.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #4A5A6A;");
+            questionLabel.setAlignment(Pos.CENTER);
+
+            content.getChildren().addAll(iconLabel, titleLabel, infoCard, questionLabel);
+
+            dialog.getDialogPane().setContent(content);
+            dialog.getDialogPane().setStyle("-fx-background-color: " + COLOR_BG + "; -fx-background-radius: 16;");
+            dialog.getDialogPane().setPrefWidth(400);
+
+            // Boutons personnalisés
+            ButtonType modifyBanBtn = new ButtonType("✏ Modifier");
+            ButtonType deleteOnlyBtn = new ButtonType("🗑 Supprimer");
+            ButtonType cancelBtn = new ButtonType("Annuler", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+            dialog.getDialogPane().getButtonTypes().addAll(modifyBanBtn, deleteOnlyBtn, cancelBtn);
+
+            // Stylisation des boutons
+            Button modifyButton = (Button) dialog.getDialogPane().lookupButton(modifyBanBtn);
+            modifyButton.setStyle("-fx-background-color: #F59E0B; -fx-text-fill: white; -fx-cursor: hand; " +
+                    "-fx-background-radius: 8; -fx-padding: 8 16; -fx-font-weight: bold;");
+
+            Button deleteButton = (Button) dialog.getDialogPane().lookupButton(deleteOnlyBtn);
+            deleteButton.setStyle("-fx-background-color: #DC2626; -fx-text-fill: white; -fx-cursor: hand; " +
+                    "-fx-background-radius: 8; -fx-padding: 8 16; -fx-font-weight: bold;");
+
+            Button cancelButton = (Button) dialog.getDialogPane().lookupButton(cancelBtn);
+            cancelButton.setStyle("-fx-background-color: #F1F5F9; -fx-text-fill: #475569; -fx-cursor: hand; " +
+                    "-fx-background-radius: 8; -fx-padding: 8 16; -fx-font-weight: 600;");
+
+            Optional<ButtonType> result = dialog.showAndWait();
+
+            if (result.isPresent() && result.get() == modifyBanBtn) {
+                modifyBan(existingBan, sujet);
+            } else if (result.isPresent() && result.get() == deleteOnlyBtn) {
+                deleteSujet(sujet);
+            }
+            return;
+        }
+
+        // Sinon, procéder au bannissement normal
+        showBanDialog(sujet, null);
+    }
+
+    /**
+     * Modifier un bannissement existant
+     */
+    private void modifyBan(Ban existingBan, Sujet sujet) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Modifier le bannissement");
+        dialog.setHeaderText(null);
+
+        // Conteneur principal avec style moderne
+        VBox content = new VBox(15);
+        content.setPadding(new Insets(25));
+        content.setStyle("-fx-background-color: " + COLOR_BG + "; -fx-background-radius: 16;");
+
+        // En-tête personnalisé
+        HBox headerBox = new HBox(10);
+        headerBox.setAlignment(Pos.CENTER_LEFT);
+        headerBox.setStyle("-fx-padding: 0 0 10 0;");
+
+        Label headerIcon = new Label("✏");
+        headerIcon.setStyle("-fx-font-size: 28px;");
+
+        VBox headerText = new VBox(3);
+        Label headerTitle = new Label("Modification du bannissement");
+        headerTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;");
+
+        String userName = sujet.isAnonyme() ? "Anonyme" : sujet.getUserName();
+        Label headerSubtitle = new Label("Utilisateur: " + userName + " | Sujet #" + sujet.getId());
+        headerSubtitle.setStyle("-fx-font-size: 13px; -fx-text-fill: #6B7C8D;");
+
+        headerText.getChildren().addAll(headerTitle, headerSubtitle);
+        headerBox.getChildren().addAll(headerIcon, headerText);
+
+        // Carte des informations actuelles
+        VBox infoCard = new VBox(8);
+        infoCard.setStyle("-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 15; " +
+                "-fx-border-color: #E2E8F0; -fx-border-radius: 12; -fx-border-width: 1;");
+
+        Label infoTitle = new Label("📋 Bannissement actuel");
+        infoTitle.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;");
+
+        VBox infoDetails = new VBox(5);
+
+        // Ligne Date
+        HBox dateRow = new HBox(10);
+        dateRow.setAlignment(Pos.CENTER_LEFT);
+        Label dateIcon = new Label("📅");
+        dateIcon.setStyle("-fx-font-size: 12px;");
+        Label dateLabel = new Label("Date: " + existingBan.getBanDate());
+        dateLabel.setStyle("-fx-text-fill: #6B7C8D; -fx-font-size: 12px;");
+        dateRow.getChildren().addAll(dateIcon, dateLabel);
+
+        // Ligne Expiration
+        HBox expiryRow = new HBox(10);
+        expiryRow.setAlignment(Pos.CENTER_LEFT);
+        Label expiryIcon = new Label("⏰");
+        expiryIcon.setStyle("-fx-font-size: 12px;");
+
+        long currentDays = java.time.temporal.ChronoUnit.DAYS.between(
+                LocalDate.now(),
+                existingBan.getBanExpiryDate().toLocalDate());
+
+        // 🔥 CORRECTION ICI - Supprimer expiryLabel et utiliser directement expiryLabelField
+        String expiryText;
+        String expiryStyle;
+        if (currentDays <= 0) {
+            expiryText = "Expiré (était le " + existingBan.getBanExpiryDate() + ")";
+            expiryStyle = "-fx-text-fill: #6B7C8D; -fx-font-size: 12px;";
+        } else {
+            expiryText = existingBan.getBanExpiryDate() + " (" + currentDays + " jours restants)";
+            expiryStyle = "-fx-text-fill: #DC2626; -fx-font-size: 12px; -fx-font-weight: bold;";
+        }
+
+        Label expiryLabelField = new Label(expiryText);
+        expiryLabelField.setStyle(expiryStyle);
+        expiryRow.getChildren().addAll(expiryIcon, expiryLabelField);
+
+        // Ligne Raison
+        HBox reasonRow = new HBox(10);
+        reasonRow.setAlignment(Pos.CENTER_LEFT);
+        Label reasonIcon = new Label("📝");
+        reasonIcon.setStyle("-fx-font-size: 12px;");
+        Label reasonLabelText = new Label("Raison: " + existingBan.getBanReason());
+        reasonLabelText.setStyle("-fx-text-fill: #6B7C8D; -fx-font-size: 12px;");
+        reasonLabelText.setWrapText(true);
+        reasonRow.getChildren().addAll(reasonIcon, reasonLabelText);
+
+        infoDetails.getChildren().addAll(dateRow, expiryRow, reasonRow);
+        infoCard.getChildren().addAll(infoTitle, infoDetails);
+
+        // Séparateur décoratif
+        Separator separator = new Separator();
+        separator.setStyle("-fx-background-color: #E2E8F0;");
+
+        // Section modification
+        VBox modifySection = new VBox(12);
+        modifySection.setStyle("-fx-padding: 5 0 0 0;");
+
+        Label modifyTitle = new Label("✏ Modifier le bannissement");
+        modifyTitle.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;");
+
+        // Nouvelle durée
+        VBox durationBox = new VBox(6);
+        Label durationLabel = new Label("📅 Nouvelle durée");
+        durationLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #4A5A6A; -fx-font-size: 13px;");
+
+        HBox durationSelectionBox = new HBox(10);
+        durationSelectionBox.setAlignment(Pos.CENTER_LEFT);
+
+        ChoiceBox<Integer> durationChoice = new ChoiceBox<>();
+        durationChoice.getItems().addAll(1, 3, 7, 15, 30, 90, 365);
+        // Pré-sélectionner la durée actuelle si non expiré
+        if (currentDays > 0) {
+            durationChoice.setValue((int) currentDays);
+        } else {
+            durationChoice.setValue(7);
+        }
+        durationChoice.setStyle("-fx-background-color: white; -fx-background-radius: 8; -fx-font-size: 13px;");
+        durationChoice.setPrefWidth(100);
+
+        Label daysLabel = new Label("jours");
+        daysLabel.setStyle("-fx-text-fill: #6B7C8D; -fx-font-size: 13px;");
+
+        durationSelectionBox.getChildren().addAll(durationChoice, daysLabel);
+        durationBox.getChildren().addAll(durationLabel, durationSelectionBox);
+
+        // Nouvelle raison
+        VBox reasonBox = new VBox(6);
+        Label newReasonLabel = new Label("📝 Nouvelle raison");
+        newReasonLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #4A5A6A; -fx-font-size: 13px;");
+
+        TextArea reasonArea = new TextArea();
+        reasonArea.setText(existingBan.getBanReason());
+        reasonArea.setPrefHeight(100);
+        reasonArea.setWrapText(true);
+        reasonArea.setStyle("-fx-background-color: white; -fx-background-radius: 8; " +
+                "-fx-border-color: #E2E8F0; -fx-border-radius: 8; -fx-border-width: 1; " +
+                "-fx-font-size: 12px; -fx-padding: 10;");
+
+        reasonBox.getChildren().addAll(newReasonLabel, reasonArea);
+
+        modifySection.getChildren().addAll(modifyTitle, durationBox, reasonBox);
+
+        // Assemblage du contenu
+        content.getChildren().addAll(headerBox, infoCard, separator, modifySection);
+
+        // Configuration du dialogue
+        dialog.getDialogPane().setContent(content);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        dialog.getDialogPane().setStyle("-fx-background-color: " + COLOR_BG + "; -fx-background-radius: 16;");
+        dialog.getDialogPane().setPrefWidth(550);
+
+        // Stylisation des boutons
+        Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
+        okButton.setText("💾 Enregistrer");
+        okButton.setStyle("-fx-background-color: #F59E0B; -fx-text-fill: white; -fx-cursor: hand; " +
+                "-fx-background-radius: 10; -fx-padding: 10 30; -fx-font-weight: bold; -fx-font-size: 13px;");
+
+        okButton.setOnMouseEntered(e -> okButton.setStyle("-fx-background-color: #D97706; -fx-text-fill: white; -fx-cursor: hand; " +
+                "-fx-background-radius: 10; -fx-padding: 10 30; -fx-font-weight: bold; -fx-font-size: 13px;"));
+        okButton.setOnMouseExited(e -> okButton.setStyle("-fx-background-color: #F59E0B; -fx-text-fill: white; -fx-cursor: hand; " +
+                "-fx-background-radius: 10; -fx-padding: 10 30; -fx-font-weight: bold; -fx-font-size: 13px;"));
+
+        Button cancelButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL);
+        cancelButton.setText("❌ Annuler");
+        cancelButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #6B7C8D; -fx-cursor: hand; " +
+                "-fx-padding: 10 30; -fx-font-weight: 600; -fx-font-size: 13px;");
+
+        cancelButton.setOnMouseEntered(e -> cancelButton.setStyle("-fx-background-color: #F1F5F9; -fx-text-fill: #475569; -fx-cursor: hand; " +
+                "-fx-padding: 10 30; -fx-font-weight: 600; -fx-font-size: 13px; -fx-background-radius: 10;"));
+        cancelButton.setOnMouseExited(e -> cancelButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #6B7C8D; -fx-cursor: hand; " +
+                "-fx-padding: 10 30; -fx-font-weight: 600; -fx-font-size: 13px;"));
+
+        Optional<ButtonType> result = dialog.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            try {
-                // TODO: Implémenter la logique de bannissement
-                // 1. Supprimer le sujet
-                // 2. Envoyer un avertissement à l'utilisateur
-                // 3. Ajouter une pénalité (ex: suspension temporaire)
+            int newDuration = durationChoice.getValue();
+            String newReason = reasonArea.getText().trim();
 
+            if (newReason.isEmpty()) {
+                newReason = existingBan.getBanReason();
+            }
+
+            if (newDuration == currentDays && newReason.equals(existingBan.getBanReason())) {
+                showAlert("Information", "Aucune modification détectée.", Alert.AlertType.INFORMATION);
+                return;
+            }
+
+            try {
+                // Mettre à jour le bannissement existant
+                serviceBan.updateBan(existingBan.getId(), newReason, newDuration);
+
+                // Supprimer le sujet
+                serviceSujet.deleteByAdmin(sujet);
+
+                // Rafraîchir l'affichage
+                loadSujets();
+
+                // Message de succès
+                Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                successAlert.setTitle("Succès");
+                successAlert.setHeaderText(null);
+                successAlert.setContentText("✓ Bannissement modifié avec succès !\n\n" +
+                        "🆔 ID du bannissement: " + existingBan.getId() + "\n" +
+                        "📅 Nouvelle durée: " + newDuration + " jours\n" +
+                        "📝 Nouvelle raison: " + newReason + "\n\n" +
+                        "🗑 Le sujet a été supprimé.");
+
+                DialogPane successPane = successAlert.getDialogPane();
+                successPane.setStyle("-fx-background-color: " + COLOR_BG + "; -fx-background-radius: 12;");
+
+                Button successOk = (Button) successPane.lookupButton(ButtonType.OK);
+                successOk.setStyle("-fx-background-color: " + COLOR_SUCCESS + "; -fx-text-fill: white; -fx-cursor: hand; " +
+                        "-fx-background-radius: 8; -fx-padding: 8 24; -fx-font-weight: bold;");
+
+                successAlert.showAndWait();
+            } catch (Exception e) {
+                showAlert("Erreur", "Impossible de modifier le bannissement: " + e.getMessage(), Alert.AlertType.ERROR);
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Affiche le dialogue de bannissement
+     */
+    private void showBanDialog(Sujet sujet, Ban existingBan) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Bannir l'utilisateur");
+        dialog.setHeaderText("⚠ Sujet toxique détecté\nScore: " + String.format("%.0f", sujet.getScoreToxicite() * 100) + "%");
+
+        VBox content = new VBox(10);
+        content.setPadding(new Insets(20));
+        content.setStyle("-fx-background-color: " + COLOR_BG + "; -fx-background-radius: 12;");
+
+        // Informations sur l'utilisateur
+        Label infoLabel = new Label("👤 Utilisateur: " + (sujet.isAnonyme() ? "Anonyme" : sujet.getUserName()));
+        infoLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #2C3E50;");
+
+        // Choix de la durée
+        Label durationLabel = new Label("📅 Durée du bannissement:");
+        durationLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #2C3E50;");
+
+        ChoiceBox<Integer> durationChoice = new ChoiceBox<>();
+        durationChoice.getItems().addAll(1, 3, 7, 15, 30, 90, 365);
+        durationChoice.setValue(7);
+        durationChoice.setStyle("-fx-background-color: white; -fx-background-radius: 8;");
+
+        // Raison du bannissement
+        Label reasonLabel = new Label("📝 Raison:");
+        reasonLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #2C3E50;");
+
+        TextArea reasonArea = new TextArea();
+        reasonArea.setPromptText("Ex: Publication de contenu toxique (score: " + String.format("%.0f", sujet.getScoreToxicite() * 100) + "%)");
+        reasonArea.setPrefHeight(80);
+        reasonArea.setStyle("-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #E2E8F0; -fx-border-radius: 8;");
+
+        content.getChildren().addAll(infoLabel, durationLabel, durationChoice, reasonLabel, reasonArea);
+
+        dialog.getDialogPane().setContent(content);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        dialog.getDialogPane().setStyle("-fx-background-color: " + COLOR_BG + "; -fx-background-radius: 16;");
+
+        Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
+        okButton.setText("Bannir");
+        okButton.setStyle("-fx-background-color: #DC2626; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 8; -fx-padding: 8 24; -fx-font-weight: bold;");
+
+        Optional<ButtonType> result = dialog.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            int duration = durationChoice.getValue();
+            String reason = reasonArea.getText().trim();
+            if (reason.isEmpty()) {
+                reason = "Publication de contenu toxique (score: " + String.format("%.0f", sujet.getScoreToxicite() * 100) + "%)";
+            }
+
+            try {
+                serviceBan.banUser(sujet.getIdUser(), reason, duration, adminId);
                 serviceSujet.deleteByAdmin(sujet);
                 loadSujets();
-                showAlert("Succès", "✓ Sujet banni avec succès !\nUn avertissement a été envoyé à l'utilisateur.", Alert.AlertType.INFORMATION);
+                showAlert("Succès", "✓ Utilisateur banni pour " + duration + " jours !\n\nLe sujet a été supprimé.", Alert.AlertType.INFORMATION);
             } catch (Exception e) {
-                showAlert("Erreur", "Impossible de bannir le sujet: " + e.getMessage(), Alert.AlertType.ERROR);
+                showAlert("Erreur", "Impossible de bannir l'utilisateur: " + e.getMessage(), Alert.AlertType.ERROR);
             }
         }
     }
@@ -406,6 +752,7 @@ public class ControllerAdminSujet {
     @FXML private void onNavObjectifsClicked() { navigateTo("/ObjectifsAdmin.fxml"); }
     @FXML private void onNavSujetsClicked() { navigateTo("/AdminSujet.fxml"); }
     @FXML private void onNavCommentairesClicked() { navigateTo("/AdminCommentaire.fxml"); }
+    @FXML private void onNavBansClicked() { navigateTo("/AdminBan.fxml"); }
     @FXML private void onNavRdvClicked() { navigateTo("/RendezVousAdmin.fxml"); }
     @FXML private void onNavUtilisateursClicked() { navigateTo("/UtilisateursAdmin.fxml"); }
     @FXML private void onNavDossiersClicked() { navigateTo("/DossiersMedicaux.fxml"); }

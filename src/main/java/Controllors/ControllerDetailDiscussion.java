@@ -27,12 +27,7 @@ import java.util.Locale;
 import models.Commentaire;
 import models.Sujet;
 import models.Vote;
-import services.ServiceSujet;
-import services.ServiceCommentaire;
-import services.ServiceVote;
-import services.ServiceTraduction;
-import services.ProfanityFilterService;
-import services.ToxicityAnalysisService;
+import services.*;
 
 public class ControllerDetailDiscussion {
 
@@ -105,6 +100,7 @@ public class ControllerDetailDiscussion {
     private Map<Integer, Boolean> isCommentTranslated = new HashMap<>();
 
     private ProfanityFilterService profanityFilter;
+    private ServiceBan serviceBan;
 
     private static final String COLOR_PRIMARY = "#2C5F8A";
     private static final String COLOR_PRIMARY_DARK = "#1E4D7B";
@@ -128,6 +124,7 @@ public class ControllerDetailDiscussion {
         serviceCommentaire = new ServiceCommentaire();
         serviceTraduction = new ServiceTraduction();
         toxicityService = new ToxicityAnalysisService(); // 🔥 INITIALISATION
+        serviceBan = new ServiceBan();
 
         loadCurrentUserInfo();
 
@@ -971,6 +968,17 @@ public class ControllerDetailDiscussion {
     @FXML
     private void onSubmitComment() {
         String contenu = commentTextArea.getText().trim();
+
+        // Vérifier si l'utilisateur est banni
+        if (serviceBan.isUserBanned(currentUserId)) {
+            String banMessage = serviceBan.getBanMessage(currentUserId);
+            Alert banAlert = new Alert(Alert.AlertType.ERROR);
+            banAlert.setTitle("Accès refusé");
+            banAlert.setHeaderText("❌ Vous êtes banni du forum");
+            banAlert.setContentText(banMessage);
+            banAlert.showAndWait();
+            return;
+        }
 
         if (!validateCommentContent(contenu)) {
             return;

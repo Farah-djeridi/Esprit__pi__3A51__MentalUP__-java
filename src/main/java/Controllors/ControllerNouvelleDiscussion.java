@@ -6,6 +6,7 @@ import javafx.stage.Stage;
 import javafx.scene.layout.VBox;
 import models.Sujet;
 import services.ProfanityFilterService;
+import services.ServiceBan;
 import services.ServiceSujet;
 import services.ToxicityAnalysisService;
 
@@ -25,6 +26,7 @@ public class ControllerNouvelleDiscussion {
     private int userId;
     private ProfanityFilterService profanityFilter;
     private ToxicityAnalysisService toxicityService;
+    private ServiceBan serviceBan;
 
     private static final int TITRE_MIN = 3;
     private static final int TITRE_MAX = 100;
@@ -46,30 +48,12 @@ public class ControllerNouvelleDiscussion {
 
         toxicityService = new ToxicityAnalysisService();
 
+        serviceBan = new ServiceBan();
+
         submitButton.setOnAction(e -> submitDiscussion());
         cancelButton.setOnAction(e -> closeWindow());
     }
 
-    private void testToxicityService() {
-        System.out.println("\n=== TEST SERVICE TOXICITÉ CORRIGÉ ===");
-
-        String[] testPhrases = {
-                "je déteste les gens comme toi",
-                "tu es vraiment stupide et inutile",
-                "j'aime beaucoup ce film",
-                "merci pour ton aide précieuse"
-        };
-
-        for (String phrase : testPhrases) {
-            double score = toxicityService.analyze(phrase);
-            boolean toxique = toxicityService.isToxic(phrase);
-            System.out.println("Phrase: \"" + phrase + "\"");
-            System.out.println("Score: " + score);
-            System.out.println("Toxique: " + toxique);
-            System.out.println("---");
-        }
-        System.out.println("=== FIN TEST ===\n");
-    }
 
     public void setProfanityFilter(ProfanityFilterService filter) {
         this.profanityFilter = filter;
@@ -161,6 +145,22 @@ public class ControllerNouvelleDiscussion {
             String titre = titreField.getText().trim();
             String contenu = contenuArea.getText().trim();
 
+        // Vérifier si l'utilisateur est banni
+        if (serviceBan.isUserBanned(userId)) {
+            String banMessage = serviceBan.getBanMessage(userId);
+            Alert banAlert = new Alert(Alert.AlertType.ERROR);
+            banAlert.setTitle("Accès refusé");
+            banAlert.setHeaderText("❌ Vous êtes banni du forum");
+            banAlert.setContentText(banMessage);
+
+            DialogPane dialogPane = banAlert.getDialogPane();
+            dialogPane.setStyle("-fx-background-color: #F0F4FA; -fx-background-radius: 12;");
+
+            banAlert.showAndWait();
+            closeWindow();
+            return;
+        }
+
             // Validation des mots inappropriés
             if (profanityFilter != null) {
                 try {
@@ -171,6 +171,8 @@ public class ControllerNouvelleDiscussion {
                     return;
                 }
             }
+
+
 
 
         if (titre.isEmpty()) {

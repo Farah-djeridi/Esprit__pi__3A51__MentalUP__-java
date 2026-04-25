@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.shape.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="Controllor.TwoFactorController"
+            prefWidth="900" prefHeight="600"
+            style="-fx-background-color: #F0F4F8;">
+
+    <HBox AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0"
+          AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+
+        <!-- ═══ PANNEAU GAUCHE BLEU ═══ -->
+        <VBox prefWidth="360" alignment="CENTER" spacing="20"
+              style="-fx-background-color: #2C5F8A; -fx-padding: 50 36;">
+
+            <!-- Logo -->
+            <StackPane>
+                <Circle radius="40" style="-fx-fill: rgba(255,255,255,0.12);
+                                           -fx-stroke: rgba(255,255,255,0.3);
+                                           -fx-stroke-width: 2;"/>
+                <ImageView fx:id="logoImage" fitWidth="50" fitHeight="50" preserveRatio="false"/>
+            </StackPane>
+
+            <Label text="Mental Up"
+                   style="-fx-text-fill: white; -fx-font-size: 26px; -fx-font-weight: bold;"/>
+
+            <!-- Icône cadenas -->
+            <Label text="🔐"
+                   style="-fx-font-size: 60px;"/>
+
+            <Label text="Double Authentification"
+                   style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+            <Label text="Une couche de sécurité&#10;supplémentaire pour&#10;protéger votre compte."
+                   style="-fx-text-fill: rgba(255,255,255,0.75); -fx-font-size: 13px;
+                          -fx-text-alignment: center; -fx-alignment: center; -fx-wrap-text: true;"/>
+
+            <!-- Badges sécurité -->
+            <VBox spacing="10" alignment="CENTER" style="-fx-padding: 10 0 0 0;">
+                <HBox alignment="CENTER" spacing="8"
+                      style="-fx-background-color: rgba(255,255,255,0.12);
+                             -fx-background-radius: 20; -fx-padding: 8 20;
+                             -fx-border-color: rgba(255,255,255,0.2);
+                             -fx-border-radius: 20; -fx-border-width: 1;">
+                    <Label text="✅" style="-fx-font-size: 13px;"/>
+                    <Label text="Code valide 5 minutes"
+                           style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 12px;"/>
+                </HBox>
+                <HBox alignment="CENTER" spacing="8"
+                      style="-fx-background-color: rgba(255,255,255,0.12);
+                             -fx-background-radius: 20; -fx-padding: 8 20;
+                             -fx-border-color: rgba(255,255,255,0.2);
+                             -fx-border-radius: 20; -fx-border-width: 1;">
+                    <Label text="📧" style="-fx-font-size: 13px;"/>
+                    <Label text="Envoyé sur votre email"
+                           style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 12px;"/>
+                </HBox>
+            </VBox>
+        </VBox>
+
+        <!-- ═══ PANNEAU DROIT ═══ -->
+        <VBox HBox.hgrow="ALWAYS" alignment="CENTER" spacing="0"
+              style="-fx-background-color: white; -fx-padding: 50 60;">
+
+            <Label text="Vérification en deux étapes"
+                   style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;
+                          -fx-padding: 0 0 8 0;"/>
+
+            <Label fx:id="lblEmail" text=""
+                   style="-fx-font-size: 13px; -fx-text-fill: #7A9CB8; -fx-padding: 0 0 30 0;"/>
+
+            <!-- ═══ 6 CASES DE SAISIE ═══ -->
+            <HBox spacing="12" alignment="CENTER" style="-fx-padding: 0 0 20 0;">
+
+                <TextField fx:id="txtCode1" maxWidth="55" prefHeight="65"
+                           style="-fx-font-size: 28px; -fx-font-weight: bold;
+                                  -fx-alignment: center; -fx-text-alignment: center;
+                                  -fx-background-color: #F0F6FF;
+                                  -fx-border-color: #C8DDF0; -fx-border-radius: 12;
+                                  -fx-background-radius: 12;
+                                  -fx-text-fill: #2C5F8A;"/>
+
+                <TextField fx:id="txtCode2" maxWidth="55" prefHeight="65"
+                           style="-fx-font-size: 28px; -fx-font-weight: bold;
+                                  -fx-alignment: center; -fx-text-alignment: center;
+                                  -fx-background-color: #F0F6FF;
+                                  -fx-border-color: #C8DDF0; -fx-border-radius: 12;
+                                  -fx-background-radius: 12;
+                                  -fx-text-fill: #2C5F8A;"/>
+
+                <TextField fx:id="txtCode3" maxWidth="55" prefHeight="65"
+                           style="-fx-font-size: 28px; -fx-font-weight: bold;
+                                  -fx-alignment: center; -fx-text-alignment: center;
+                                  -fx-background-color: #F0F6FF;
+                                  -fx-border-color: #C8DDF0; -fx-border-radius: 12;
+                                  -fx-background-radius: 12;
+                                  -fx-text-fill: #2C5F8A;"/>
+
+                <!-- Séparateur visuel -->
+                <Label text="—" style="-fx-text-fill: #C8DDF0; -fx-font-size: 20px;"/>
+
+                <TextField fx:id="txtCode4" maxWidth="55" prefHeight="65"
+                           style="-fx-font-size: 28px; -fx-font-weight: bold;
+                                  -fx-alignment: center; -fx-text-alignment: center;
+                                  -fx-background-color: #F0F6FF;
+                                  -fx-border-color: #C8DDF0; -fx-border-radius: 12;
+                                  -fx-background-radius: 12;
+                                  -fx-text-fill: #2C5F8A;"/>
+
+                <TextField fx:id="txtCode5" maxWidth="55" prefHeight="65"
+                           style="-fx-font-size: 28px; -fx-font-weight: bold;
+                                  -fx-alignment: center; -fx-text-alignment: center;
+                                  -fx-background-color: #F0F6FF;
+                                  -fx-border-color: #C8DDF0; -fx-border-radius: 12;
+                                  -fx-background-radius: 12;
+                                  -fx-text-fill: #2C5F8A;"/>
+
+                <TextField fx:id="txtCode6" maxWidth="55" prefHeight="65"
+                           style="-fx-font-size: 28px; -fx-font-weight: bold;
+                                  -fx-alignment: center; -fx-text-alignment: center;
+                                  -fx-background-color: #F0F6FF;
+                                  -fx-border-color: #C8DDF0; -fx-border-radius: 12;
+                                  -fx-background-radius: 12;
+                                  -fx-text-fill: #2C5F8A;"/>
+            </HBox>
+
+            <!-- Timer -->
+            <Label fx:id="lblTimer" text="Expire dans 5:00"
+                   style="-fx-text-fill: #7A9CB8; -fx-font-size: 13px; -fx-padding: 0 0 8 0;"/>
+
+            <!-- Message erreur -->
+            <Label fx:id="lblError" text="" wrapText="true"
+                   style="-fx-font-size: 12px; -fx-padding: 0 0 16 0;"/>
+
+            <!-- Bouton Vérifier -->
+            <Button fx:id="btnVerify" text="✔  Vérifier le code" onAction="#handleVerify"
+                    maxWidth="Infinity"
+                    style="-fx-background-color: #2C5F8A; -fx-text-fill: white;
+                           -fx-font-size: 14px; -fx-font-weight: bold;
+                           -fx-pref-height: 46; -fx-background-radius: 8; -fx-cursor: hand;"/>
+
+            <VBox spacing="12" style="-fx-padding: 16 0 0 0;" alignment="CENTER">
+
+                <!-- Renvoyer le code -->
+                <HBox alignment="CENTER" spacing="6">
+                    <Label text="Vous n'avez pas reçu le code ?"
+                           style="-fx-text-fill: #7A9CB8; -fx-font-size: 12px;"/>
+                    <Hyperlink fx:id="btnResend" text="Renvoyer" onAction="#handleResend"
+                               style="-fx-text-fill: #2C5F8A; -fx-font-weight: bold; -fx-font-size: 12px;"/>
+                </HBox>
+
+                <!-- Annuler -->
+                <Hyperlink text="← Retour au login" onAction="#handleCancel"
+                           style="-fx-text-fill: #A0B4C8; -fx-font-size: 12px;"/>
+            </VBox>
+        </VBox>
+    </HBox>
+</AnchorPane>

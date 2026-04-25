@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.shape.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="Controllor.ControllerUserForm"
+      spacing="0" prefWidth="440"
+      style="-fx-background-color: white; -fx-background-radius: 12;">
+
+    <!-- Header violet -->
+    <HBox alignment="CENTER_LEFT" spacing="12"
+          style="-fx-background-color: #8E44AD; -fx-padding: 18 24;
+                 -fx-background-radius: 12 12 0 0;">
+        <Label fx:id="lblTitle" text="Nouvel utilisateur"
+               style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="✕" onAction="#handleCancel"
+                style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white;
+                       -fx-background-radius: 50; -fx-padding: 4 9; -fx-cursor: hand; -fx-font-size: 13px;"/>
+    </HBox>
+
+    <!-- Formulaire -->
+    <VBox spacing="16" style="-fx-padding: 24 28;">
+
+        <HBox spacing="14">
+            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                <Label text="Prénom" style="-fx-font-size: 12px; -fx-text-fill: #5A6C7D; -fx-font-weight: bold;"/>
+                <TextField fx:id="txtPrenom" promptText="Prénom"
+                           style="-fx-background-color: #F8F9FF; -fx-border-color: #D8E6F0;
+                                  -fx-border-radius: 8; -fx-background-radius: 8;
+                                  -fx-padding: 9 12; -fx-font-size: 13px;"/>
+            </VBox>
+            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                <Label text="Nom" style="-fx-font-size: 12px; -fx-text-fill: #5A6C7D; -fx-font-weight: bold;"/>
+                <TextField fx:id="txtNom" promptText="Nom"
+                           style="-fx-background-color: #F8F9FF; -fx-border-color: #D8E6F0;
+                                  -fx-border-radius: 8; -fx-background-radius: 8;
+                                  -fx-padding: 9 12; -fx-font-size: 13px;"/>
+            </VBox>
+        </HBox>
+
+        <VBox spacing="6">
+            <Label text="Email" style="-fx-font-size: 12px; -fx-text-fill: #5A6C7D; -fx-font-weight: bold;"/>
+            <HBox alignment="CENTER_LEFT" spacing="8"
+                  style="-fx-background-color: #F8F9FF; -fx-border-color: #D8E6F0;
+                         -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 0 12; -fx-pref-height: 40;">
+                <Label text="✉" style="-fx-text-fill: #7A9CB8; -fx-font-size: 13px;"/>
+                <TextField fx:id="txtEmail" promptText="email@exemple.com"
+                           style="-fx-background-color: transparent; -fx-border-color: transparent;
+                                  -fx-font-size: 13px;" HBox.hgrow="ALWAYS"/>
+            </HBox>
+        </VBox>
+
+        <VBox spacing="6">
+            <Label text="Mot de passe" style="-fx-font-size: 12px; -fx-text-fill: #5A6C7D; -fx-font-weight: bold;"/>
+            <Label fx:id="lblPassHelper" text="Laisser vide pour ne pas changer"
+                   style="-fx-font-size: 11px; -fx-text-fill: #A0B4C8;"/>
+            <HBox alignment="CENTER_LEFT" spacing="8"
+                  style="-fx-background-color: #F8F9FF; -fx-border-color: #D8E6F0;
+                         -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 0 12; -fx-pref-height: 40;">
+                <Label text="🔒" style="-fx-text-fill: #7A9CB8; -fx-font-size: 13px;"/>
+                <PasswordField fx:id="txtPassword" promptText="••••••••"
+                               style="-fx-background-color: transparent; -fx-border-color: transparent;
+                                      -fx-font-size: 13px;" HBox.hgrow="ALWAYS"/>
+            </HBox>
+        </VBox>
+
+        <VBox spacing="6">
+            <Label text="Rôle" style="-fx-font-size: 12px; -fx-text-fill: #5A6C7D; -fx-font-weight: bold;"/>
+            <HBox spacing="10">
+                <Button fx:id="btnEtudiant" text="Étudiant" onAction="#selectEtudiant"
+                        HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                        style="-fx-background-color: #2C5F8A; -fx-text-fill: white;
+                               -fx-background-radius: 8; -fx-pref-height: 38; -fx-cursor: hand;"/>
+                <Button fx:id="btnPsy" text="Psychologue" onAction="#selectPsy"
+                        HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                        style="-fx-background-color: #F0F6FF; -fx-text-fill: #7A9CB8;
+                               -fx-border-color: #C8DDF0; -fx-border-radius: 8;
+                               -fx-background-radius: 8; -fx-pref-height: 38; -fx-cursor: hand;"/>
+                <Button fx:id="btnAdmin" text="Admin" onAction="#selectAdmin"
+                        HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                        style="-fx-background-color: #F0F6FF; -fx-text-fill: #7A9CB8;
+                               -fx-border-color: #C8DDF0; -fx-border-radius: 8;
+                               -fx-background-radius: 8; -fx-pref-height: 38; -fx-cursor: hand;"/>
+            </HBox>
+        </VBox>
+
+        <Label fx:id="lblError" text="" wrapText="true"
+               style="-fx-text-fill: #C0392B; -fx-font-size: 12px;"/>
+
+        <!-- Boutons -->
+        <HBox spacing="12" style="-fx-padding: 4 0 0 0;">
+            <Button text="Annuler" onAction="#handleCancel"
+                    HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                    style="-fx-background-color: #F8F9FF; -fx-text-fill: #5A6C7D;
+                           -fx-border-color: #D8E6F0; -fx-border-radius: 8;
+                           -fx-background-radius: 8; -fx-pref-height: 42; -fx-cursor: hand;"/>
+            <Button fx:id="btnSave" text="Enregistrer" onAction="#handleSave"
+                    HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                    style="-fx-background-color: #8E44AD; -fx-text-fill: white;
+                           -fx-font-weight: bold; -fx-pref-height: 42;
+                           -fx-background-radius: 8; -fx-cursor: hand;"/>
+        </HBox>
+    </VBox>
+</VBox>

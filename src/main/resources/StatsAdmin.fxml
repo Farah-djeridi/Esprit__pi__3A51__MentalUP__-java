@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.web.WebView?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="Controllor.ControllerStatsAdmin"
+            prefWidth="1100" prefHeight="700"
+            style="-fx-background-color: #F4F8FF;">
+
+    <!-- SIDEBAR (meme que AdminUsers) -->
+    <left>
+        <VBox prefWidth="240" prefHeight="700" style="-fx-background-color: #2C3E50;">
+            <HBox alignment="CENTER_LEFT" spacing="10"
+                  style="-fx-padding: 22 16 18 16; -fx-border-color: transparent transparent rgba(255,255,255,0.1) transparent; -fx-border-width: 0 0 1 0;">
+                <ImageView fx:id="logoImage" fitWidth="40" fitHeight="40" preserveRatio="true"/>
+                <VBox spacing="2">
+                    <Label text="MentalUp Admin" style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                    <Label text="Administration" style="-fx-text-fill: rgba(255,255,255,0.5); -fx-font-size: 11px;"/>
+                </VBox>
+            </HBox>
+            <VBox spacing="2" style="-fx-padding: 14 10 0 10;" VBox.vgrow="ALWAYS">
+                <HBox alignment="CENTER_LEFT" spacing="12" onMouseClicked="#goToDashboard"
+                      style="-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 12; -fx-cursor: hand;"
+                      onMouseEntered="#onHoverEnter" onMouseExited="#onHoverExit">
+                    <Label text="Tableau de bord" style="-fx-text-fill: rgba(255,255,255,0.75); -fx-font-size: 13px;"/>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" spacing="12" onMouseClicked="#goToUsers"
+                      style="-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 12; -fx-cursor: hand;"
+                      onMouseEntered="#onHoverEnter" onMouseExited="#onHoverExit">
+                    <Label text="Utilisateurs" style="-fx-text-fill: rgba(255,255,255,0.75); -fx-font-size: 13px;"/>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" spacing="12" onMouseClicked="#goToDashboard"
+                      style="-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 12; -fx-cursor: hand;"
+                      onMouseEntered="#onHoverEnter" onMouseExited="#onHoverExit">
+                    <Label text="Rendez-vous" style="-fx-text-fill: rgba(255,255,255,0.75); -fx-font-size: 13px;"/>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" spacing="12" onMouseClicked="#goToDashboard"
+                      style="-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 12; -fx-cursor: hand;"
+                      onMouseEntered="#onHoverEnter" onMouseExited="#onHoverExit">
+                    <Label text="Forum" style="-fx-text-fill: rgba(255,255,255,0.75); -fx-font-size: 13px;"/>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" spacing="12"
+                      style="-fx-background-color: #8E44AD; -fx-background-radius: 8; -fx-padding: 10 12; -fx-cursor: hand;">
+                    <Label text="Statistiques" style="-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                </HBox>
+            </VBox>
+            <HBox alignment="CENTER_LEFT" spacing="10" onMouseClicked="#handleLogout"
+                  style="-fx-padding: 16 14; -fx-cursor: hand; -fx-border-color: rgba(255,255,255,0.1) transparent transparent transparent; -fx-border-width: 1 0 0 0;">
+                <Label text="Deconnexion" style="-fx-text-fill: rgba(255,255,255,0.6); -fx-font-size: 13px;"/>
+            </HBox>
+        </VBox>
+    </left>
+
+    <!-- CONTENU : WebView avec Google Charts -->
+    <center>
+        <VBox spacing="0">
+            <HBox alignment="CENTER_LEFT" spacing="12"
+                  style="-fx-background-color: white; -fx-padding: 18 28; -fx-border-color: transparent transparent #E8EFF6 transparent; -fx-border-width: 0 0 1 0;">
+                <Label text="Statistiques des inscriptions"
+                       style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblStatsInfo" text=""
+                       style="-fx-font-size: 13px; -fx-text-fill: #7A8C9A;"/>
+            </HBox>
+            <WebView fx:id="webView" VBox.vgrow="ALWAYS" prefHeight="620"/>
+        </VBox>
+    </center>
+
+</BorderPane>

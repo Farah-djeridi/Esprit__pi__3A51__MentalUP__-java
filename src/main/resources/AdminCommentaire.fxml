@@ -278,7 +278,7 @@
                             <HBox spacing="15" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS"
                                   style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 15 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2); -fx-border-color: #E8EEF4; -fx-border-radius: 12; -fx-border-width: 1;">
                                 <StackPane style="-fx-background-color: #FEE2E2; -fx-background-radius: 10; -fx-padding: 10;">
-                                    <Label text="⚠️" style="-fx-font-size: 24px;"/>
+                                    <Label text="⚠" style="-fx-font-size: 24px;"/>
                                 </StackPane>
                                 <VBox spacing="2">
                                     <Label text="Commentaires Toxiques" style="-fx-text-fill: #6B7C8D; -fx-font-size: 13px; -fx-font-weight: 600;"/>
@@ -286,7 +286,6 @@
                                 </VBox>
                             </HBox>
 
-                            <!-- Carte 3 : Sains -->
                             <HBox spacing="15" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS"
                                   style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 15 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2); -fx-border-color: #E8EEF4; -fx-border-radius: 12; -fx-border-width: 1;">
                                 <StackPane style="-fx-background-color: #DCFCE7; -fx-background-radius: 10; -fx-padding: 10;">

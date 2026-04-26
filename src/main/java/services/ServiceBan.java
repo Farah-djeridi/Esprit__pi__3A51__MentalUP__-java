@@ -15,7 +15,6 @@ public class ServiceBan {
         this.cnx = MyDataBase.getInstance().getCnx();
     }
 
-    // Bannir un utilisateur
     public void banUser(int userId, String reason, int daysDuration, int bannedBy) {
         String req = "INSERT INTO ban (user_id, ban_reason, ban_date, ban_expiry_date, is_active, banned_by) " +
                 "VALUES (?, ?, ?, ?, ?, ?)";
@@ -33,7 +32,7 @@ public class ServiceBan {
             System.out.println("Erreur lors du bannissement: " + e.getMessage());
         }
     }
-    // Dans ServiceBan.java - Ajouter cette méthode
+
     public void updateBan(int banId, String reason, int daysDuration) {
         String req = "UPDATE ban SET ban_reason = ?, ban_expiry_date = ? WHERE id = ?";
         try {
@@ -48,8 +47,7 @@ public class ServiceBan {
             e.printStackTrace();
         }
     }
-    // Vérifier si un utilisateur est actuellement banni
-    // Dans ServiceBan.java
+
     public boolean isUserBanned(int userId) {
         String req = "SELECT * FROM ban WHERE user_id = ? AND is_active = true AND ban_expiry_date >= ?";
         try {
@@ -67,7 +65,6 @@ public class ServiceBan {
         return false;
     }
 
-    // Obtenir le bannissement actif d'un utilisateur
     public Ban getActiveBan(int userId) {
         String req = "SELECT b.*, u.nom as user_name, a.nom as admin_name " +
                 "FROM ban b " +
@@ -99,7 +96,6 @@ public class ServiceBan {
         return null;
     }
 
-    // Désactiver un bannissement
     private void deactivateBan(int banId) {
         String req = "UPDATE ban SET is_active = false WHERE id = ?";
         try {
@@ -111,10 +107,7 @@ public class ServiceBan {
         }
     }
 
-    // Débannir manuellement un utilisateur
-    // Dans ServiceBan.java
     public void unbanUser(int userId) {
-        // Désactiver tous les bannissements actifs de cet utilisateur
         String req = "UPDATE ban SET is_active = false WHERE user_id = ? AND is_active = true";
         try {
             PreparedStatement pstm = cnx.prepareStatement(req);
@@ -127,40 +120,6 @@ public class ServiceBan {
         }
     }
 
-    // Obtenir tous les utilisateurs bannis
-    public List<Ban> getAllActiveBans() {
-        List<Ban> bans = new ArrayList<>();
-        String req = "SELECT b.*, u.nom as user_name, a.nom as admin_name " +
-                "FROM ban b " +
-                "LEFT JOIN user u ON b.user_id = u.id " +
-                "LEFT JOIN user a ON b.banned_by = a.id " +
-                "WHERE b.is_active = true AND b.ban_expiry_date >= ? " +
-                "ORDER BY b.ban_date DESC";
-        try {
-            PreparedStatement pstm = cnx.prepareStatement(req);
-            pstm.setDate(1, Date.valueOf(LocalDate.now()));
-            ResultSet rs = pstm.executeQuery();
-
-            while (rs.next()) {
-                Ban ban = new Ban();
-                ban.setId(rs.getInt("id"));
-                ban.setUserId(rs.getInt("user_id"));
-                ban.setUserName(rs.getString("user_name"));
-                ban.setBanReason(rs.getString("ban_reason"));
-                ban.setBanDate(rs.getDate("ban_date"));
-                ban.setBanExpiryDate(rs.getDate("ban_expiry_date"));
-                ban.setActive(rs.getBoolean("is_active"));
-                ban.setBannedBy(rs.getInt("banned_by"));
-                ban.setBannedByName(rs.getString("admin_name"));
-                bans.add(ban);
-            }
-        } catch (SQLException e) {
-            System.out.println("Erreur: " + e.getMessage());
-        }
-        return bans;
-    }
-
-    // Obtenir les informations de bannissement (message pour l'utilisateur)
     public String getBanMessage(int userId) {
         Ban ban = getActiveBan(userId);
         if (ban != null) {
@@ -172,11 +131,9 @@ public class ServiceBan {
         }
         return null;
     }
-    // Ajouter cette méthode pour récupérer tous les bannissements avec les noms d'utilisateurs
-// Dans ServiceBan.java
+
     public List<Ban> getAllBansWithDetails() {
         List<Ban> bans = new ArrayList<>();
-        // Récupérer TOUS les bannissements (actifs ET inactifs) pour l'affichage
         String req = "SELECT b.*, u.nom as user_name, a.nom as admin_name " +
                 "FROM ban b " +
                 "LEFT JOIN user u ON b.user_id = u.id " +
@@ -205,9 +162,6 @@ public class ServiceBan {
         }
         return bans;
     }
-    /**
-     * Supprimer définitivement un bannissement de la base de données
-     */
     public void deleteBan(int banId) {
         String req = "DELETE FROM ban WHERE id = ?";
         try {

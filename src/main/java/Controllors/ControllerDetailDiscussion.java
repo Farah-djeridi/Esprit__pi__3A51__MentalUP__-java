@@ -79,7 +79,7 @@ public class ControllerDetailDiscussion {
     private ServiceCommentaire serviceCommentaire;
     private ServiceVote serviceVote;
     private ServiceTraduction serviceTraduction;
-    private ToxicityAnalysisService toxicityService; // 🔥 AJOUTÉ
+    private ToxicityAnalysisService toxicityService;
 
     private Sujet currentSujet;
     private List<Commentaire> allCommentaires;
@@ -123,7 +123,7 @@ public class ControllerDetailDiscussion {
 
         serviceCommentaire = new ServiceCommentaire();
         serviceTraduction = new ServiceTraduction();
-        toxicityService = new ToxicityAnalysisService(); // 🔥 INITIALISATION
+        toxicityService = new ToxicityAnalysisService();
         serviceBan = new ServiceBan();
 
         loadCurrentUserInfo();
@@ -152,7 +152,6 @@ public class ControllerDetailDiscussion {
 
         badgeRdv.setText("3");
 
-        // Initialiser le bouton d'annulation de traduction du sujet
         cancelTranslateSujetBtn = new Button("↩ Annuler");
         cancelTranslateSujetBtn.setStyle(
                 "-fx-background-color: #F1F5F9;" +
@@ -585,7 +584,6 @@ public class ControllerDetailDiscussion {
         return btn;
     }
 
-    // 🔥 NOUVEAU : Analyser la toxicité d'un commentaire
     private double analyzeCommentToxicity(String content) {
         if (content == null || content.isEmpty()) return 0.0;
         double score = toxicityService.analyze(content);
@@ -640,7 +638,6 @@ public class ControllerDetailDiscussion {
         dateValue.setStyle("-fx-font-size: 12px; -fx-text-fill: " + COLOR_TEXT_SECONDARY + ";");
         metaData.getChildren().addAll(authorLabel, dot, dateValue);
 
-        // 🔥 BADGE DE TOXICITÉ POUR LE COMMENTAIRE
         if (commentaire.isEstToxique() && commentaire.getScoreToxicite() >= 0.7) {
             Label toxicBadge = new Label("⚠ Toxique " + String.format("(%.0f%%)", commentaire.getScoreToxicite() * 100));
             toxicBadge.setStyle(
@@ -784,55 +781,8 @@ public class ControllerDetailDiscussion {
         return true;
     }
 
-    private boolean validateSujetContent(String titre, String contenu) {
-        if (titre == null || titre.trim().isEmpty()) {
-            showAlert("Erreur", "Le titre ne peut pas être vide", Alert.AlertType.WARNING);
-            return false;
-        }
-        if (titre.length() < 3) {
-            showAlert("Erreur", "Le titre doit contenir au moins 3 caractères", Alert.AlertType.WARNING);
-            return false;
-        }
-        if (titre.length() > 100) {
-            showAlert("Erreur", "Le titre ne peut pas dépasser 100 caractères", Alert.AlertType.WARNING);
-            return false;
-        }
-        if (contenu == null || contenu.trim().isEmpty()) {
-            showAlert("Erreur", "Le contenu ne peut pas être vide", Alert.AlertType.WARNING);
-            return false;
-        }
-        if (contenu.length() < 10) {
-            showAlert("Erreur", "Le contenu doit contenir au moins 10 caractères", Alert.AlertType.WARNING);
-            return false;
-        }
-        if (contenu.length() > 5000) {
-            showAlert("Erreur", "Le contenu ne peut pas dépasser 5000 caractères", Alert.AlertType.WARNING);
-            return false;
-        }
-        return true;
-    }
 
-    private boolean validateCommentEdit(String newContent, String originalContent) {
-        if (newContent == null || newContent.trim().isEmpty()) {
-            showAlert("Erreur", "Le commentaire ne peut pas être vide", Alert.AlertType.WARNING);
-            return false;
-        }
-        if (newContent.length() < 3) {
-            showAlert("Erreur", "Le commentaire doit contenir au moins 3 caractères", Alert.AlertType.WARNING);
-            return false;
-        }
-        if (newContent.length() > 1000) {
-            showAlert("Erreur", "Le commentaire ne peut pas dépasser 1000 caractères", Alert.AlertType.WARNING);
-            return false;
-        }
-        if (newContent.equals(originalContent)) {
-            showAlert("Information", "Aucune modification détectée", Alert.AlertType.INFORMATION);
-            return false;
-        }
-        return true;
-    }
 
-    // 🔥 MODIFICATION D'UN COMMENTAIRE AVEC ANALYSE DE TOXICITÉ
     private void editComment(Commentaire commentaire, Label contentLabel, MenuButton menuButton) {
         TextArea editArea = new TextArea(commentaire.getContenu());
         editArea.setWrapText(true);
@@ -868,7 +818,6 @@ public class ControllerDetailDiscussion {
         saveButton.setOnAction(e -> {
             String newText = editArea.getText().trim();
 
-            // 1. Valider la longueur
             if (newText.isEmpty()) {
                 showAlert("Erreur", "Le commentaire ne peut pas être vide", Alert.AlertType.WARNING);
                 return;
@@ -882,7 +831,6 @@ public class ControllerDetailDiscussion {
                 return;
             }
 
-            // 2. Valider les mots inappropriés
             if (profanityFilter != null) {
                 try {
                     profanityFilter.validateText(newText, "commentaire");
@@ -892,7 +840,6 @@ public class ControllerDetailDiscussion {
                 }
             }
 
-            // 3. Vérifier si le texte a changé
             if (newText.equals(commentaire.getContenu())) {
                 showAlert("Information", "Aucune modification détectée", Alert.AlertType.INFORMATION);
                 parent.getChildren().set(index, contentLabel);
@@ -902,11 +849,9 @@ public class ControllerDetailDiscussion {
                 return;
             }
 
-            // 🔥 ANALYSE DE TOXICITÉ POUR LA MODIFICATION
             double scoreToxicite = analyzeCommentToxicity(newText);
             boolean estToxique = scoreToxicite >= 0.7;
 
-            // 4. Sauvegarder avec les scores de toxicité
             commentaire.setContenu(newText);
             commentaire.setScoreToxicite(scoreToxicite);
             commentaire.setEstToxique(estToxique);
@@ -922,7 +867,7 @@ public class ControllerDetailDiscussion {
             showAlert("Succès", "Commentaire modifié avec succès !", Alert.AlertType.INFORMATION);
 
 
-            loadCommentaires(); // Rafraîchir pour afficher le badge
+            loadCommentaires();
         });
 
         buttonBox.getChildren().addAll(cancelButton, saveButton);
@@ -964,7 +909,6 @@ public class ControllerDetailDiscussion {
         }
     }
 
-    // 🔥 AJOUT D'UN COMMENTAIRE AVEC ANALYSE DE TOXICITÉ
     @FXML
     private void onSubmitComment() {
         String contenu = commentTextArea.getText().trim();
@@ -993,7 +937,6 @@ public class ControllerDetailDiscussion {
             }
         }
 
-        // 🔥 ANALYSE DE TOXICITÉ POUR LE NOUVEAU COMMENTAIRE
         double scoreToxicite = analyzeCommentToxicity(contenu);
         boolean estToxique = scoreToxicite >= 0.7;
 

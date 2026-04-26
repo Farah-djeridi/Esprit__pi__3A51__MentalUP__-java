@@ -12,9 +12,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
-/**
- * Service de détection des mots inappropriés via l'API Ninjas
- */
 public class ProfanityFilterService {
 
     private static final String API_URL = "https://api.api-ninjas.com/v1/profanityfilter";
@@ -71,10 +68,8 @@ public class ProfanityFilterService {
 
         String clean = text.trim();
 
-        // 1. Filtre FR
         if (containsFrenchProfanity(clean)) return true;
 
-        // 2. API
         if (!apiConfigured) return false;
 
         for (String chunk : splitIntoChunks(clean)) {

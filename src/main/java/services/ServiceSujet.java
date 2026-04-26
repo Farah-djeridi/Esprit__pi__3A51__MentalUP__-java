@@ -120,8 +120,8 @@ public class ServiceSujet implements IService<Sujet> {
             pstm.setString(1, s.getTitre());
             pstm.setString(2, s.getContenu());
             pstm.setBoolean(3, s.isAnonyme());
-            pstm.setDouble(4, s.getScoreToxicite());  // 🔥 Ajout du score de toxicité
-            pstm.setBoolean(5, s.isEstToxique());     // 🔥 Ajout du flag toxique
+            pstm.setDouble(4, s.getScoreToxicite());
+            pstm.setBoolean(5, s.isEstToxique());
             pstm.setInt(6, s.getId());
 
             int rowsAffected = pstm.executeUpdate();

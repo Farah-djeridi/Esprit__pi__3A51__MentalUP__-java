@@ -132,7 +132,6 @@ public class ControllerAdminBan {
         activeBansLabel.setText(String.valueOf(active));
         expiredBansLabel.setText(String.valueOf(expired));
 
-        // Update Chart
         ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList(
             new PieChart.Data("Actifs", active),
             new PieChart.Data("Expirés", expired)
@@ -147,22 +146,18 @@ public class ControllerAdminBan {
 
         filteredBans = new ArrayList<>(allBans);
 
-        // Filtre par recherche
         if (searchText != null && !searchText.isEmpty()) {
             filteredBans.removeIf(b ->
                     (b.getUserName() == null || !b.getUserName().toLowerCase().contains(searchText))
             );
         }
 
-        // Filtre par statut - Vérifier à la fois is_active ET la date
         LocalDate today = LocalDate.now();
         if ("Actifs".equals(filter)) {
-            // Un bannissement est actif si: is_active = true ET date d'expiration >= aujourd'hui
             filteredBans.removeIf(b ->
                     !b.isActive() || b.getBanExpiryDate().toLocalDate().isBefore(today)
             );
         } else if ("Expirés".equals(filter)) {
-            // Un bannissement est expiré si: is_active = false OU date d'expiration < aujourd'hui
             filteredBans.removeIf(b ->
                     b.isActive() && !b.getBanExpiryDate().toLocalDate().isBefore(today)
             );
@@ -186,21 +181,17 @@ public class ControllerAdminBan {
         row.setStyle("-fx-background-color: " + (isEven ? "white" : "#F8FAFE") +
                 "; -fx-padding: 12 15; -fx-border-color: #E8EEF4; -fx-border-width: 0 0 1 0;");
 
-        // Utilisateur
         Label userLabel = new Label(ban.getUserName() != null ? ban.getUserName() : "Utilisateur #" + ban.getUserId());
         userLabel.setPrefWidth(180);
         userLabel.setStyle("-fx-text-fill: #2C3E50; -fx-font-weight: 600; -fx-font-size: 13px;");
 
-        // Date du ban
         Label banDateLabel = new Label(formatDate(ban.getBanDate()));
         banDateLabel.setPrefWidth(120);
         banDateLabel.setStyle("-fx-text-fill: #6B7C8D; -fx-font-size: 12px;");
 
-        // Date d'expiration
         Label expiryDateLabel = new Label(formatDate(ban.getBanExpiryDate()));
         expiryDateLabel.setPrefWidth(120);
 
-        // Vérifier le vrai statut du bannissement
         LocalDate today = LocalDate.now();
         boolean isExpired = ban.getBanExpiryDate().toLocalDate().isBefore(today);
         boolean isActive = ban.isActive() && !isExpired;
@@ -211,14 +202,12 @@ public class ControllerAdminBan {
             expiryDateLabel.setStyle("-fx-text-fill: #DC2626; -fx-font-weight: bold; -fx-font-size: 12px;");
         }
 
-        // Durée
         long days = ChronoUnit.DAYS.between(ban.getBanDate().toLocalDate(), ban.getBanExpiryDate().toLocalDate());
         Label durationLabel = new Label(days + " jours");
         durationLabel.setPrefWidth(80);
         durationLabel.setStyle("-fx-text-fill: #6B7C8D; -fx-font-size: 12px;");
         durationLabel.setAlignment(Pos.CENTER);
 
-        // Raison
         String reasonText = ban.getBanReason();
         if (reasonText.length() > 35) {
             reasonText = reasonText.substring(0, 35) + "...";
@@ -228,17 +217,14 @@ public class ControllerAdminBan {
         reasonLabel.setStyle("-fx-text-fill: #4A5A6A; -fx-font-size: 12px;");
         reasonLabel.setWrapText(true);
 
-        // Banni par
         Label bannedByLabel = new Label(ban.getBannedByName() != null ? ban.getBannedByName() : "Admin");
         bannedByLabel.setPrefWidth(120);
         bannedByLabel.setStyle("-fx-text-fill: #6B7C8D; -fx-font-size: 12px;");
 
-        // Actions
         HBox actionsBox = new HBox(8);
         actionsBox.setPrefWidth(180);
         actionsBox.setAlignment(Pos.CENTER);
 
-        // 🔥 Afficher les boutons selon le statut
         if (isActive) {
             // Bouton Modifier
             Button modifyBtn = new Button("✏ Modifier");
@@ -251,7 +237,6 @@ public class ControllerAdminBan {
                     "-fx-background-radius: 5; -fx-padding: 5 8; -fx-font-size: 10px; -fx-font-weight: bold;"));
             actionsBox.getChildren().add(modifyBtn);
 
-            // Bouton Débannir
             Button unbanBtn = new Button("🔓 Débannir");
             unbanBtn.setStyle("-fx-background-color: #22C55E; -fx-text-fill: white; -fx-cursor: hand; " +
                     "-fx-background-radius: 5; -fx-padding: 5 8; -fx-font-size: 10px; -fx-font-weight: bold;");
@@ -262,7 +247,7 @@ public class ControllerAdminBan {
                     "-fx-background-radius: 5; -fx-padding: 5 8; -fx-font-size: 10px; -fx-font-weight: bold;"));
             actionsBox.getChildren().add(unbanBtn);
         } else {
-            // 🔥 Bouton Supprimer pour les bannissements désactivés ou expirés
+
             Button deleteBtn = new Button("🗑 Supprimer");
             deleteBtn.setStyle("-fx-background-color: #6B7C8D; -fx-text-fill: white; -fx-cursor: hand; " +
                     "-fx-background-radius: 5; -fx-padding: 5 8; -fx-font-size: 10px; -fx-font-weight: bold;");
@@ -273,7 +258,6 @@ public class ControllerAdminBan {
                     "-fx-background-radius: 5; -fx-padding: 5 8; -fx-font-size: 10px; -fx-font-weight: bold;"));
             actionsBox.getChildren().add(deleteBtn);
 
-            // Afficher le statut
             Label statusLabel = new Label(isExpired ? "(Expiré)" : "(Désactivé)");
             statusLabel.setStyle("-fx-text-fill: #6B7C8D; -fx-font-size: 10px; -fx-font-style: italic;");
             actionsBox.getChildren().add(statusLabel);
@@ -284,42 +268,31 @@ public class ControllerAdminBan {
         return row;
     }
 
-    /**
-     * Supprimer définitivement un bannissement de la base de données
-     */
-    /**
-     * Supprimer définitivement un bannissement de la base de données
-     */
+
     private void deleteBan(Ban ban) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Supprimer le bannissement");
 
-        // Conteneur personnalisé
         VBox content = new VBox(15);
         content.setPadding(new Insets(20));
         content.setStyle("-fx-background-color: " + COLOR_BG + "; -fx-background-radius: 12;");
 
-        // Icône d'avertissement personnalisée (pas de point d'interrogation)
         Label iconLabel = new Label("⚠");
         iconLabel.setStyle("-fx-font-size: 42px; -fx-text-fill: #DC2626;");
         iconLabel.setAlignment(Pos.CENTER);
 
-        // Titre
         Label titleLabel = new Label("Suppression définitive");
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #DC2626;");
         titleLabel.setAlignment(Pos.CENTER);
 
-        // Message
         Label messageLabel = new Label("Êtes-vous sûr de vouloir supprimer ce bannissement ?");
         messageLabel.setStyle("-fx-font-size: 15px; -fx-text-fill: #4A5A6A;");
         messageLabel.setAlignment(Pos.CENTER);
 
-        // Informations utilisateur
         Label infoLabel = new Label("👤 " + ban.getUserName() + " | 📅 " + ban.getBanDate());
         infoLabel.setStyle("-fx-background-color: #F1F5F9; -fx-padding: 8 12; -fx-background-radius: 8; -fx-font-size: 14px; -fx-text-fill: #475569;");
         infoLabel.setAlignment(Pos.CENTER);
 
-        // Avertissement
         Label warningLabel = new Label("⚠ Cette action est irréversible et supprimera l'historique.");
         warningLabel.setStyle("-fx-background-color: #FEE2E2; -fx-padding: 10; -fx-background-radius: 8; -fx-font-size: 13px; -fx-text-fill: #DC2626;");
         warningLabel.setWrapText(true);
@@ -331,7 +304,6 @@ public class ControllerAdminBan {
         dialog.getDialogPane().setStyle("-fx-background-color: " + COLOR_BG + "; -fx-background-radius: 16;");
         dialog.getDialogPane().setPrefWidth(350);
 
-        // Stylisation des boutons
         Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
         okButton.setText("🗑 Supprimer");
         okButton.setStyle("-fx-background-color: #DC2626; -fx-text-fill: white; -fx-cursor: hand; " +
@@ -359,20 +331,16 @@ public class ControllerAdminBan {
             }
         }
     }
-    /**
-     * Modifier un bannissement existant (durée et raison)
-     */
+
     private void modifyBan(Ban existingBan) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Modifier le bannissement");
         dialog.setHeaderText(null);
 
-        // Conteneur principal avec style moderne
         VBox content = new VBox(15);
         content.setPadding(new Insets(25));
         content.setStyle("-fx-background-color: " + COLOR_BG + "; -fx-background-radius: 16;");
 
-        // En-tête personnalisé
         HBox headerBox = new HBox(10);
         headerBox.setAlignment(Pos.CENTER_LEFT);
         headerBox.setStyle("-fx-padding: 0 0 10 0;");
@@ -390,7 +358,6 @@ public class ControllerAdminBan {
         headerText.getChildren().addAll(headerTitle, headerSubtitle);
         headerBox.getChildren().addAll(headerIcon, headerText);
 
-        // Carte des informations actuelles
         VBox infoCard = new VBox(8);
         infoCard.setStyle("-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 15; " +
                 "-fx-border-color: #E2E8F0; -fx-border-radius: 12; -fx-border-width: 1;");
@@ -400,7 +367,6 @@ public class ControllerAdminBan {
 
         VBox infoDetails = new VBox(5);
 
-        // Ligne Date
         HBox dateRow = new HBox(10);
         dateRow.setAlignment(Pos.CENTER_LEFT);
         Label dateIcon = new Label("📅");
@@ -409,7 +375,6 @@ public class ControllerAdminBan {
         dateLabel.setStyle("-fx-text-fill: #6B7C8D; -fx-font-size: 12px;");
         dateRow.getChildren().addAll(dateIcon, dateLabel);
 
-        // Ligne Expiration
         HBox expiryRow = new HBox(10);
         expiryRow.setAlignment(Pos.CENTER_LEFT);
         Label expiryIcon = new Label("⏰");
@@ -422,7 +387,6 @@ public class ControllerAdminBan {
         expiryLabel.setStyle("-fx-text-fill: #DC2626; -fx-font-size: 12px; -fx-font-weight: bold;");
         expiryRow.getChildren().addAll(expiryIcon, expiryLabel);
 
-        // Ligne Raison
         HBox reasonRow = new HBox(10);
         reasonRow.setAlignment(Pos.CENTER_LEFT);
         Label reasonIcon = new Label("📝");
@@ -435,18 +399,15 @@ public class ControllerAdminBan {
         infoDetails.getChildren().addAll(dateRow, expiryRow, reasonRow);
         infoCard.getChildren().addAll(infoTitle, infoDetails);
 
-        // Séparateur décoratif
         Separator separator = new Separator();
         separator.setStyle("-fx-background-color: #E2E8F0;");
 
-        // Section modification
         VBox modifySection = new VBox(12);
         modifySection.setStyle("-fx-padding: 5 0 0 0;");
 
         Label modifyTitle = new Label("✏ Modifier le bannissement");
         modifyTitle.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;");
 
-        // Nouvelle durée
         VBox durationBox = new VBox(6);
         Label durationLabel = new Label("📅 Nouvelle durée");
         durationLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #4A5A6A; -fx-font-size: 13px;");
@@ -466,7 +427,6 @@ public class ControllerAdminBan {
         durationSelectionBox.getChildren().addAll(durationChoice, daysLabel);
         durationBox.getChildren().addAll(durationLabel, durationSelectionBox);
 
-        // Nouvelle raison
         VBox reasonBox = new VBox(6);
         Label newReasonLabel = new Label("📝 Nouvelle raison");
         newReasonLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #4A5A6A; -fx-font-size: 13px;");
@@ -484,22 +444,18 @@ public class ControllerAdminBan {
 
         modifySection.getChildren().addAll(modifyTitle, durationBox, reasonBox);
 
-        // Assemblage du contenu
         content.getChildren().addAll(headerBox, infoCard, separator, modifySection);
 
-        // Configuration du dialogue
         dialog.getDialogPane().setContent(content);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
         dialog.getDialogPane().setStyle("-fx-background-color: " + COLOR_BG + "; -fx-background-radius: 16;");
         dialog.getDialogPane().setPrefWidth(500);
 
-        // Stylisation des boutons
         Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
         okButton.setText("💾 Enregistrer");
         okButton.setStyle("-fx-background-color: #F59E0B; -fx-text-fill: white; -fx-cursor: hand; " +
                 "-fx-background-radius: 10; -fx-padding: 10 30; -fx-font-weight: bold; -fx-font-size: 13px;");
 
-        // Effet hover sur le bouton OK
         okButton.setOnMouseEntered(e -> okButton.setStyle("-fx-background-color: #D97706; -fx-text-fill: white; -fx-cursor: hand; " +
                 "-fx-background-radius: 10; -fx-padding: 10 30; -fx-font-weight: bold; -fx-font-size: 13px;"));
         okButton.setOnMouseExited(e -> okButton.setStyle("-fx-background-color: #F59E0B; -fx-text-fill: white; -fx-cursor: hand; " +
@@ -524,18 +480,15 @@ public class ControllerAdminBan {
                 newReason = existingBan.getBanReason();
             }
 
-            // Vérifier si des modifications ont été faites
             if (newDuration == currentDays && newReason.equals(existingBan.getBanReason())) {
                 showAlert("Information", "Aucune modification détectée.", Alert.AlertType.INFORMATION);
                 return;
             }
 
             try {
-                // 🔥 UTILISER updateBan au lieu de unbanUser + banUser
                 serviceBan.updateBan(existingBan.getId(), newReason, newDuration);
                 loadBans();
 
-                // Message de succès stylisé
                 Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
                 successAlert.setTitle("Succès");
                 successAlert.setHeaderText(null);
@@ -578,16 +531,12 @@ public class ControllerAdminBan {
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
-                // Désactiver le bannissement spécifique
                 serviceBan.unbanUser(ban.getUserId());
 
-                // Recharger complètement les données
                 allBans = serviceBan.getAllBansWithDetails();
 
-                // Re-filtrer et réafficher
                 filterAndDisplay();
 
-                // Mettre à jour le compteur total
                 totalBansLabel.setText(String.valueOf(allBans.size()));
 
                 showAlert("Succès", "✓ " + ban.getUserName() + " a été débanni avec succès !", Alert.AlertType.INFORMATION);

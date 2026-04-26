@@ -57,13 +57,11 @@ public class ToxicityAnalysisService {
                 return 0.0;
             }
 
-            // 🔥 DÉTECTER LA LANGUE ET TRADUIRE UNIQUEMENT SI NÉCESSAIRE
             String detectedLang = detectLanguage(text);
             System.out.println("Langue détectée: " + detectedLang);
 
             String textToAnalyze = text;
 
-            // Traduire seulement si ce n'est pas déjà de l'anglais
             if (!"en".equals(detectedLang)) {
                 System.out.println("🔄 Traduction nécessaire (" + detectedLang + " → en)");
                 String translated = traductionService.traduire(text, "en", detectedLang);
@@ -86,7 +84,6 @@ public class ToxicityAnalysisService {
 
             System.out.println("Texte final analysé: " + textToAnalyze);
 
-            // Appel à l'API Hugging Face
             URL url = new URL(API_URL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
@@ -164,7 +161,6 @@ public class ToxicityAnalysisService {
         }
     }
 
-    // 🔥 VOTRE FONCTION DE DÉTECTION DE LANGUE
     private String detectLanguage(String texte) {
         if (texte == null || texte.isEmpty()) {
             return "en";
@@ -193,7 +189,7 @@ public class ToxicityAnalysisService {
                 .replace("\t", "\\t");
     }
     public boolean isToxic(String text) {
-        return analyze(text) >= 0.7;
+        return analyze(text) >= 0.5;
     }
 
     public boolean isConfigured() {

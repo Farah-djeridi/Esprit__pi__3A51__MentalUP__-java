@@ -117,7 +117,6 @@ public class ControllerForum {
         allSujets = new ArrayList<>();
         filteredSujets = new ArrayList<>();
 
-        // Initialiser le filtre de profanity
         profanityFilter = new ProfanityFilterService();
 
         setupNavigationHoverEffects();
@@ -131,7 +130,6 @@ public class ControllerForum {
 
         serviceTraduction = new ServiceTraduction();
 
-        // Afficher un avertissement si l'API n'est pas configurée
         if (!profanityFilter.isApiConfigured()) {
             System.err.println("⚠️ Filtre de mots inappropriés: API non configurée");
         }
@@ -359,7 +357,6 @@ public class ControllerForum {
 
         metaData.getChildren().addAll(authorLabel, dot, dateValue);
 
-        // 🔥 AJOUT DU BADGE TOXIQUE DANS LA MÊME LIGNE
         if (sujet.isEstToxique() && sujet.getScoreToxicite() >= 0.5) {
             Label toxicBadge = new Label("⚠ Toxique " + String.format("(%.0f%%)", sujet.getScoreToxicite() * 100));
             toxicBadge.setStyle(
@@ -370,7 +367,6 @@ public class ControllerForum {
                             "-fx-padding: 3 10;" +
                             "-fx-background-radius: 20;"
             );
-            // Ajouter un séparateur avant le badge
             Label dot2 = new Label("•");
             dot2.setStyle("-fx-text-fill: " + COLOR_TEXT_MUTED + ";");
             metaData.getChildren().addAll(dot2, toxicBadge);
@@ -420,7 +416,6 @@ public class ControllerForum {
         Button translateBtn = new Button("🌍 Traduire");
         Button cancelBtn = new Button("↩ Annuler");
 
-        // style
         translateBtn.setStyle(
                 "-fx-background-color: #E0F2FE;" +
                         "-fx-text-fill: #0369A1;" +
@@ -443,7 +438,6 @@ public class ControllerForum {
             e.consume();
 
             try {
-                // sauvegarde SEULEMENT la première fois
                 if (!isTranslated.getOrDefault(sujet.getId(), false)) {
                     originalTitres.put(sujet.getId(), sujet.getTitre());
                     originalContenus.put(sujet.getId(), sujet.getContenu());
@@ -794,7 +788,6 @@ public class ControllerForum {
             source.setStyle("-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 14; -fx-cursor: hand;");
         }
     }
-
 
     @FXML
     private void onNewDiscussion() {

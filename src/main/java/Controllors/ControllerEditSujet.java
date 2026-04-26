@@ -8,9 +8,6 @@ import services.ProfanityFilterService;
 import services.ServiceSujet;
 import services.ToxicityAnalysisService;
 
-import java.time.LocalDate;
-import java.sql.Date;
-
 public class ControllerEditSujet {
 
     @FXML private TextField titreField;
@@ -47,7 +44,6 @@ public class ControllerEditSujet {
         setupValidation();
         setupButtonStyles();
 
-        // Initialiser le service de toxicité
         toxicityService = new ToxicityAnalysisService();
 
         submitButton.setOnAction(e -> updateDiscussion());
@@ -160,7 +156,6 @@ public class ControllerEditSujet {
         String titre = titreField.getText().trim();
         String contenu = contenuArea.getText().trim();
 
-        // Validation des mots inappropriés
         if (profanityFilter != null) {
             try {
                 profanityFilter.validateText(titre, "titre");
@@ -171,7 +166,6 @@ public class ControllerEditSujet {
             }
         }
 
-        // Validations
         if (titre.isEmpty()) {
             showAlert("Erreur de saisie", "Veuillez saisir un titre", Alert.AlertType.ERROR);
             titreField.requestFocus();
@@ -208,11 +202,9 @@ public class ControllerEditSujet {
             return;
         }
 
-        // 🔥 ANALYSE DE TOXICITÉ (sans avertissement)
         double scoreToxicite = toxicityService.analyze(contenu);
         boolean estToxique = toxicityService.isToxic(contenu);
 
-        // Log simple pour debug (optionnel)
         System.out.println("Modification - Score toxicité: " + scoreToxicite);
 
         boolean hasChanges = !titre.equals(sujet.getTitre()) ||
@@ -225,12 +217,10 @@ public class ControllerEditSujet {
             return;
         }
 
-        // Mettre à jour les champs avec les nouvelles valeurs
         sujet.setTitre(titre);
         sujet.setContenu(contenu);
         sujet.setAnonyme(anonymeCheckBox.isSelected());
 
-        // 🔥 METTRE À JOUR LES SCORES DE TOXICITÉ
         sujet.setScoreToxicite(scoreToxicite);
         sujet.setEstToxique(estToxique);
 

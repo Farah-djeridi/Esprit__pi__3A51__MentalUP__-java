@@ -60,7 +60,6 @@ public class ControllerNouvelleDiscussion {
     }
 
     private void setupValidation() {
-        // Validation titre en temps réel
         titreField.textProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null && newVal.length() > TITRE_MAX) {
                 titreField.setText(oldVal);
@@ -145,7 +144,6 @@ public class ControllerNouvelleDiscussion {
             String titre = titreField.getText().trim();
             String contenu = contenuArea.getText().trim();
 
-        // Vérifier si l'utilisateur est banni
         if (serviceBan.isUserBanned(userId)) {
             String banMessage = serviceBan.getBanMessage(userId);
             Alert banAlert = new Alert(Alert.AlertType.ERROR);
@@ -161,7 +159,6 @@ public class ControllerNouvelleDiscussion {
             return;
         }
 
-            // Validation des mots inappropriés
             if (profanityFilter != null) {
                 try {
                     profanityFilter.validateText(titre, "titre");
@@ -229,11 +226,9 @@ public class ControllerNouvelleDiscussion {
             return;
         }
 
-        // 🔥 ANALYSE TOXICITÉ (NE BLOQUE PAS)
         double scoreToxicite = toxicityService.analyze(contenu);
         boolean estToxique = toxicityService.isToxic(contenu);
 
-// (option debug)
         System.out.println("Score toxicité: " + scoreToxicite);
 
         Sujet sujet = new Sujet();

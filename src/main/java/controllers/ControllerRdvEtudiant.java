@@ -167,6 +167,16 @@ public class ControllerRdvEtudiant {
     }
 
     private void showRatingDialog(int psyId, String psyNom) {
+        // Vérifier si l'étudiant a eu au moins une consultation terminée avec ce psy
+        if (!serviceRdv.hasHadConsultation(etudiantId, psyId)) {
+            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
+            alert.setTitle("Accès restreint");
+            alert.setHeaderText("Vote impossible");
+            alert.setContentText("Vous ne pouvez noter que les psychologues avec qui vous avez déjà eu une consultation terminée.");
+            alert.showAndWait();
+            return;
+        }
+
         javafx.scene.control.ChoiceDialog<Integer> dialog = new javafx.scene.control.ChoiceDialog<>(5, 1, 2, 3, 4, 5);
         dialog.setTitle("Noter le praticien");
         dialog.setHeaderText("Quelle note donnez-vous au " + psyNom + " ?");
@@ -299,6 +309,7 @@ public class ControllerRdvEtudiant {
             FadeTransition ft = new FadeTransition(Duration.millis(300), root);
             ft.setFromValue(0); ft.setToValue(1); ft.play();
             stage.show();
+            stage.centerOnScreen();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -315,6 +326,7 @@ public class ControllerRdvEtudiant {
             FadeTransition ft = new FadeTransition(Duration.millis(300), root);
             ft.setFromValue(0); ft.setToValue(1); ft.play();
             stage.show();
+            stage.centerOnScreen();
         } catch (Exception e) { e.printStackTrace(); }
     }
 

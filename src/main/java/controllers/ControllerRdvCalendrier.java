@@ -297,6 +297,7 @@ public class ControllerRdvCalendrier {
             FadeTransition ft = new FadeTransition(Duration.millis(300), root);
             ft.setFromValue(0); ft.setToValue(1); ft.play();
             stage.show();
+            stage.centerOnScreen();
         } catch (Exception e) { e.printStackTrace(); }
     }
 
@@ -306,6 +307,7 @@ public class ControllerRdvCalendrier {
             Parent root = FXMLLoader.load(getClass().getResource("/gui/Home.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root)); stage.show();
+            stage.centerOnScreen();
         } catch (Exception e) { e.printStackTrace(); }
     }
 
@@ -315,6 +317,7 @@ public class ControllerRdvCalendrier {
             Parent root = FXMLLoader.load(getClass().getResource("/gui/RendezVous_Etudiant.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root)); stage.show();
+            stage.centerOnScreen();
         } catch (Exception e) { e.printStackTrace(); }
     }
 

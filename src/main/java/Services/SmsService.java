@@ -36,10 +36,10 @@ public class SmsService {
     }
 
     public static void sendSms(String to, String text) {
-
+        String formattedTo = formatPhoneNumber(to);
         try {
             Message message = Message.creator(
-                    new PhoneNumber(to),
+                    new PhoneNumber(formattedTo),
                     new PhoneNumber(TWILIO_NUMBER),
                     text
             ).create();
@@ -47,6 +47,25 @@ public class SmsService {
         } catch (Exception e) {
             System.err.println("Erreur lors de l'envoi du SMS : " + e.getMessage());
         }
+    }
+
+    private static String formatPhoneNumber(String phone) {
+        if (phone == null || phone.isEmpty()) return phone;
+        
+        // Supprimer les espaces et caractères spéciaux sauf +
+        String cleaned = phone.replaceAll("[^0-9+]", "");
+        
+        // Si c'est un numéro tunisien à 8 chiffres (ex: 5202XXXX)
+        if (cleaned.length() == 8 && cleaned.matches("\\d+")) {
+            return "+216" + cleaned;
+        }
+        
+        // Si ça ne commence pas par + et que c'est assez long, on peut supposer qu'il manque le +
+        if (!cleaned.startsWith("+")) {
+            return "+" + cleaned;
+        }
+        
+        return cleaned;
     }
 
     public static void notifyRdvConfirmation(String to, String date, String heure) {

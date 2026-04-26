@@ -406,4 +406,19 @@ public class ServiceRendezVous {
         }
         return null;
     }
+
+    public boolean hasHadConsultation(int etudiantId, int psyId) {
+        String sql = "SELECT COUNT(*) FROM rendez_vous WHERE etudiant_id = ? AND psychologue_id = ? AND statut = 'terminé'";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, etudiantId);
+            ps.setInt(2, psyId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            System.err.println("[hasHadConsultation] " + e.getMessage());
+        }
+        return false;
+    }
 }

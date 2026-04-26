@@ -176,6 +176,7 @@ public class DashboardPsyController {
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.show();
+            stage.centerOnScreen();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -212,6 +213,7 @@ public class DashboardPsyController {
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.show();
+            stage.centerOnScreen();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -225,6 +227,7 @@ public class DashboardPsyController {
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.show();
+            stage.centerOnScreen();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -243,6 +246,7 @@ public class DashboardPsyController {
             // récupérer la scène actuelle
             Stage stage = (Stage) navHome.getScene().getWindow();
             stage.setScene(new Scene(root));
+            stage.centerOnScreen();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -257,6 +261,7 @@ public class DashboardPsyController {
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.show();
+            stage.centerOnScreen();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -290,7 +295,8 @@ public class DashboardPsyController {
         result.ifPresent(d -> {
             try {
                 List<RendezVous> history = serviceRdv.getByEtudiantId(d.getPatientId());
-                String fileName = "Dossier_" + d.getPatientNom().replace(" ", "_") + ".pdf";
+                String timestamp = new java.text.SimpleDateFormat("yyyyMMdd_HHmmss").format(new java.util.Date());
+                String fileName = "Dossier_" + d.getPatientNom().replace(" ", "_") + "_" + timestamp + ".pdf";
                 String path = System.getProperty("user.home") + "\\Desktop\\" + fileName;
                 pdfService.generatePatientDossierPDF(d, history, path);
                 showAlert("Succès", "Dossier exporté sur le bureau : " + fileName);
@@ -332,7 +338,8 @@ public class DashboardPsyController {
                         .collect(Collectors.toList());
                 }
 
-                String fileName = "Planning_" + period.replace(" ", "_") + ".pdf";
+                String timestamp = new java.text.SimpleDateFormat("yyyyMMdd_HHmmss").format(new java.util.Date());
+                String fileName = "Planning_" + period.replace(" ", "_") + "_" + timestamp + ".pdf";
                 String path = System.getProperty("user.home") + "\\Desktop\\" + fileName;
                 pdfService.generatePlanningPDF(filtered, period, path);
                 showAlert("Succès", "Planning exporté sur le bureau : " + fileName);

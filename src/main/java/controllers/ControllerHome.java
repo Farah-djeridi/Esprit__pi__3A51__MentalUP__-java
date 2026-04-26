@@ -64,6 +64,7 @@ public class ControllerHome {
             ft.play();
 
             stage.show();
+            stage.centerOnScreen();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -64,7 +64,7 @@ public class RendezVousController {
         filtreStatut.getItems().addAll("libre", "réservé", "confirmé", "en attente");
         filtreType.getItems().addAll("consultation", "suivi", "urgence", "bilan");
 
-        // Sous-menu RDV ouvert par défaut sur cette page
+      
         if (submenuRdv != null) {
             submenuRdv.setVisible(true);
             submenuRdv.setManaged(true);
@@ -140,7 +140,7 @@ public class RendezVousController {
         card.setPadding(new Insets(14, 18, 14, 18));
         card.setStyle("-fx-cursor: hand;");
 
-        // Couleur indicateur gauche
+       
         String color = getStatutColor(r.getStatut());
         Region indicator = new Region();
         indicator.setPrefWidth(4);
@@ -148,7 +148,7 @@ public class RendezVousController {
         indicator.setMinHeight(50);
         indicator.setStyle("-fx-background-color: " + color + "; -fx-background-radius: 4;");
 
-        // Date / Heure
+       
         VBox dateBox = new VBox(4);
         dateBox.setMinWidth(110);
         dateBox.setAlignment(Pos.CENTER_LEFT);
@@ -181,14 +181,13 @@ public class RendezVousController {
 
         typeBox.getChildren().addAll(typeLabel, idLabel);
 
-        // Statut pill
         Label statutLabel = new Label(capitalize(r.getStatut()));
         statutLabel.setStyle(getStatutStyle(r.getStatut()));
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // Actions
+       
         HBox actions = new HBox(8);
         actions.setAlignment(Pos.CENTER_RIGHT);
 

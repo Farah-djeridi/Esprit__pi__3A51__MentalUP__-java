@@ -80,8 +80,28 @@ public class ControllerRdvConfirmation {
         String selectedMode = comboMode.getValue();
         String telephone = txtTelephone.getText().trim();
         
+        // Validation des champs
+        boolean hasError = false;
+        if (selectedMode == null || selectedMode.isEmpty()) {
+            comboMode.setStyle("-fx-border-color: #e74c3c; -fx-border-width: 2px;");
+            hasError = true;
+        } else {
+            comboMode.setStyle("");
+        }
+
         if (telephone.isEmpty()) {
-            txtTelephone.setStyle("-fx-border-color: #e74c3c; -fx-border-radius: 10; -fx-background-radius: 10;");
+            txtTelephone.setStyle("-fx-border-color: #e74c3c; -fx-border-width: 2px; -fx-border-radius: 10;");
+            hasError = true;
+        } else {
+            txtTelephone.setStyle("");
+        }
+
+        if (hasError) {
+            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
+            alert.setTitle("Champs manquants");
+            alert.setHeaderText(null);
+            alert.setContentText("Veuillez remplir tous les champs obligatoires.");
+            alert.showAndWait();
             return;
         }
 

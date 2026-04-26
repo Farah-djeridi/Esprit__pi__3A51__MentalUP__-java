@@ -127,8 +127,29 @@ public class NouveauDossierController {
         String risque = niveauRisqueBox.getValue();
         LocalDate date = datePicker.getValue();
 
-        if (selectedPatient == null || notes == null || notes.trim().isEmpty() || risque == null || date == null) {
-            showAlert("Erreur de saisie", "Veuillez remplir tous les champs obligatoires (Patient, Date, Risque, Notes).");
+        boolean hasError = false;
+        if (selectedPatient == null) {
+            patientComboBox.setStyle("-fx-border-color: #e74c3c; -fx-border-width: 2px;");
+            hasError = true;
+        } else patientComboBox.setStyle("");
+
+        if (notes == null || notes.trim().isEmpty()) {
+            notesField.setStyle("-fx-border-color: #e74c3c; -fx-border-width: 2px;");
+            hasError = true;
+        } else notesField.setStyle("");
+
+        if (risque == null) {
+            niveauRisqueBox.setStyle("-fx-border-color: #e74c3c; -fx-border-width: 2px;");
+            hasError = true;
+        } else niveauRisqueBox.setStyle("");
+
+        if (date == null) {
+            datePicker.setStyle("-fx-border-color: #e74c3c; -fx-border-width: 2px;");
+            hasError = true;
+        } else datePicker.setStyle("");
+
+        if (hasError) {
+            showAlert("Champs manquants", "Veuillez remplir tous les champs obligatoires (Patient, Date, Risque, Notes).");
             return;
         }
 

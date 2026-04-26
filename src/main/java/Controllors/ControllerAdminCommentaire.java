@@ -11,6 +11,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.image.ImageView;
+import javafx.scene.chart.PieChart;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -48,6 +51,9 @@ public class ControllerAdminCommentaire {
     @FXML private TextField searchField;
     @FXML private ComboBox<String> filterCombo;
     @FXML private Label totalCommentairesLabel;
+    @FXML private Label toxicCommentsLabel;
+    @FXML private Label safeCommentsLabel;
+    @FXML private PieChart commentStatsChart;
 
     @FXML private VBox cardsContainer;
 
@@ -121,11 +127,29 @@ public class ControllerAdminCommentaire {
     private void loadCommentaires() {
         try {
             allCommentaires = serviceCommentaire.getAll();
-            totalCommentairesLabel.setText(String.valueOf(allCommentaires.size()));
+            updateStatistics();
             filterAndDisplay();
         } catch (Exception e) {
             showAlert("Erreur", "Impossible de charger les commentaires: " + e.getMessage(), Alert.AlertType.ERROR);
         }
+    }
+
+    private void updateStatistics() {
+        totalCommentairesLabel.setText(String.valueOf(allCommentaires.size()));
+
+        long toxic = allCommentaires.stream().filter(Commentaire::isEstToxique).count();
+        long safe = allCommentaires.size() - toxic;
+
+        toxicCommentsLabel.setText(String.valueOf(toxic));
+        safeCommentsLabel.setText(String.valueOf(safe));
+
+        // Update Chart
+        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList(
+            new PieChart.Data("Toxiques", toxic),
+            new PieChart.Data("Sains", safe)
+        );
+        commentStatsChart.setData(pieChartData);
+        commentStatsChart.setTitle("Analyse de Toxicité");
     }
 
     private void filterAndDisplay() {
@@ -721,6 +745,15 @@ public class ControllerAdminCommentaire {
 
     @FXML private void onFilter() { filterAndDisplay(); }
     @FXML private void onRefresh() { loadCommentaires(); }
+
+    @FXML
+    private void onExportPDF() {
+        if (filteredCommentaires == null || filteredCommentaires.isEmpty()) {
+            showAlert("Export PDF", "Aucun commentaire à exporter.", Alert.AlertType.WARNING);
+            return;
+        }
+        services.PDFService.exportCommentairesToPDF(filteredCommentaires, (Stage) navAccueil.getScene().getWindow());
+    }
 
     @FXML private void onNavHomeClicked() { navigateTo("/HomeAdmin.fxml"); }
     @FXML private void onNavSuiviStatsClicked() { navigateTo("/StatistiquesAdmin.fxml"); }

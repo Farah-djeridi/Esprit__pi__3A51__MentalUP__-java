@@ -11,6 +11,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.image.ImageView;
+import javafx.scene.chart.PieChart;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -47,6 +50,9 @@ public class ControllerAdminSujet {
     @FXML private TextField searchField;
     @FXML private ComboBox<String> filterCombo;
     @FXML private Label totalSujetsLabel;
+    @FXML private Label toxicSujetsLabel;
+    @FXML private Label popularSujetsLabel;
+    @FXML private PieChart sujetStatsChart;
 
 
     @FXML private VBox cardsContainer;
@@ -154,12 +160,33 @@ public class ControllerAdminSujet {
     private void loadSujets() {
         try {
             allSujets = serviceSujet.getAll();
-            totalSujetsLabel.setText(String.valueOf(allSujets.size()));
+            updateStatistics();
             filterAndDisplay();
         } catch (Exception e) {
             showAlert("Erreur", "Impossible de charger les sujets: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace();
         }
+    }
+
+    private void updateStatistics() {
+        totalSujetsLabel.setText(String.valueOf(allSujets.size()));
+
+        long toxic = allSujets.stream().filter(Sujet::isEstToxique).count();
+        long popular = allSujets.stream().filter(s -> s.getNbLikes() > 10).count();
+        long normal = allSujets.size() - toxic - popular;
+        if (normal < 0) normal = 0;
+
+        toxicSujetsLabel.setText(String.valueOf(toxic));
+        popularSujetsLabel.setText(String.valueOf(popular));
+
+        // Update Chart
+        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList(
+            new PieChart.Data("Toxiques", toxic),
+            new PieChart.Data("Populaires", popular),
+            new PieChart.Data("Normaux", normal)
+        );
+        sujetStatsChart.setData(pieChartData);
+        sujetStatsChart.setTitle("Répartition des Sujets");
     }
 
     private void filterAndDisplay() {
@@ -746,6 +773,15 @@ public class ControllerAdminSujet {
     }
 
     @FXML private void onFilter() { filterAndDisplay(); }
+
+    @FXML
+    private void onExportPDF() {
+        if (filteredSujets == null || filteredSujets.isEmpty()) {
+            showAlert("Export PDF", "Aucun sujet à exporter.", Alert.AlertType.WARNING);
+            return;
+        }
+        services.PDFService.exportSujetsToPDF(filteredSujets, (Stage) navAccueil.getScene().getWindow());
+    }
 
     @FXML private void onNavHomeClicked() { navigateTo("/HomeAdmin.fxml"); }
     @FXML private void onNavSuiviStatsClicked() { navigateTo("/StatistiquesAdmin.fxml"); }

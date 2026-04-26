@@ -11,6 +11,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.image.ImageView;
+import javafx.scene.chart.PieChart;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -42,6 +45,9 @@ public class ControllerAdminBan {
     @FXML private TextField searchField;
     @FXML private ComboBox<String> filterCombo;
     @FXML private Label totalBansLabel;
+    @FXML private Label activeBansLabel;
+    @FXML private Label expiredBansLabel;
+    @FXML private PieChart banStatsChart;
 
     @FXML private VBox cardsContainer;
 
@@ -109,11 +115,30 @@ public class ControllerAdminBan {
     private void loadBans() {
         try {
             allBans = serviceBan.getAllBansWithDetails();
-            totalBansLabel.setText(String.valueOf(allBans.size()));
+            updateStatistics();
             filterAndDisplay();
         } catch (Exception e) {
             showAlert("Erreur", "Impossible de charger les bannissements: " + e.getMessage(), Alert.AlertType.ERROR);
         }
+    }
+
+    private void updateStatistics() {
+        totalBansLabel.setText(String.valueOf(allBans.size()));
+
+        LocalDate today = LocalDate.now();
+        long active = allBans.stream().filter(b -> b.isActive() && !b.getBanExpiryDate().toLocalDate().isBefore(today)).count();
+        long expired = allBans.size() - active;
+
+        activeBansLabel.setText(String.valueOf(active));
+        expiredBansLabel.setText(String.valueOf(expired));
+
+        // Update Chart
+        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList(
+            new PieChart.Data("Actifs", active),
+            new PieChart.Data("Expirés", expired)
+        );
+        banStatsChart.setData(pieChartData);
+        banStatsChart.setTitle("Statut des Bans");
     }
 
     private void filterAndDisplay() {
@@ -584,6 +609,15 @@ public class ControllerAdminBan {
 
     @FXML private void onFilter() { filterAndDisplay(); }
     @FXML private void onRefresh() { loadBans(); }
+
+    @FXML
+    private void onExportPDF() {
+        if (filteredBans == null || filteredBans.isEmpty()) {
+            showAlert("Export PDF", "Aucun bannissement à exporter.", Alert.AlertType.WARNING);
+            return;
+        }
+        services.PDFService.exportBansToPDF(filteredBans, (Stage) navAccueil.getScene().getWindow());
+    }
 
     @FXML private void onNavHomeClicked() { navigateTo("/HomeAdmin.fxml"); }
     @FXML private void onNavSuiviStatsClicked() { navigateTo("/StatistiquesAdmin.fxml"); }

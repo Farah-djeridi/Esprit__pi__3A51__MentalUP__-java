@@ -5,6 +5,7 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
+<?import javafx.scene.chart.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -257,15 +258,53 @@
                            HBox.hgrow="NEVER"/>
                 </HBox>
 
-                <!-- Statistiques -->
-                <HBox spacing="15">
-                    <HBox spacing="10" alignment="CENTER_LEFT"
-                          style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 12 18;">
-                        <Label text="🚫" style="-fx-font-size: 20px;"/>
-                        <Label text="Bannissements actifs :" style="-fx-text-fill: #5A6C7D;"/>
-                        <Label fx:id="totalBansLabel" text="0" style="-fx-font-weight: bold; -fx-text-fill: #DC2626; -fx-font-size: 18px;"/>
-                    </HBox>
-                    <Region HBox.hgrow="ALWAYS"/>
+                <!-- Statistiques et Actions -->
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <VBox spacing="15" HBox.hgrow="ALWAYS">
+                        <!-- Carte 1 : Total -->
+                        <HBox spacing="15" alignment="CENTER_LEFT"
+                              style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 15 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2); -fx-border-color: #E8EEF4; -fx-border-radius: 12; -fx-border-width: 1;">
+                            <StackPane style="-fx-background-color: #E8F0FE; -fx-background-radius: 10; -fx-padding: 10;">
+                                <Label text="📊" style="-fx-font-size: 24px;"/>
+                            </StackPane>
+                            <VBox spacing="2">
+                                <Label text="Total Bannissements" style="-fx-text-fill: #6B7C8D; -fx-font-size: 13px; -fx-font-weight: 600;"/>
+                                <Label fx:id="totalBansLabel" text="0" style="-fx-font-weight: bold; -fx-text-fill: #2C3E50; -fx-font-size: 22px;"/>
+                            </VBox>
+                        </HBox>
+
+                        <HBox spacing="15">
+                            <!-- Carte 2 : Actifs -->
+                            <HBox spacing="15" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS"
+                                  style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 15 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2); -fx-border-color: #E8EEF4; -fx-border-radius: 12; -fx-border-width: 1;">
+                                <StackPane style="-fx-background-color: #FEE2E2; -fx-background-radius: 10; -fx-padding: 10;">
+                                    <Label text="🚫" style="-fx-font-size: 24px;"/>
+                                </StackPane>
+                                <VBox spacing="2">
+                                    <Label text="Bannissements Actifs" style="-fx-text-fill: #6B7C8D; -fx-font-size: 13px; -fx-font-weight: 600;"/>
+                                    <Label fx:id="activeBansLabel" text="0" style="-fx-font-weight: bold; -fx-text-fill: #DC2626; -fx-font-size: 22px;"/>
+                                </VBox>
+                            </HBox>
+
+                            <!-- Carte 3 : Expirés -->
+                            <HBox spacing="15" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS"
+                                  style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 15 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2); -fx-border-color: #E8EEF4; -fx-border-radius: 12; -fx-border-width: 1;">
+                                <StackPane style="-fx-background-color: #DCFCE7; -fx-background-radius: 10; -fx-padding: 10;">
+                                    <Label text="✅" style="-fx-font-size: 24px;"/>
+                                </StackPane>
+                                <VBox spacing="2">
+                                    <Label text="Bannissements Expirés" style="-fx-text-fill: #6B7C8D; -fx-font-size: 13px; -fx-font-weight: 600;"/>
+                                    <Label fx:id="expiredBansLabel" text="0" style="-fx-font-weight: bold; -fx-text-fill: #16A34A; -fx-font-size: 22px;"/>
+                                </VBox>
+                            </HBox>
+                        </HBox>
+                    </VBox>
+                    
+                    <!-- Chart Section -->
+                    <StackPane prefWidth="250" prefHeight="180" 
+                               style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 5; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2); -fx-border-color: #E8EEF4; -fx-border-radius: 12; -fx-border-width: 1;">
+                        <PieChart fx:id="banStatsChart" labelsVisible="true" legendSide="RIGHT" />
+                    </StackPane>
                 </HBox>
 
                 <!-- Barre de recherche -->
@@ -300,6 +339,13 @@
                                    -fx-cursor: hand;"/>
                     <Button text="🔄 Actualiser" onAction="#onRefresh"
                             style="-fx-background-color: #2C5F8A;
+                                   -fx-text-fill: white;
+                                   -fx-font-weight: bold;
+                                   -fx-background-radius: 10;
+                                   -fx-padding: 6 18;
+                                   -fx-cursor: hand;"/>
+                    <Button text="📄 Exporter PDF" onAction="#onExportPDF"
+                            style="-fx-background-color: #DC2626;
                                    -fx-text-fill: white;
                                    -fx-font-weight: bold;
                                    -fx-background-radius: 10;

@@ -5,6 +5,7 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
+<?import javafx.scene.chart.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -258,6 +259,56 @@
                            HBox.hgrow="NEVER"/>
                 </HBox>
 
+                <!-- Statistiques et Actions -->
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <VBox spacing="15" HBox.hgrow="ALWAYS">
+                        <!-- Carte 1 : Total -->
+                        <HBox spacing="15" alignment="CENTER_LEFT"
+                              style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 15 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2); -fx-border-color: #E8EEF4; -fx-border-radius: 12; -fx-border-width: 1;">
+                            <StackPane style="-fx-background-color: #E8F0FE; -fx-background-radius: 10; -fx-padding: 10;">
+                                <Label text="📝" style="-fx-font-size: 24px;"/>
+                            </StackPane>
+                            <VBox spacing="2">
+                                <Label text="Total Sujets" style="-fx-text-fill: #6B7C8D; -fx-font-size: 13px; -fx-font-weight: 600;"/>
+                                <Label fx:id="totalSujetsLabel" text="0" style="-fx-font-weight: bold; -fx-text-fill: #2C3E50; -fx-font-size: 22px;"/>
+                            </VBox>
+                        </HBox>
+
+                        <HBox spacing="15">
+                            <!-- Carte 2 : Toxiques -->
+                            <HBox spacing="15" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS"
+                                  style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 15 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2); -fx-border-color: #E8EEF4; -fx-border-radius: 12; -fx-border-width: 1;">
+                                <StackPane style="-fx-background-color: #FEE2E2; -fx-background-radius: 10; -fx-padding: 10;">
+                                    <Label text="⚠" style="-fx-font-size: 24px;"/>
+                                </StackPane>
+                                <VBox spacing="2">
+                                    <Label text="Sujets Toxiques" style="-fx-text-fill: #6B7C8D; -fx-font-size: 13px; -fx-font-weight: 600;"/>
+                                    <Label fx:id="toxicSujetsLabel" text="0" style="-fx-font-weight: bold; -fx-text-fill: #DC2626; -fx-font-size: 22px;"/>
+                                </VBox>
+                            </HBox>
+
+                            <!-- Carte 3 : Populaires -->
+                            <HBox spacing="15" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS"
+                                  style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 15 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2); -fx-border-color: #E8EEF4; -fx-border-radius: 12; -fx-border-width: 1;">
+                                <StackPane style="-fx-background-color: #FEF3C7; -fx-background-radius: 10; -fx-padding: 10;">
+                                    <Label text="⭐" style="-fx-font-size: 24px;"/>
+                                </StackPane>
+                                <VBox spacing="2">
+                                    <Label text="Sujets Populaires" style="-fx-text-fill: #6B7C8D; -fx-font-size: 13px; -fx-font-weight: 600;"/>
+                                    <Label fx:id="popularSujetsLabel" text="0" style="-fx-font-weight: bold; -fx-text-fill: #D97706; -fx-font-size: 22px;"/>
+                                </VBox>
+                            </HBox>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Chart Section -->
+                    <StackPane prefWidth="250" prefHeight="180" 
+                               style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 5; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2); -fx-border-color: #E8EEF4; -fx-border-radius: 12; -fx-border-width: 1;">
+                        <PieChart fx:id="sujetStatsChart" labelsVisible="true" legendSide="RIGHT" />
+                    </StackPane>
+                </HBox>
+
+                <!-- Barre de recherche -->
                 <HBox spacing="15" alignment="CENTER_LEFT"
                       style="-fx-background-color: white;
                              -fx-background-radius: 15;
@@ -287,16 +338,13 @@
                                    -fx-background-radius: 10;
                                    -fx-padding: 6 18;
                                    -fx-cursor: hand;"/>
-                </HBox>
-
-                <HBox spacing="15">
-                    <HBox spacing="10" alignment="CENTER_LEFT"
-                          style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 12 18;">
-                        <Label text="📊" style="-fx-font-size: 20px;"/>
-                        <Label text="Total sujets :" style="-fx-text-fill: #5A6C7D;"/>
-                        <Label fx:id="totalSujetsLabel" text="0" style="-fx-font-weight: bold; -fx-text-fill: #2C3E50; -fx-font-size: 18px;"/>
-                    </HBox>
-                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="📄 Exporter PDF" onAction="#onExportPDF"
+                            style="-fx-background-color: #DC2626;
+                                   -fx-text-fill: white;
+                                   -fx-font-weight: bold;
+                                   -fx-background-radius: 10;
+                                   -fx-padding: 6 18;
+                                   -fx-cursor: hand;"/>
                 </HBox>
 
                 <VBox spacing="0" style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 2);"

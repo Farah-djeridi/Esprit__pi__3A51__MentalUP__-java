@@ -15,11 +15,11 @@
             fx:controller="controllers.CalendrierController"
             maxWidth="Infinity" maxHeight="Infinity">
 
-    <!-- ================= SIDEBAR ================= -->
+
     <left>
         <VBox prefWidth="270" style="-fx-background-color: #1a4a5f;">
 
-            <!-- LOGO + BRAND -->
+         
             <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 26 20 22 20;">
                 <StackPane>
                     <ImageView fx:id="logoImage" fitWidth="40" fitHeight="40" preserveRatio="true"/>
@@ -33,7 +33,7 @@
 
             <Separator style="-fx-background-color: #2a5a6f;"/>
 
-            <!-- MENU -->
+           
             <VBox spacing="4" style="-fx-padding: 16 14 0 14;" VBox.vgrow="ALWAYS">
 
                 <Label text="MENU PRINCIPAL" textFill="#6a8a9a"
@@ -161,11 +161,11 @@
         </VBox>
     </left>
 
-    <!-- ================= CONTENU PRINCIPAL ================= -->
+ 
     <center>
         <VBox style="-fx-background-color: #F0F4F8;">
 
-            <!-- TOP BAR -->
+         
             <HBox alignment="CENTER_LEFT" spacing="16"
                   style="-fx-padding: 18 28 14 28; -fx-background-color: white;
                          -fx-border-color: #E0E7EF; -fx-border-width: 0 0 1 0;">
@@ -202,7 +202,7 @@
                                -fx-cursor:hand; -fx-font-size:13px; -fx-font-weight:bold;"/>
             </HBox>
 
-            <!-- CONTROLS SEMAINE -->
+          
             <HBox alignment="CENTER_LEFT" spacing="10"
                   style="-fx-padding: 12 28; -fx-background-color:white;
                          -fx-border-color:#E0E7EF; -fx-border-width:0 0 1 0;">
@@ -221,7 +221,7 @@
                               -fx-padding:0 0 0 10;"/>
             </HBox>
 
-            <!-- CALENDRIER GRILLE -->
+           
             <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
                         style="-fx-background-color:transparent; -fx-background:transparent;">
                 <VBox style="-fx-background-color:#F0F4F8; -fx-padding:16;">

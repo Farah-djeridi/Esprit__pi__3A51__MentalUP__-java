@@ -13,7 +13,7 @@
     <left>
         <VBox prefWidth="270" style="-fx-background-color: #1a4a5f;">
 
-            <!-- LOGO + BRAND -->
+       
             <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 26 20 22 20;">
                 <StackPane>
                     <ImageView fx:id="logoImage" fitWidth="40" fitHeight="40" preserveRatio="true"/>
@@ -27,13 +27,13 @@
 
             <Separator style="-fx-background-color: #2a5a6f;"/>
 
-            <!-- MENU -->
+     
             <VBox spacing="4" style="-fx-padding: 16 14 0 14;" VBox.vgrow="ALWAYS">
 
                 <Label text="MENU PRINCIPAL" textFill="#6a8a9a"
                        style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 0 0 8 8;"/>
 
-                <!-- Accueil -->
+            
                 <HBox fx:id="navHome" onMouseClicked="#goHome"
                       alignment="CENTER_LEFT" spacing="10"
                       style="-fx-padding: 11 14; -fx-background-radius: 10; -fx-cursor: hand;">
@@ -41,7 +41,7 @@
                     <Label text="Accueil" textFill="white" style="-fx-font-size: 14px;"/>
                 </HBox>
 
-                <!-- Rendez-vous (ACTIVE) -->
+             
                 <VBox spacing="2">
                     <HBox fx:id="navRdv" onMouseClicked="#toggleRdvMenu"
                           alignment="CENTER_LEFT" spacing="10"
@@ -67,7 +67,7 @@
                     </VBox>
                 </VBox>
 
-                <!-- Dossiers médicaux -->
+               
                 <VBox spacing="2">
                     <HBox fx:id="navDossiers" onMouseClicked="#toggleDossiersMenu"
                           alignment="CENTER_LEFT" spacing="10"
@@ -91,7 +91,7 @@
                     </VBox>
                 </VBox>
 
-                <!-- Activités -->
+                
                 <HBox fx:id="navActivites" onMouseClicked="#goActivites"
                       alignment="CENTER_LEFT" spacing="10"
                       style="-fx-padding: 11 14; -fx-background-radius: 10; -fx-cursor: hand;">
@@ -99,7 +99,7 @@
                     <Label text="Activités" textFill="white" style="-fx-font-size: 14px;"/>
                 </HBox>
 
-                <!-- Ressources -->
+             
                 <HBox fx:id="navRessources" onMouseClicked="#goRessources"
                       alignment="CENTER_LEFT" spacing="10"
                       style="-fx-padding: 11 14; -fx-background-radius: 10; -fx-cursor: hand;">
@@ -107,7 +107,7 @@
                     <Label text="Ressources" textFill="white" style="-fx-font-size: 14px;"/>
                 </HBox>
 
-                <!-- Statistiques -->
+               
                 <HBox fx:id="navStats" onMouseClicked="#goStats"
                       alignment="CENTER_LEFT" spacing="10"
                       style="-fx-padding: 11 14; -fx-background-radius: 10; -fx-cursor: hand;">
@@ -118,7 +118,7 @@
 
             <Region VBox.vgrow="ALWAYS"/>
 
-            <!-- APERÇU RAPIDE -->
+        
             <VBox spacing="12" style="-fx-padding: 18 18 18 18; -fx-background-color: #154a5f;">
                 <Label text="APERÇU RAPIDE" textFill="#6a8a9a"
                        style="-fx-font-size: 10px; -fx-font-weight: bold;"/>
@@ -142,7 +142,7 @@
                 </HBox>
             </VBox>
 
-            <!-- PROFIL + LOGOUT -->
+         
             <VBox spacing="12" style="-fx-padding: 16 18 20 18; -fx-border-color: #2a5a6f; -fx-border-width: 1 0 0 0;">
                 <HBox alignment="CENTER_LEFT" spacing="10">
                     <Circle radius="20" fill="#2a5a6f"/>
@@ -163,11 +163,11 @@
         </VBox>
     </left>
 
-    <!-- MAIN CONTENT -->
+  
     <center>
         <VBox style="-fx-background-color: #f0f4f8;" VBox.vgrow="ALWAYS">
 
-            <!-- TOP BAR -->
+        
             <HBox alignment="CENTER_LEFT" spacing="16"
                   style="-fx-padding: 16 28 14 28; -fx-background-color: white;
                          -fx-border-color: #e2e8f0; -fx-border-width: 0 0 1 0;
@@ -192,13 +192,12 @@
 
 
 
-                    <!-- SEARCH + FILTERS -->
                     <VBox spacing="10"
                           style="-fx-background-color: white; -fx-background-radius: 12;
                                  -fx-padding: 16 20; -fx-border-color: #e2e8f0; -fx-border-width: 1;
                                  -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 6, 0, 0, 1);">
 
-                        <!-- Search row -->
+                        
                         <HBox spacing="10" alignment="CENTER_LEFT">
                             <HBox spacing="10" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS"
                                   style="-fx-background-color: #f8fafc; -fx-background-radius: 8;
@@ -220,7 +219,7 @@
                                            -fx-font-family: 'Segoe UI';"/>
                         </HBox>
 
-                        <!-- Filter row -->
+                        
                         <HBox spacing="10" alignment="CENTER_LEFT">
                             <Label text="Filtres :" textFill="#64748b"
                                    style="-fx-font-size: 12px; -fx-font-family: 'Segoe UI';"/>
@@ -244,7 +243,6 @@
                         </HBox>
                     </VBox>
 
-                    <!-- CARDS LIST -->
                     <VBox spacing="0"
                           style="-fx-background-color: white; -fx-background-radius: 14;
                                  -fx-border-color: #e2e8f0; -fx-border-width: 1;

@@ -11,7 +11,7 @@ public class MainFX extends Application {
     public void start(Stage stage) {
         try {
             FXMLLoader loader = new FXMLLoader(
-                        getClass().getResource("/gui/Home.fxml")
+                        getClass().getResource("/gui/DashboardPsyVue.fxml")
             );
 
 

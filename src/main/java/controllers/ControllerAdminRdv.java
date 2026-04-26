@@ -301,18 +301,18 @@ public class ControllerAdminRdv {
         cbStat.setValue("libre"); cbStat.setPrefWidth(240);
         cbStat.setStyle("-fx-background-radius: 8;"); grid.add(cbStat, 1, 4);
 
-        // Type
+      
         grid.add(fl("Type RDV"), 0, 5);
         ComboBox<String> cbType = new ComboBox<>(); cbType.setId("typeRdv");
         cbType.getItems().addAll("consultation", "suivi", "urgence", "bilan");
         cbType.setValue("consultation"); cbType.setPrefWidth(240);
         cbType.setStyle("-fx-background-radius: 8;"); grid.add(cbType, 1, 5);
 
-        // Psychologue ID
+       
         grid.add(fl("Psy ID"), 0, 6);
         TextField tfPsy = ft("2"); tfPsy.setId("psyId"); grid.add(tfPsy, 1, 6);
 
-        // Pré-remplir si édition
+       
         if (existing != null) {
             if (existing.getDate() != null) dp.setValue(existing.getDate().toLocalDate());
             if (existing.getHeureDebut() != null) tfS.setText(existing.getHeureDebut().toString().substring(0, 5));

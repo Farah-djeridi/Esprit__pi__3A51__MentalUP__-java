@@ -13,7 +13,7 @@
     <left>
         <VBox prefWidth="270" style="-fx-background-color: #1a4a5f;">
 
-            <!-- LOGO + BRAND -->
+           
             <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 26 20 22 20;">
                 <StackPane>
                     <ImageView fx:id="logoImage" fitWidth="40" fitHeight="40" preserveRatio="true"/>
@@ -62,7 +62,7 @@
                     </VBox>
                 </VBox>
 
-                <!-- Dossiers médicaux (ACTIVE) -->
+               
                 <VBox spacing="2">
                     <HBox fx:id="navDossiers" onMouseClicked="#toggleDossiersMenu"
                           alignment="CENTER_LEFT" spacing="10"
@@ -155,11 +155,11 @@
         </VBox>
     </left>
 
-    <!-- MAIN CONTENT -->
+   
     <center>
         <VBox style="-fx-background-color: #f0f4f8;" VBox.vgrow="ALWAYS">
 
-            <!-- TOP BAR -->
+         
             <HBox alignment="CENTER_LEFT" spacing="16"
                   style="-fx-padding: 16 28 14 28; -fx-background-color: white;
                          -fx-border-color: #e2e8f0; -fx-border-width: 0 0 1 0;
@@ -184,7 +184,7 @@
                                -fx-cursor: hand; -fx-font-size: 13px; -fx-font-family: 'Segoe UI';"/>
             </HBox>
 
-            <!-- SEARCH BAR -->
+      
             <HBox spacing="12" alignment="CENTER_LEFT"
                   style="-fx-padding: 16 28 0 28;">
                 <HBox spacing="10" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS"
@@ -207,10 +207,10 @@
                                -fx-padding: 10 18; -fx-cursor: hand; -fx-font-size: 12px;"/>
             </HBox>
 
-            <!-- SPLIT LAYOUT: LIST + DETAILS -->
+          
             <HBox spacing="16" style="-fx-padding: 16 28 28 28;" VBox.vgrow="ALWAYS">
 
-                <!-- LEFT: DOSSIER LIST -->
+             
                 <VBox spacing="0" HBox.hgrow="ALWAYS"
                       style="-fx-background-color: white; -fx-background-radius: 14;
                              -fx-border-color: #e2e8f0; -fx-border-width: 1;
@@ -228,13 +228,13 @@
                                      -fx-border-color: transparent; -fx-font-family: 'Segoe UI';"/>
                 </VBox>
 
-                <!-- RIGHT: DETAILS PANEL -->
+               
                 <VBox spacing="0" HBox.hgrow="ALWAYS"
                       style="-fx-background-color: white; -fx-background-radius: 14;
                              -fx-border-color: #e2e8f0; -fx-border-width: 1;
                              -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 8, 0, 0, 2);">
 
-                    <!-- Detail header -->
+                  
                     <HBox alignment="CENTER_LEFT" spacing="12"
                           style="-fx-padding: 18 22 16 22; -fx-border-color: #f1f5f9; -fx-border-width: 0 0 1 0;">
                         <VBox spacing="2">
@@ -249,7 +249,7 @@
                                 style="-fx-background: transparent; -fx-background-color: transparent;">
                         <VBox spacing="16" style="-fx-padding: 20 22;">
 
-                            <!-- Patient info -->
+              
                             <HBox spacing="16">
                                 <VBox spacing="4" HBox.hgrow="ALWAYS">
                                     <Label text="PATIENT" textFill="#94a3b8"
@@ -265,7 +265,7 @@
                                 </VBox>
                             </HBox>
 
-                            <!-- Niveau risque -->
+                          
                             <VBox spacing="6">
                                 <Label text="NIVEAU DE RISQUE" textFill="#94a3b8"
                                        style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
@@ -277,7 +277,7 @@
                                                  -fx-font-family: 'Segoe UI'; -fx-padding: 6;"/>
                             </VBox>
 
-                            <!-- Notes -->
+                          
                             <VBox spacing="6">
                                 <Label text="NOTES GÉNÉRALES" textFill="#94a3b8"
                                        style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI';"/>
@@ -291,7 +291,7 @@
                                                  -fx-font-family: 'Segoe UI'; -fx-padding: 10;"/>
                             </VBox>
 
-                            <!-- IA Summary section -->
+                           
                             <VBox spacing="10"
                                   style="-fx-background-color: white; -fx-background-radius: 12;
                                          -fx-border-color: #1565c0; -fx-border-width: 1.5;
@@ -315,7 +315,7 @@
                                                  -fx-text-fill: #1e293b; -fx-font-weight: 500;"/>
                             </VBox>
 
-                            <!-- ACTION BUTTONS -->
+                           
                             <HBox spacing="10" style="-fx-padding: 6 0 0 0;">
                                 <Button text="✔ Enregistrer" onAction="#handleUpdate"
                                         style="-fx-background-color: #0f2942; -fx-text-fill: white;

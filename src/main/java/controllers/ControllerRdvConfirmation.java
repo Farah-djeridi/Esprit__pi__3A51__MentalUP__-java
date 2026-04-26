@@ -52,7 +52,7 @@ public class ControllerRdvConfirmation {
             labelDate.setText("Date non définie");
         }
 
-        // Heure
+        
         String heureDebut = rdv.getHeureDebut() != null
                 ? rdv.getHeureDebut().toString().substring(0, 5) : "--:--";
         String heureFin   = rdv.getHeureFin() != null
@@ -62,7 +62,7 @@ public class ControllerRdvConfirmation {
 
         labelType.setText(rdv.getTypeRdv() != null ? rdv.getTypeRdv() : "Consultation individuelle");
 
-        // Initialiser comboMode
+    
         comboMode.getItems().addAll("Présentiel", "En ligne");
         comboMode.setValue("Présentiel");
     }
@@ -70,7 +70,7 @@ public class ControllerRdvConfirmation {
 
     @FXML
     private void onConfirmer(ActionEvent event) {
-        // Animation bouton
+       
         ScaleTransition st = new ScaleTransition(Duration.millis(100), btnConfirmer);
         st.setToX(0.95); st.setToY(0.95);
         st.setAutoReverse(true);

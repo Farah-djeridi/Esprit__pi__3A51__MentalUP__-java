@@ -167,7 +167,7 @@ public class ControllerRdvEtudiant {
     }
 
     private void showRatingDialog(int psyId, String psyNom) {
-        // Vérifier si l'étudiant a eu au moins une consultation terminée avec ce psy
+
         if (!serviceRdv.hasHadConsultation(etudiantId, psyId)) {
             javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
             alert.setTitle("Accès restreint");
@@ -189,9 +189,7 @@ public class ControllerRdvEtudiant {
         });
     }
 
-    // ══════════════════════════════════════════════════════
-    //  RDV ÉTUDIANT
-    // ══════════════════════════════════════════════════════
+   
     private void chargerRdvAujourdhui() {
         rdvAujContainer.getChildren().clear();
         List<RendezVous> list = serviceRdv.getRdvAujourdhui(etudiantId);
@@ -291,9 +289,6 @@ public class ControllerRdvEtudiant {
 
 
 
-    // ══════════════════════════════════════════════════════
-    //  OUVRIR CALENDRIER
-    // ══════════════════════════════════════════════════════
     private void ouvrirCalendrier(int psyId, String psyNom) {
         try {
             System.out.println("[ouvrirCalendrier] psyId=" + psyId + ", psyNom=" + psyNom + ", etudiantId=" + etudiantId);
@@ -315,9 +310,7 @@ public class ControllerRdvEtudiant {
         }
     }
 
-    // ══════════════════════════════════════════════════════
-    //  NAVIGATION
-    // ══════════════════════════════════════════════════════
+  
     private void loadPage(String fxml, MouseEvent event) {
         try {
             Parent root = FXMLLoader.load(getClass().getResource(fxml));
@@ -347,9 +340,7 @@ public class ControllerRdvEtudiant {
     @FXML private void onNotifications(ActionEvent e) {}
     @FXML private void onLogout(ActionEvent e) {}
 
-    // ══════════════════════════════════════════════════════
-    //  HELPERS
-    // ══════════════════════════════════════════════════════
+   
     private Label emptyLabel(String msg) {
         Label l = new Label(msg);
         l.setStyle("-fx-text-fill: #94A3B8; -fx-font-size: 13px; -fx-padding: 8 0;");

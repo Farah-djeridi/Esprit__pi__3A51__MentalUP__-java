@@ -178,13 +178,13 @@ public class ControllerAdminDossiers {
             ligne2.getChildren().addAll(lblPatient, lblPsy);
         }
 
-        // Note confidentialité
+       
         Label lblConfidentiel = new Label("🔒 Notes confidentielles — non affichées");
         lblConfidentiel.setStyle("-fx-font-size: 11px; -fx-text-fill: #B7950B; -fx-font-style: italic;");
 
         infos.getChildren().addAll(ligne1, ligne2, lblConfidentiel);
 
-        // Badge risque
+        
         Label badge = new Label(d.getNiveauRisque() != null ? d.getNiveauRisque().toUpperCase() : "—");
         badge.setStyle(
             "-fx-background-color: " + couleur + "22; -fx-text-fill: " + couleur + ";" +
@@ -197,7 +197,7 @@ public class ControllerAdminDossiers {
         contenu.getChildren().addAll(icone, infos, spacer, badge);
         card.getChildren().addAll(barre, contenu);
 
-        // Hover
+        
         card.setOnMouseEntered(ev -> card.setStyle(
             "-fx-background-color: #FAFCFF; -fx-background-radius: 14;" +
             "-fx-effect: dropshadow(gaussian, rgba(44,62,80,0.12), 12, 0, 0, 3);" +
@@ -272,7 +272,7 @@ public class ControllerAdminDossiers {
         dp.setStyle("-fx-background-radius: 8; -fx-border-color: #D0D9E0; -fx-border-radius: 8;");
         grid.add(dp, 1, 1);
 
-        // Niveau de risque
+        
         grid.add(fl("Niveau de risque"), 0, 2);
         ComboBox<String> cbRisque = new ComboBox<>();
         cbRisque.getItems().addAll("faible", "moyen", "élevé");
@@ -280,22 +280,22 @@ public class ControllerAdminDossiers {
         cbRisque.setStyle("-fx-background-radius: 8;");
         grid.add(cbRisque, 1, 2);
 
-        // Patient ID
+      
         grid.add(fl("Patient ID"), 0, 3);
         TextField tfPatient = ft("1"); tfPatient.setPrefWidth(250);
         grid.add(tfPatient, 1, 3);
 
-        // Psychologue ID
+        
         grid.add(fl("Psy ID"), 0, 4);
         TextField tfPsy = ft("2"); tfPsy.setPrefWidth(250);
         grid.add(tfPsy, 1, 4);
 
-        // ⚠ NOTE : pas de champ "Notes générales" — confidentielles
+
         Label noteConf = new Label("🔒 Les notes générales sont gérées uniquement par le psychologue.");
         noteConf.setStyle("-fx-font-size: 11px; -fx-text-fill: #B7950B; -fx-font-style: italic;");
         grid.add(noteConf, 0, 5, 2, 1);
 
-        // Pré-remplir si édition
+       
         if (existing != null) {
             if (existing.getDateCreation() != null) dp.setValue(existing.getDateCreation().toLocalDate());
             if (existing.getNiveauRisque() != null) cbRisque.setValue(existing.getNiveauRisque());
@@ -340,9 +340,7 @@ public class ControllerAdminDossiers {
         return dialog;
     }
 
-    // ══════════════════════════════════════════════════════
-    //  RECHERCHE + FILTRES + TRI
-    // ══════════════════════════════════════════════════════
+   
     @FXML private void onSearch(KeyEvent e)         { appliquerFiltresEtTri(); }
     @FXML private void onFiltreChange(ActionEvent e){ appliquerFiltresEtTri(); }
     @FXML private void onTriChange(ActionEvent e)   { appliquerFiltresEtTri(); }

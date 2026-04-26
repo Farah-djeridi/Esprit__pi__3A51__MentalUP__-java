@@ -201,19 +201,18 @@ public class CalendrierController {
         cell.setOnMouseExited(e ->
                 cell.setStyle("-fx-background-color:" + bg +
                         "; -fx-border-color:#F0F4F8; -fx-border-width:0 1 1 0;"));
-        // Addition restricted
-        // cell.setOnMouseClicked(e -> ouvrirDialogAjout(day, hour));
+        
 
         return cell;
     }
 
     @FXML public void toggleFilterGreen() {
         if (showLibre && !showReserved) {
-            // Déjà en mode focus Vert -> on réaffiche tout
+           
             showLibre = true;
             showReserved = true;
         } else {
-            // On focus sur le Vert
+           
             showLibre = true;
             showReserved = false;
         }
@@ -223,11 +222,11 @@ public class CalendrierController {
 
     @FXML public void toggleFilterRed() {
         if (showReserved && !showLibre) {
-            // Déjà en mode focus Rouge -> on réaffiche tout
+          
             showLibre = true;
             showReserved = true;
         } else {
-            // On focus sur le Rouge
+           
             showLibre = false;
             showReserved = true;
         }

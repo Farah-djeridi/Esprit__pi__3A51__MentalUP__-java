@@ -25,7 +25,7 @@ public class SmsService {
             System.err.println("Erreur de chargement des propriétés Twilio : " + e.getMessage());
         }
 
-        // Initialisation de Twilio
+
         try {
             if (ACCOUNT_SID != null && AUTH_TOKEN != null) {
                 Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
@@ -52,15 +52,15 @@ public class SmsService {
     private static String formatPhoneNumber(String phone) {
         if (phone == null || phone.isEmpty()) return phone;
         
-        // Supprimer les espaces et caractères spéciaux sauf +
+       
         String cleaned = phone.replaceAll("[^0-9+]", "");
         
-        // Si c'est un numéro tunisien à 8 chiffres (ex: 5202XXXX)
+       
         if (cleaned.length() == 8 && cleaned.matches("\\d+")) {
             return "+216" + cleaned;
         }
         
-        // Si ça ne commence pas par + et que c'est assez long, on peut supposer qu'il manque le +
+       
         if (!cleaned.startsWith("+")) {
             return "+" + cleaned;
         }

@@ -12,7 +12,7 @@
             maxWidth="Infinity" maxHeight="Infinity"
             style="-fx-background-color: #F0F4F8;">
 
-    <!-- ═══════════════ SIDEBAR ADMIN ═══════════════ -->
+   
     <left>
         <VBox prefWidth="260" maxWidth="260" VBox.vgrow="ALWAYS" style="-fx-background-color: #2C3E50;">
 
@@ -63,7 +63,7 @@
                     <Label text="Rendez-vous" style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px; -fx-font-weight: 500;"/>
                 </HBox>
 
-                <!-- Dossiers ACTIF -->
+           
                 <HBox alignment="CENTER_LEFT" spacing="12"
                       style="-fx-background-color: #34495E; -fx-background-radius: 8; -fx-padding: 10 14; -fx-cursor: hand;
                              -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 2);">
@@ -111,12 +111,12 @@
         </VBox>
     </left>
 
-    <!-- ═══════════════ CONTENU PRINCIPAL ═══════════════ -->
+   
     <center>
         <VBox spacing="0" VBox.vgrow="ALWAYS"
               style="-fx-background-color: #F0F4F8;">
 
-            <!-- Top bar -->
+       
             <HBox alignment="CENTER_LEFT" spacing="16"
                   style="-fx-background-color: white; -fx-padding: 14 24;
                          -fx-border-color: transparent transparent #E8EEF4 transparent; -fx-border-width: 0 0 1 0;">
@@ -134,7 +134,7 @@
                         style="-fx-background: transparent; -fx-background-color: transparent; -fx-border-color: transparent;">
                 <VBox spacing="20" style="-fx-padding: 22 24 24 24;">
 
-                    <!-- ── Statistiques dossiers ── -->
+                    
                     <HBox spacing="14">
 
                         <VBox spacing="6" HBox.hgrow="ALWAYS" onMouseClicked="#onFilterTotalDossiers"
@@ -183,7 +183,6 @@
 
                     </HBox>
 
-                    <!-- ── Note confidentialité ── -->
                     <HBox spacing="10" alignment="CENTER_LEFT"
                           style="-fx-background-color: #FFF8E7;
                                  -fx-background-radius: 12; -fx-padding: 12 18;

@@ -154,7 +154,7 @@ public class NouveauDossierController {
         }
 
         int patientId = patientMap.get(selectedPatient);
-        int psychologueId = 2; // simulé (connecté)
+        int psychologueId = 2; 
 
         Dossier d = new Dossier();
         d.setPatientId(patientId);
@@ -176,12 +176,12 @@ public class NouveauDossierController {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(json);
 
-            // 🔴 CHECK ERROR FIRST
+           
             if (root.has("error")) {
                 return "API Error: " + root.path("error").path("message").asText();
             }
 
-            // 🔴 CHECK STRUCTURE SAFELY
+          
             JsonNode choices = root.path("choices");
 
             if (!choices.isArray() || choices.isEmpty()) {
@@ -216,7 +216,7 @@ public class NouveauDossierController {
             return;
         }
 
-        // appel IA
+       
         callGroqAI(notes);
     }
 

@@ -15,13 +15,13 @@ public class RendezVous {
     private String lieu;
     private String telephone;
     private int psychologueId;
-    private Integer etudiantId; // nullable
+    private Integer etudiantId; 
 
-    // 🔹 Constructor (empty)
+
     public RendezVous() {
     }
 
-    // 🔹 Constructor (with parameters)
+   
     public RendezVous(int id, Date date, Time heureDebut, Time heureFin,
                       String typeRdv, String statut, String lienMeet,
                       String lieu, String telephone,
@@ -39,7 +39,7 @@ public class RendezVous {
         this.etudiantId = etudiantId;
     }
 
-    // 🔹 Getters & Setters
+    
 
     public int getId() {
         return id;
@@ -129,9 +129,7 @@ public class RendezVous {
         this.etudiantId = etudiantId;
     }
 
-    // 🔹 toString()
-
-    // 🔹 toString()
+  
 
     public String getMode() {
         return "En ligne".equalsIgnoreCase(this.lieu) ? "En ligne" : "Présentiel";

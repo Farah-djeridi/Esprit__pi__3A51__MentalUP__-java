@@ -21,6 +21,8 @@ import Models.Dossier;
 import Services.PDFService;
 import Services.ServiceRendezVous;
 import Services.ServiceDossier;
+import Models.RendezVous;
+import Models.Dossier;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -71,7 +73,7 @@ public class ControllerHomeAdmin {
     }
 
     private void chargerDonneesStatistiques() {
-        // Load Dossiers
+        
         List<Dossier> dossiers = serviceDossier.getAll();
         statDossiers.setText(String.valueOf(dossiers.size()));
 
@@ -86,7 +88,7 @@ public class ControllerHomeAdmin {
         );
         pieChartDossiers.setData(dossierData);
 
-        // Load RDVs
+        
         List<RendezVous> rdvs = serviceRdv.getAll();
         statRdvs.setText(String.valueOf(rdvs.size()));
 
@@ -101,7 +103,7 @@ public class ControllerHomeAdmin {
         );
         pieChartRdvs.setData(rdvData);
 
-        // Mock for missing services (Patients / Psychologues)
+      
         statPatients.setText("1,234");
         statPsychologues.setText("45");
     }
@@ -175,7 +177,6 @@ public class ControllerHomeAdmin {
         arrowForum.setText(forumOpen ? "▼" : "▶");
     }
 
-    // ========== NAVIGATION PRINCIPALE ==========
 
     @FXML
     void onNavHomeClicked(MouseEvent event) {

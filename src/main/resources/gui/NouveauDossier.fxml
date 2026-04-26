@@ -15,7 +15,7 @@
     <left>
         <VBox prefWidth="270" style="-fx-background-color: #1a4a5f;">
 
-            <!-- LOGO + BRAND -->
+          
             <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 26 20 22 20;">
                 <StackPane>
                     <ImageView fx:id="logoImage" fitWidth="40" fitHeight="40" preserveRatio="true"/>
@@ -161,7 +161,7 @@
     <center>
         <VBox style="-fx-background-color: #f0f4f8;" VBox.vgrow="ALWAYS">
 
-            <!-- TOP BAR -->
+           
             <HBox alignment="CENTER_LEFT" spacing="16"
                   style="-fx-padding: 16 28 14 28; -fx-background-color: white;
                          -fx-border-color: #e2e8f0; -fx-border-width: 0 0 1 0;
@@ -178,7 +178,7 @@
                         style="-fx-background: transparent; -fx-background-color: transparent;">
                 <VBox spacing="20" style="-fx-padding: 28 32 32 32;">
 
-                    <!-- PATIENT SELECTION -->
+                   
                     <VBox spacing="12"
                           style="-fx-background-color: white; -fx-background-radius: 14;
                                  -fx-padding: 22 24; -fx-border-color: #e2e8f0; -fx-border-width: 1;
@@ -208,7 +208,7 @@
                         </VBox>
                     </VBox>
 
-                    <!-- DATE + RISQUE -->
+                   
                     <HBox spacing="20">
                         <VBox spacing="12" HBox.hgrow="ALWAYS"
                               style="-fx-background-color: white; -fx-background-radius: 14;
@@ -316,7 +316,7 @@
                         </VBox>
                     </VBox>
 
-                    <!-- IA SUMMARY PREVIEW -->
+                  
                     <VBox spacing="12"
                           style="-fx-background-color: white; -fx-background-radius: 14;
                                  -fx-padding: 22 24; -fx-border-color: #1565c0; -fx-border-width: 1;
@@ -344,7 +344,7 @@
                                          -fx-text-fill: #1e293b;"/>
                     </VBox>
 
-                    <!-- ACTION BUTTONS -->
+                 
                     <HBox spacing="12" alignment="CENTER_RIGHT">
                         <Button text="Annuler" onAction="#handleCancel"
                                 style="-fx-background-color: #f8fafc; -fx-text-fill: #64748b;

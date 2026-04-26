@@ -63,7 +63,7 @@ public class ConsulterDossiersController {
     public void initialize() {
         niveauRisqueBox.getItems().addAll("Faible", "Modéré", "Élevé", "Critique");
 
-        // Sous-menus visibles par défaut sur cette page
+       
         if (submenuRdv != null) {
             submenuRdv.setVisible(false);
             submenuRdv.setManaged(false);
@@ -84,7 +84,6 @@ public class ConsulterDossiersController {
             }
         });
 
-        // Style de la liste
         dossierList.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
     }
 
@@ -134,14 +133,14 @@ public class ConsulterDossiersController {
                         handleDelete();
                     });
 
-                    // Selection logic
+                
                     updateStyle(root, title, isSelected());
 
                     root.getChildren().addAll(infos, btnDel);
                     setGraphic(root);
                     setText(null);
 
-                    // Hover effect (only if not selected)
+                    
                     setOnMouseEntered(e -> {
                         if (!isSelected()) root.setStyle("-fx-padding: 10 14; -fx-background-radius: 10; -fx-background-color: #f1f5f9;");
                     });
@@ -194,7 +193,7 @@ public class ConsulterDossiersController {
         notesArea.setText(d.getNotesGenerales());
         niveauRisqueBox.setValue(d.getNiveauRisque());
 
-        // Afficher les données IA si présentes
+       
         if (aiSummaryArea != null) {
             String summary = d.getAiSummary();
             aiSummaryArea.setText(summary != null && !summary.isEmpty()
@@ -209,11 +208,11 @@ public class ConsulterDossiersController {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(json);
 
-            // 🔴 Cas erreur API Groq
+           
             if (root.has("error")) {
                 JsonNode error = root.path("error");
 
-                // parfois "message", parfois "error.message"
+                
                 String msg = error.has("message")
                         ? error.path("message").asText()
                         : error.asText();
@@ -221,7 +220,7 @@ public class ConsulterDossiersController {
                 return "API Error: " + msg;
             }
 
-            // 🔵 Vérifier choices
+        
             JsonNode choices = root.path("choices");
 
             if (!choices.isArray() || choices.isEmpty()) {
@@ -289,13 +288,13 @@ public class ConsulterDossiersController {
         }
 
         try {
-            // Récupérer l'historique des RDV pour ce patient
+        
             List<RendezVous> history = serviceRdv.getByEtudiantId(selected.getPatientId());
             
             String patientName = selected.getPatientNom() != null ? selected.getPatientNom() : "Patient_" + selected.getPatientId();
             String fileName = "Dossier_" + patientName.replace(" ", "_") + ".pdf";
             
-            // Pour Windows, on met sur le Bureau
+            
             String desktopPath = System.getProperty("user.home") + "\\Desktop\\" + fileName;
 
             pdfService.generatePatientDossierPDF(selected, history, desktopPath);
@@ -408,7 +407,7 @@ public class ConsulterDossiersController {
         service.update(selected);
         showAlert("Succès", "Dossier modifié avec succès !");
         
-        // Vider les champs après modification
+        
         selected = null;
         dossierList.getSelectionModel().clearSelection();
         resetDetails();

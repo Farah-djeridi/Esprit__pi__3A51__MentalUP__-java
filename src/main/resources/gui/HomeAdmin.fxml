@@ -245,9 +245,7 @@
         </VBox>
     </left>
 
-    <!-- ═══════════════════════════════════════════
-         CONTENU PRINCIPAL - ACCUEIL ADMIN
-    ═══════════════════════════════════════════ -->
+   
     <center>
         <VBox spacing="0" prefWidth="764" prefHeight="700"
               style="-fx-background-color: #F4F8FF;">

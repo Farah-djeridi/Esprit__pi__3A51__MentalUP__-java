@@ -53,11 +53,11 @@ public class ControllerHome {
                 stage = (Stage) bannerBox.getScene().getWindow();
             }
 
-            // Animation de transition entre les pages
+           
             Scene scene = new Scene(root);
             stage.setScene(scene);
 
-            // Animation fade-in pour la nouvelle page
+          
             FadeTransition ft = new FadeTransition(Duration.millis(300), root);
             ft.setFromValue(0);
             ft.setToValue(1);
@@ -70,16 +70,15 @@ public class ControllerHome {
         }
     }
 
-    // Animation au chargement de la page
+   
     public void initialize() {
 
-        // Animation d'apparition pour la bannière
+       
         FadeTransition ftBanner = new FadeTransition(Duration.millis(500), bannerBox);
         ftBanner.setFromValue(0);
         ftBanner.setToValue(1);
         ftBanner.play();
 
-        // Animation d'apparition pour les cartes (décalées)
         if (card1 != null) {
             FadeTransition ftCard1 = new FadeTransition(Duration.millis(400), card1);
             ftCard1.setFromValue(0);
@@ -155,7 +154,7 @@ public class ControllerHome {
         if (rdvHomeContainer == null) return;
         rdvHomeContainer.getChildren().clear();
 
-        // Récupérer les RDV aujourd'hui et à venir
+        
         List<RendezVous> aujourdhui = serviceRdv.getRdvAujourdhui(etudiantId);
         List<RendezVous> avenir = serviceRdv.getRdvAvenir(etudiantId);
 
@@ -166,7 +165,7 @@ public class ControllerHome {
             return;
         }
 
-        // Afficher max 3 rendez-vous
+      
         int count = 0;
         for (RendezVous r : aujourdhui) {
             if (count >= 3) break;
@@ -220,7 +219,7 @@ public class ControllerHome {
         loadPage("/gui/RendezVous_Etudiant.fxml", event);
     }
 
-    // 🔹 Navigation
+   
     @FXML
     void onNavHomeClicked(MouseEvent event) {
         loadPage("/gui/Home.fxml", event);
@@ -250,7 +249,7 @@ public class ControllerHome {
         System.out.println("Ressources");
     }
 
-    // 🔹 Hover pour la sidebar
+   
     @FXML
     private void onNavHoverEnter(MouseEvent event) {
         HBox source = (HBox) event.getSource();
@@ -271,7 +270,7 @@ public class ControllerHome {
         source.setStyle("-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 14; -fx-cursor: hand;");
     }
 
-    // 🔹 Animations pour les cartes
+    
     @FXML
     private void onCardHoverEnter(MouseEvent event) {
         VBox card = (VBox) event.getSource();
@@ -292,7 +291,6 @@ public class ControllerHome {
         card.setStyle("-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 22; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);");
     }
 
-    // 🔹 Animations pour les avantages
     @FXML
     private void onAdvantageHoverEnter(MouseEvent event) {
         VBox adv = (VBox) event.getSource();
@@ -313,10 +311,10 @@ public class ControllerHome {
         adv.setStyle("-fx-padding: 10; -fx-background-radius: 12; -fx-background-color: transparent;");
     }
 
-    // 🔹 Top actions
+
     @FXML
     private void onNotifications(ActionEvent event) {
-        // Animation du bouton notification
+      
         Button btn = (Button) event.getSource();
         ScaleTransition st = new ScaleTransition(Duration.millis(150), btn);
         st.setToX(1.1);
@@ -329,7 +327,7 @@ public class ControllerHome {
 
     @FXML
     private void onLogout(ActionEvent event) {
-        // Animation du bouton logout
+       
         Button btn = (Button) event.getSource();
         ScaleTransition st = new ScaleTransition(Duration.millis(150), btn);
         st.setToX(0.95);
@@ -342,7 +340,7 @@ public class ControllerHome {
 
     @FXML
     private void onStartSuivi(ActionEvent event) {
-        // Animation du bouton start
+      
         Button btn = (Button) event.getSource();
         ScaleTransition st = new ScaleTransition(Duration.millis(150), btn);
         st.setToX(1.05);

@@ -27,7 +27,7 @@
     <VBox spacing="12"
           style="-fx-background-color: white; -fx-padding: 24 28;">
 
-        <!-- Psychologue -->
+        
         <HBox spacing="12" alignment="CENTER_LEFT"
               style="-fx-background-color: #F0F7FF; -fx-background-radius: 10; -fx-padding: 12 16;">
             <Label text="👨‍⚕️" style="-fx-font-size: 20px;"/>
@@ -57,7 +57,7 @@
             </VBox>
         </HBox>
 
-        <!-- Type de séance -->
+       
         <HBox spacing="12" alignment="CENTER_LEFT"
               style="-fx-background-color: #FDF0FF; -fx-background-radius: 10; -fx-padding: 12 16;">
             <Label text="💼" style="-fx-font-size: 20px;"/>

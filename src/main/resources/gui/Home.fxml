@@ -101,7 +101,7 @@
                            style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 500;"/>
                 </HBox>
 
-                <!-- Activités -->
+                
                 <HBox alignment="CENTER_LEFT" spacing="12"
                       fx:id="navActivites"
                       onMouseClicked="#onNavActivitesClicked"
@@ -116,7 +116,7 @@
                            style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 500;"/>
                 </HBox>
 
-                <!-- Ressources -->
+           
                 <HBox alignment="CENTER_LEFT" spacing="12"
                       fx:id="navRessources"
                       onMouseClicked="#onNavRessourcesClicked"
@@ -130,6 +130,7 @@
                     <Label text="Ressources"
                            style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 500;"/>
                 </HBox>
+
             </VBox>
 
             <!-- Profil utilisateur -->
@@ -164,7 +165,6 @@
         <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: #F4F8FF;" hbarPolicy="NEVER">
             <VBox spacing="0" style="-fx-background-color: #F4F8FF;">
 
-                <!-- Barre supérieure -->
                 <HBox alignment="CENTER_LEFT" spacing="12"
                       style="-fx-background-color: rgba(255,255,255,0.95);
                              -fx-padding: 14 24;

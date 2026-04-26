@@ -11,9 +11,7 @@ public class DossierValidator {
 
     public static final List<String> NIVEAUX_RISQUE_VALIDES = List.of("faible", "moyen", "élevé");
 
-    // ═══════════════════════════════════════════════════════
-    //  RÉSULTAT DE VALIDATION (partagé avec RendezVousValidator)
-    // ═══════════════════════════════════════════════════════
+
     public static class ValidationResult {
         private final List<String> erreurs = new ArrayList<>();
 
@@ -31,9 +29,7 @@ public class DossierValidator {
         }
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  VALIDATION COMPLÈTE
-    // ═══════════════════════════════════════════════════════
+   
     public static ValidationResult valider(Dossier d) {
         ValidationResult result = new ValidationResult();
 
@@ -51,11 +47,7 @@ public class DossierValidator {
         return result;
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  VALIDATIONS INDIVIDUELLES
-    // ═══════════════════════════════════════════════════════
-
-    /** La date de création ne peut pas être dans le futur */
+  
     public static void validerDateCreation(Date date, ValidationResult result) {
         if (date == null) {
             result.addErreur("La date de création est obligatoire.");
@@ -66,7 +58,7 @@ public class DossierValidator {
         }
     }
 
-    /** Niveau de risque doit être parmi les valeurs autorisées */
+
     public static void validerNiveauRisque(String niveauRisque, ValidationResult result) {
         if (niveauRisque == null || niveauRisque.isBlank()) {
             result.addErreur("Le niveau de risque est obligatoire.");
@@ -77,30 +69,27 @@ public class DossierValidator {
         }
     }
 
-    /** L'ID du patient doit être > 0 */
+   
     public static void validerPatientId(int patientId, ValidationResult result) {
         if (patientId <= 0) {
             result.addErreur("L'identifiant du patient doit être supérieur à 0.");
         }
     }
 
-    /** L'ID du psychologue doit être > 0 */
+   
     public static void validerPsychologueId(int psychologueId, ValidationResult result) {
         if (psychologueId <= 0) {
             result.addErreur("L'identifiant du psychologue doit être supérieur à 0.");
         }
     }
 
-    /** Le patient et le psychologue ne peuvent pas être le même utilisateur */
     public static void validerIdsDistincts(int patientId, int psychologueId, ValidationResult result) {
         if (patientId > 0 && psychologueId > 0 && patientId == psychologueId) {
             result.addErreur("Le patient et le psychologue ne peuvent pas être la même personne.");
         }
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  HELPER — Parse ID depuis texte
-    // ═══════════════════════════════════════════════════════
+    
     public static int parseId(String texte, String label, ValidationResult result) {
         if (texte == null || texte.isBlank()) {
             result.addErreur(label + " est obligatoire.");

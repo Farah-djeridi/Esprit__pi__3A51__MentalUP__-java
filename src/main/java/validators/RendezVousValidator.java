@@ -12,21 +12,19 @@ import java.util.List;
 
 public class RendezVousValidator {
 
-    // Statuts valides
+   
     public static final List<String> STATUTS_VALIDES =
             List.of("libre", "réservé", "confirmé", "annulé", "disponible", "en attente");
 
-    // Types valides
+   
     public static final List<String> TYPES_VALIDES =
             List.of("consultation", "suivi", "urgence", "bilan");
 
-    // Heures limites
+  
     public static final int HEURE_MIN = 8;
     public static final int HEURE_MAX = 20;
 
-    // ═══════════════════════════════════════════════════════
-    //  RÉSULTAT DE VALIDATION
-    // ═══════════════════════════════════════════════════════
+  
     public static class ValidationResult {
         private final List<String> erreurs = new ArrayList<>();
 
@@ -34,7 +32,6 @@ public class RendezVousValidator {
         public boolean isValide()             { return erreurs.isEmpty(); }
         public List<String> getErreurs()      { return erreurs; }
 
-        /** Retourne toutes les erreurs en une seule chaîne */
         public String getMessageComplet() {
             return String.join("\n", erreurs);
         }
@@ -46,7 +43,7 @@ public class RendezVousValidator {
     }
 
 
-    //  VALIDATION COMPLÈTE
+
 
     public static ValidationResult valider(RendezVous r) {
         ValidationResult result = new ValidationResult();
@@ -69,7 +66,7 @@ public class RendezVousValidator {
 
 
 
-    /** La date ne peut pas être null ni dans le passé */
+
     public static void validerDate(Date date, ValidationResult result) {
         if (date == null) {
             result.addErreur("La date est obligatoire.");
@@ -80,7 +77,7 @@ public class RendezVousValidator {
         }
     }
 
-    /** L'heure de début doit être dans la plage 08h–20h */
+  
     public static void validerHeureDebut(Time heureDebut, ValidationResult result) {
         if (heureDebut == null) {
             result.addErreur("L'heure de début est obligatoire.");
@@ -92,7 +89,7 @@ public class RendezVousValidator {
         }
     }
 
-    /** L'heure de fin doit être dans la plage 08h–20h */
+    
     public static void validerHeureFin(Time heureFin, ValidationResult result) {
         if (heureFin == null) {
             result.addErreur("L'heure de fin est obligatoire.");
@@ -104,13 +101,12 @@ public class RendezVousValidator {
         }
     }
 
-    /** L'heure de fin doit être APRÈS l'heure de début */
     public static void validerOrdreHeures(Time heureDebut, Time heureFin, ValidationResult result) {
         if (heureDebut == null || heureFin == null) return;
         if (!heureFin.toLocalTime().isAfter(heureDebut.toLocalTime())) {
             result.addErreur("L'heure de fin doit être après l'heure de début.");
         }
-        // Durée minimale : 30 minutes
+     
         long minutes = java.time.Duration.between(
                 heureDebut.toLocalTime(), heureFin.toLocalTime()
         ).toMinutes();
@@ -119,7 +115,7 @@ public class RendezVousValidator {
         }
     }
 
-    /** Statut doit faire partie des valeurs autorisées */
+    
     public static void validerStatut(String statut, ValidationResult result) {
         if (statut == null || statut.isBlank()) {
             result.addErreur("Le statut est obligatoire.");
@@ -130,7 +126,7 @@ public class RendezVousValidator {
         }
     }
 
-    /** Type RDV doit faire partie des valeurs autorisées */
+    
     public static void validerType(String typeRdv, ValidationResult result) {
         if (typeRdv == null || typeRdv.isBlank()) {
             result.addErreur("Le type de rendez-vous est obligatoire.");
@@ -141,21 +137,14 @@ public class RendezVousValidator {
         }
     }
 
-    /** L'ID du psychologue doit être > 0 */
+
     public static void validerPsychologueId(int psychologueId, ValidationResult result) {
         if (psychologueId <= 0) {
             result.addErreur("L'identifiant du psychologue doit être supérieur à 0.");
         }
     }
 
-    // ═══════════════════════════════════════════════════════
-    //  HELPER — Validation depuis un formulaire texte
-    // ═══════════════════════════════════════════════════════
-
-    /**
-     * Valide une heure saisie sous forme de texte "HH:mm"
-     * Retourne null si invalide, le Time sinon.
-     */
+  
     public static Time parseHeure(String texte, String label, ValidationResult result) {
         if (texte == null || texte.isBlank()) {
             result.addErreur(label + " est obligatoire.");
@@ -173,10 +162,7 @@ public class RendezVousValidator {
         }
     }
 
-    /**
-     * Valide un ID saisi sous forme texte.
-     * Retourne -1 si invalide.
-     */
+   
     public static int parseId(String texte, String label, ValidationResult result) {
         if (texte == null || texte.isBlank()) {
             result.addErreur(label + " est obligatoire.");

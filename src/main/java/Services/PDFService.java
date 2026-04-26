@@ -31,7 +31,7 @@ public class PDFService {
 
     private void drawHeader(PDDocument document, PDPageContentStream contentStream, String title) throws IOException {
         // Logo
-        try (InputStream is = getClass().getResourceAsStream("/Images/logo.png")) {
+        try (InputStream is = getClass().getResourceAsStream("/ressources/images/logo.png")) {
             if (is != null) {
                 byte[] imageBytes = is.readAllBytes();
                 PDImageXObject logo = PDImageXObject.createFromByteArray(document, imageBytes, "logo");
@@ -41,12 +41,12 @@ public class PDFService {
             System.err.println("Could not load logo for PDF: " + e.getMessage());
         }
 
-        // Header Background bar
+       
         contentStream.setNonStrokingColor(PRIMARY_COLOR);
         contentStream.addRect(120, 770, 430, 50);
         contentStream.fill();
 
-        // Title
+       
         contentStream.setNonStrokingColor(Color.WHITE);
         contentStream.beginText();
         contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 18);
@@ -54,7 +54,7 @@ public class PDFService {
         contentStream.showText(title.toUpperCase());
         contentStream.endText();
 
-        // Separator Line
+      
         contentStream.setStrokingColor(PRIMARY_COLOR);
         contentStream.setLineWidth(1f);
         contentStream.moveTo(50, 750);
@@ -90,7 +90,7 @@ public class PDFService {
             try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
                 drawHeader(document, contentStream, "Dossier Médical Patient");
 
-                // Patient Info
+               
                 contentStream.setNonStrokingColor(PRIMARY_COLOR);
                 contentStream.beginText();
                 contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 12);
@@ -109,7 +109,7 @@ public class PDFService {
                 contentStream.showText("Niveau de risque : " + dossier.getNiveauRisque());
                 contentStream.endText();
 
-                // Section Notes
+                
                 contentStream.setNonStrokingColor(PRIMARY_COLOR);
                 contentStream.beginText();
                 contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 12);
@@ -136,7 +136,7 @@ public class PDFService {
                     contentStream.endText();
                 }
 
-                // Table Historique
+               
                 int yPosition = 480;
                 contentStream.setNonStrokingColor(PRIMARY_COLOR);
                 contentStream.beginText();
@@ -146,7 +146,7 @@ public class PDFService {
                 contentStream.endText();
                 yPosition -= 20;
 
-                // Table Header
+
                 contentStream.setNonStrokingColor(new Color(240, 244, 248));
                 contentStream.addRect(50, yPosition - 5, 500, 20);
                 contentStream.fill();

@@ -218,6 +218,26 @@ public class ServiceObjectif implements IService<Objectif> {
             System.out.println("Erreur delete objectif : " + e.getMessage());
         }
     }
+    public int terminerObjectifsExpiresByUser(int userId) {
+        String req = "UPDATE objectif " +
+                "SET statut_objectif = 'terminé', progression = 100 " +
+                "WHERE user_id = ? " +
+                "AND LOWER(statut_objectif) = 'en cours' " +
+                "AND date_fin < CURDATE()";
+
+        try {
+            PreparedStatement ps = cnx.prepareStatement(req);
+            ps.setInt(1, userId);
+
+            int rows = ps.executeUpdate();
+            System.out.println("Objectifs expirés terminés automatiquement : " + rows);
+            return rows;
+
+        } catch (SQLException e) {
+            System.out.println("Erreur terminerObjectifsExpiresByUser : " + e.getMessage());
+            return 0;
+        }
+    }
 
     public List<Activite> getActivites() {
         List<Activite> activites = new ArrayList<>();

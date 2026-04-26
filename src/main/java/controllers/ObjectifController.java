@@ -117,6 +117,7 @@ public class ObjectifController {
         }
 
         afficherGlobalMessage("", false);
+        int nbTermines = service.terminerObjectifsExpiresByUser(currentUserId);
         refreshAll();
         setActiveTab("ajouter");
     }

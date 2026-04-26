@@ -203,6 +203,7 @@ public class SuiviMentaleController {
         }
 
         resetValidationMessages();
+        objectifService.terminerObjectifsExpiresByUser(currentUserId);
         refreshAll();
         verifierAjoutAutorise();
         afficherObjectifLie();

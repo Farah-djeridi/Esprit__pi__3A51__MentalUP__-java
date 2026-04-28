@@ -84,6 +84,9 @@
                 <Label text="🎟 Gestion des Réservations"
                        style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2d3748;"/>
                 <Region HBox.hgrow="ALWAYS"/>
+                <Button text="📧 Config Email" onAction="#configurerEmail"
+                        style="-fx-background-color: #4299e1; -fx-text-fill: white; -fx-font-size: 12px;
+                               -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 8; -fx-cursor: hand;"/>
                 <Label text="🔔" style="-fx-font-size: 20px; -fx-background-color: white;
                        -fx-padding: 8; -fx-background-radius: 50%; -fx-cursor: hand;
                        -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);"/>

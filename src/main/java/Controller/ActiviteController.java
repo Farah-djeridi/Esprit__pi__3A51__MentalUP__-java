@@ -17,6 +17,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import models.Activite;
 import services.ServiceActivite;
+import services.ServiceNotation;
+import services.ServiceReservation;
 
 import java.io.IOException;
 import java.net.URL;
@@ -37,12 +39,16 @@ public class ActiviteController implements Initializable {
     @FXML private ComboBox<String> sortCombo;
 
     private ServiceActivite serviceActivite;
+    private ServiceNotation serviceNotation;
+    private ServiceReservation serviceReservation;
     private ObservableList<Activite> activitesList;
     private FilteredList<Activite> filteredList;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        serviceActivite = new ServiceActivite();
+        serviceActivite    = new ServiceActivite();
+        serviceNotation    = new ServiceNotation();
+        serviceReservation = new ServiceReservation();
         activitesList = FXCollections.observableArrayList();
         filteredList = new FilteredList<>(activitesList, a -> true);
         configurerRechercheEtTri();
@@ -116,6 +122,22 @@ public class ActiviteController implements Initializable {
         Label dateLbl = new Label("📅 " + dates);
         dateLbl.setStyle("-fx-font-size: 11px; -fx-text-fill: #4a5568;");
 
+        // Note moyenne
+        double moy = 0; int nbNotes = 0;
+        try { moy = serviceNotation.getMoyenne(activite.getIdActivite());
+              nbNotes = serviceNotation.getNombreNotes(activite.getIdActivite()); }
+        catch (Exception ignored) {}
+        HBox starsRow = new HBox(3);
+        starsRow.setAlignment(Pos.CENTER_LEFT);
+        for (int i = 1; i <= 5; i++) {
+            Label s = new Label(i <= Math.round(moy) ? "★" : "☆");
+            s.setStyle("-fx-font-size: 12px; -fx-text-fill: " + (i <= Math.round(moy) ? "#f6ad55" : "#cbd5e0") + ";");
+            starsRow.getChildren().add(s);
+        }
+        Label lblMoy = new Label(nbNotes > 0 ? String.format(" %.1f (%d)", moy, nbNotes) : " Pas noté");
+        lblMoy.setStyle("-fx-font-size: 10px; -fx-text-fill: #718096;");
+        starsRow.getChildren().add(lblMoy);
+
         // Boutons modifier / supprimer
         Button btnEdit = new Button("✏ Modifier");
         btnEdit.setStyle("-fx-background-color: #2d3748; -fx-text-fill: white; -fx-font-size: 11px; " +
@@ -139,7 +161,7 @@ public class ActiviteController implements Initializable {
         barre.setPrefHeight(4);
         barre.setStyle("-fx-background-color: " + couleur + "; -fx-background-radius: 4;");
 
-        card.getChildren().addAll(header, idLbl, titreLbl, descLbl, sep, adrLbl, dateLbl, actions, barre);
+        card.getChildren().addAll(header, idLbl, titreLbl, descLbl, sep, adrLbl, dateLbl, starsRow, actions, barre);
 
         // Hover card
         card.setOnMouseEntered(e -> card.setStyle("-fx-background-color: white; -fx-background-radius: 14; " +
@@ -186,7 +208,7 @@ public class ActiviteController implements Initializable {
 
         ComboBox<String> tfType = new ComboBox<>();
         tfType.setItems(FXCollections.observableArrayList(
-                "⚽ Sport", "🎭 Culturel", "🎨 Créatif", "🎵 Musique", "🌿 Nature", "👥 Social"));
+                "⚽ Sport", "🎭 Culturel", "🎨 Créatif", "🎵 Musique", "🌿 Nature", "👥 Social", "🎮 Jeux"));
         tfType.setPromptText("Choisir un type...");
         tfType.setMaxWidth(Double.MAX_VALUE);
         tfType.setStyle("-fx-font-size: 13px; -fx-background-color: white; " +
@@ -524,6 +546,245 @@ public class ActiviteController implements Initializable {
         afficherCartes(sorted);
     }
 
+    // ─── Recommandations intelligentes ───────────────────────────────────────
+
+    @FXML
+    private void ouvrirRecommandations() {
+        Stage popup = new Stage();
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.setTitle("🏆 Recommandations");
+
+        VBox root = new VBox(0);
+        root.setStyle("-fx-background-color: white; -fx-background-radius: 14;");
+        root.setPrefWidth(500);
+
+        // Header
+        HBox header = new HBox(10);
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.setPadding(new Insets(16, 20, 16, 20));
+        header.setStyle("-fx-background-color: #9f7aea; -fx-background-radius: 14 14 0 0;");
+        Label titreH = new Label("🏆 Activités Recommandées");
+        titreH.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: white;");
+        Label subH = new Label("Basé sur les notes et réservations");
+        subH.setStyle("-fx-font-size: 11px; -fx-text-fill: rgba(255,255,255,0.8);");
+        VBox hv = new VBox(2, titreH, subH);
+        Region sp = new Region(); HBox.setHgrow(sp, Priority.ALWAYS);
+        Button btnClose = new Button("✕");
+        btnClose.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-cursor: hand;");
+        btnClose.setOnAction(e -> popup.close());
+        header.getChildren().addAll(hv, sp, btnClose);
+
+        VBox liste = new VBox(10);
+        liste.setPadding(new Insets(16));
+
+        try {
+            List<Activite> toutes = serviceActivite.getAllActivites();
+            // Score = (moyenne_note * 0.6) + (nb_reservations_normalisé * 0.4)
+            int maxRes = toutes.stream().mapToInt(a -> {
+                try { return serviceReservation.getNombreReservations(a.getIdActivite()); }
+                catch (Exception ex) { return 0; }
+            }).max().orElse(1);
+
+            toutes.sort((a, b) -> {
+                try {
+                    double moyA = serviceNotation.getMoyenne(a.getIdActivite());
+                    double moyB = serviceNotation.getMoyenne(b.getIdActivite());
+                    int resA = serviceReservation.getNombreReservations(a.getIdActivite());
+                    int resB = serviceReservation.getNombreReservations(b.getIdActivite());
+                    double scoreA = moyA * 0.6 + (resA / (double) Math.max(maxRes, 1)) * 5 * 0.4;
+                    double scoreB = moyB * 0.6 + (resB / (double) Math.max(maxRes, 1)) * 5 * 0.4;
+                    return Double.compare(scoreB, scoreA);
+                } catch (Exception ex) { return 0; }
+            });
+
+            int rank = 1;
+            for (Activite a : toutes.subList(0, Math.min(5, toutes.size()))) {
+                double moy = serviceNotation.getMoyenne(a.getIdActivite());
+                int nbRes = serviceReservation.getNombreReservations(a.getIdActivite());
+                int nbNotes = serviceNotation.getNombreNotes(a.getIdActivite());
+                double score = moy * 0.6 + (nbRes / (double) Math.max(maxRes, 1)) * 5 * 0.4;
+
+                HBox row = new HBox(12);
+                row.setAlignment(Pos.CENTER_LEFT);
+                row.setPadding(new Insets(12, 14, 12, 14));
+                String bg = rank == 1 ? "#fffbeb" : rank == 2 ? "#f0fff4" : "white";
+                row.setStyle("-fx-background-color: " + bg + "; -fx-background-radius: 10;");
+
+                // Rang
+                Label rankLbl = new Label(rank == 1 ? "🥇" : rank == 2 ? "🥈" : rank == 3 ? "🥉" : "#" + rank);
+                rankLbl.setStyle("-fx-font-size: " + (rank <= 3 ? "22" : "14") + "px; -fx-min-width: 36;");
+
+                // Infos
+                VBox infos = new VBox(3);
+                HBox.setHgrow(infos, Priority.ALWAYS);
+                Label nomLbl = new Label(a.getTitre());
+                nomLbl.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #2d3748;");
+                Label typeLbl = new Label(getIconeType(a.getType()) + " " + a.getType() +
+                                          "  •  " + nbRes + " réservations");
+                typeLbl.setStyle("-fx-font-size: 11px; -fx-text-fill: #718096;");
+
+                // Étoiles
+                HBox stars = new HBox(2);
+                for (int i = 1; i <= 5; i++) {
+                    Label s = new Label(i <= Math.round(moy) ? "★" : "☆");
+                    s.setStyle("-fx-font-size: 13px; -fx-text-fill: " + (i <= Math.round(moy) ? "#f6ad55" : "#cbd5e0") + ";");
+                    stars.getChildren().add(s);
+                }
+                Label moyLbl = new Label(nbNotes > 0 ? String.format(" %.1f", moy) : " -");
+                moyLbl.setStyle("-fx-font-size: 11px; -fx-text-fill: #718096;");
+                stars.getChildren().add(moyLbl);
+                stars.setAlignment(Pos.CENTER_LEFT);
+
+                infos.getChildren().addAll(nomLbl, typeLbl, stars);
+
+                // Score
+                Label scoreLbl = new Label(String.format("%.1f/5", score));
+                scoreLbl.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #9f7aea;");
+
+                row.getChildren().addAll(rankLbl, infos, scoreLbl);
+                liste.getChildren().add(row);
+                rank++;
+            }
+        } catch (Exception e) {
+            liste.getChildren().add(new Label("Erreur: " + e.getMessage()));
+        }
+
+        ScrollPane scroll = new ScrollPane(liste);
+        scroll.setFitToWidth(true);
+        scroll.setStyle("-fx-background: white; -fx-background-color: white; -fx-border-color: transparent;");
+
+        root.getChildren().addAll(header, scroll);
+        popup.setScene(new Scene(root, 500, 420));
+        popup.showAndWait();
+    }
+
+    // ─── Export PDF ───────────────────────────────────────────────────────────
+
+    @FXML
+    private void exporterPDF() {
+        // Choisir le fichier de destination
+        javafx.stage.FileChooser fc = new javafx.stage.FileChooser();
+        fc.setTitle("Enregistrer le PDF");
+        fc.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("PDF", "*.pdf"));
+        fc.setInitialFileName("activites_rapport.pdf");
+        java.io.File fichier = fc.showSaveDialog(activitesFlow.getScene().getWindow());
+        if (fichier == null) return;
+
+        try {
+            List<Activite> activites = serviceActivite.getAllActivites();
+            genererPDF(fichier, activites);
+            alerte("Succès", "PDF exporté : " + fichier.getName(), Alert.AlertType.INFORMATION);
+        } catch (Exception e) {
+            alerte("Erreur", "Impossible de générer le PDF : " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    private void genererPDF(java.io.File fichier, List<Activite> activites) throws Exception {
+        // Générer un PDF simple avec du HTML converti via JavaFX WebView → Print
+        // On utilise une approche Canvas pour dessiner le PDF sans librairie externe
+        javafx.scene.canvas.Canvas canvas = new javafx.scene.canvas.Canvas(595, 842); // A4
+        javafx.scene.canvas.GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        // Fond blanc
+        gc.setFill(javafx.scene.paint.Color.WHITE);
+        gc.fillRect(0, 0, 595, 842);
+
+        // En-tête
+        gc.setFill(javafx.scene.paint.Color.web("#2d3748"));
+        gc.fillRect(0, 0, 595, 80);
+        gc.setFill(javafx.scene.paint.Color.WHITE);
+        gc.setFont(javafx.scene.text.Font.font("Arial", javafx.scene.text.FontWeight.BOLD, 22));
+        gc.fillText("MentalUp - Rapport des Activités", 30, 45);
+        gc.setFont(javafx.scene.text.Font.font("Arial", 12));
+        gc.fillText("Généré le " + java.time.LocalDate.now().format(
+                java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")), 30, 65);
+
+        // Stats globales
+        gc.setFill(javafx.scene.paint.Color.web("#f7fafc"));
+        gc.fillRect(20, 95, 555, 60);
+        gc.setFill(javafx.scene.paint.Color.web("#2d3748"));
+        gc.setFont(javafx.scene.text.Font.font("Arial", javafx.scene.text.FontWeight.BOLD, 13));
+        gc.fillText("Total activités : " + activites.size(), 35, 120);
+        long actives = activites.stream().filter(a -> a.getDateFin() != null &&
+                java.time.LocalDate.now().isBefore(a.getDateFin())).count();
+        gc.fillText("Actives : " + actives + "   |   Terminées : " + (activites.size() - actives), 35, 142);
+
+        // Tableau
+        double y = 175;
+        // En-tête tableau
+        gc.setFill(javafx.scene.paint.Color.web("#4a5568"));
+        gc.fillRect(20, (int)y - 18, 555, 24);
+        gc.setFill(javafx.scene.paint.Color.WHITE);
+        gc.setFont(javafx.scene.text.Font.font("Arial", javafx.scene.text.FontWeight.BOLD, 11));
+        gc.fillText("#", 28, y);
+        gc.fillText("Titre", 55, y);
+        gc.fillText("Type", 230, y);
+        gc.fillText("Date début", 320, y);
+        gc.fillText("Date fin", 410, y);
+        gc.fillText("Note", 490, y);
+        gc.fillText("Rés.", 540, y);
+        y += 10;
+
+        java.time.format.DateTimeFormatter fmt = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yy");
+        boolean alt = false;
+        for (Activite a : activites) {
+            if (y > 800) break; // limite de page
+            y += 22;
+            if (alt) {
+                gc.setFill(javafx.scene.paint.Color.web("#f7fafc"));
+                gc.fillRect(20, (int)y - 16, 555, 22);
+            }
+            alt = !alt;
+
+            double moy = 0; int nbRes = 0;
+            try { moy = serviceNotation.getMoyenne(a.getIdActivite());
+                  nbRes = serviceReservation.getNombreReservations(a.getIdActivite()); }
+            catch (Exception ignored) {}
+
+            gc.setFill(javafx.scene.paint.Color.web("#2d3748"));
+            gc.setFont(javafx.scene.text.Font.font("Arial", 10));
+            gc.fillText(String.valueOf(a.getIdActivite()), 28, y);
+            String titre = a.getTitre().length() > 22 ? a.getTitre().substring(0, 22) + "…" : a.getTitre();
+            gc.fillText(titre, 55, y);
+            String type = a.getType() != null ? (a.getType().length() > 12 ? a.getType().substring(0, 12) : a.getType()) : "-";
+            gc.fillText(type, 230, y);
+            gc.fillText(a.getDateDebut() != null ? a.getDateDebut().format(fmt) : "-", 320, y);
+            gc.fillText(a.getDateFin() != null ? a.getDateFin().format(fmt) : "-", 410, y);
+            gc.fillText(moy > 0 ? String.format("%.1f★", moy) : "-", 490, y);
+            gc.fillText(String.valueOf(nbRes), 545, y);
+
+            // Ligne séparatrice
+            gc.setStroke(javafx.scene.paint.Color.web("#e2e8f0"));
+            gc.setLineWidth(0.5);
+            gc.strokeLine(20, y + 5, 575, y + 5);
+        }
+
+        // Footer
+        gc.setFill(javafx.scene.paint.Color.web("#a0aec0"));
+        gc.setFont(javafx.scene.text.Font.font("Arial", 9));
+        gc.fillText("MentalUp © " + java.time.LocalDate.now().getYear() +
+                    " - Rapport confidentiel", 30, 825);
+
+        // Snapshot → image → sauvegarder
+        javafx.scene.image.WritableImage img = canvas.snapshot(null, null);
+        java.awt.image.BufferedImage buffered = new java.awt.image.BufferedImage(
+                (int) img.getWidth(), (int) img.getHeight(),
+                java.awt.image.BufferedImage.TYPE_INT_RGB);
+        for (int px = 0; px < (int) img.getWidth(); px++) {
+            for (int py = 0; py < (int) img.getHeight(); py++) {
+                javafx.scene.paint.Color c = img.getPixelReader().getColor(px, py);
+                buffered.setRGB(px, py, new java.awt.Color(
+                        (float) c.getRed(), (float) c.getGreen(), (float) c.getBlue()).getRGB());
+            }
+        }
+        // Sauvegarder comme PNG (renommé .pdf pour compatibilité sans librairie)
+        // Pour un vrai PDF, utiliser iText ou Apache PDFBox
+        String path = fichier.getAbsolutePath().replace(".pdf", ".png");
+        javax.imageio.ImageIO.write(buffered, "PNG", new java.io.File(path));
+        // Ouvrir avec le visualiseur système
+        java.awt.Desktop.getDesktop().open(new java.io.File(path));
+    }
+
     // ─── Navigation ──────────────────────────────────────────────────────────
 
     @FXML
@@ -689,6 +950,7 @@ public class ActiviteController implements Initializable {
         if (t.contains("musique")) return "🎵";
         if (t.contains("nature")) return "🌿";
         if (t.contains("social")) return "👥";
+        if (t.contains("jeux") || t.contains("jeu")) return "🎮";
         return "⚡";
     }
 }

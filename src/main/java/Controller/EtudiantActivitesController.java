@@ -18,13 +18,17 @@ import javafx.stage.Stage;
 import models.Activite;
 import models.Reservation;
 import services.ServiceActivite;
+import services.ServiceNotation;
 import services.ServiceReservation;
+import utils.CaptchaVerification;
+import utils.CaptchaAvance;
 
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class EtudiantActivitesController implements Initializable {
@@ -34,12 +38,14 @@ public class EtudiantActivitesController implements Initializable {
 
     private ServiceActivite serviceActivite;
     private ServiceReservation serviceReservation;
+    private ServiceNotation serviceNotation;
     private List<Activite> toutesActivites = new java.util.ArrayList<>();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        serviceActivite  = new ServiceActivite();
+        serviceActivite    = new ServiceActivite();
         serviceReservation = new ServiceReservation();
+        serviceNotation    = new ServiceNotation();
         chargerActivites();
 
         searchField.textProperty().addListener((obs, oldVal, newVal) -> {
@@ -135,10 +141,12 @@ public class EtudiantActivitesController implements Initializable {
         // ── Carte OpenStreetMap ───────────────────────────────────────────────
         double lat = activite.getLatitude();
         double lon = activite.getLongitude();
-        if (lat == 0.0 && lon == 0.0) { lat = 36.8065; lon = 10.1815; }
-
-        // ── Carte OSM assemblée depuis tuiles ─────────────────────────────────
-        javafx.scene.layout.StackPane mapView = creerCarteOSM(lat, lon);
+        if (lat == 0.0 && lon == 0.0) {
+            double off = (activite.getIdActivite() % 20) * 0.005;
+            lat = 36.8065 + off;
+            lon = 10.1815 + off;
+        }
+        javafx.scene.layout.StackPane mapView = creerCarteOSM(lat, lon, index);
 
         // ── Contenu texte ─────────────────────────────────────────────────────
         VBox content = new VBox(10);
@@ -184,7 +192,56 @@ public class EtudiantActivitesController implements Initializable {
         btnReserver.setStyle(disponible
                 ? "-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 25; -fx-cursor: hand; -fx-background-radius: 8;"
                 : "-fx-background-color: #ccc; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 25; -fx-background-radius: 8;");
-        btnReserver.setOnAction(e -> ouvrirSelectionPlace(activite));
+        btnReserver.setOnAction(e -> {
+            System.out.println("🎯 Bouton réserver cliqué pour: " + activite.getTitre());
+            Stage parentStage = (Stage) activitesGrid.getScene().getWindow();
+            
+            // Choisir le type de CAPTCHA aléatoirement
+            int typeCaptcha = new java.util.Random().nextInt(2);
+            System.out.println("🎲 Type CAPTCHA choisi: " + typeCaptcha + " (0=Avancé, 1=Verification)");
+            
+            if (typeCaptcha == 0) {
+                CaptchaAvance.afficherCaptchaAvance(
+                    parentStage, 
+                    "réserver cette activité", 
+                    success -> {
+                        System.out.println("🔐 Résultat CAPTCHA avancé: " + (success ? "SUCCÈS" : "ÉCHEC"));
+                        if (success) {
+                            javafx.application.Platform.runLater(() -> {
+                                System.out.println("🎟️ Ouverture sélection de place...");
+                                try {
+                                    ouvrirSelectionPlace(activite);
+                                    System.out.println("✅ Sélection de place ouverte avec succès");
+                                } catch (Exception ex) {
+                                    System.err.println("❌ Erreur ouverture sélection: " + ex.getMessage());
+                                    ex.printStackTrace();
+                                }
+                            });
+                        }
+                    }
+                );
+            } else {
+                CaptchaVerification.afficherVerification(
+                    parentStage, 
+                    "réserver cette activité", 
+                    success -> {
+                        System.out.println("🔐 Résultat CAPTCHA verification: " + (success ? "SUCCÈS" : "ÉCHEC"));
+                        if (success) {
+                            javafx.application.Platform.runLater(() -> {
+                                System.out.println("🎟️ Ouverture sélection de place...");
+                                try {
+                                    ouvrirSelectionPlace(activite);
+                                    System.out.println("✅ Sélection de place ouverte avec succès");
+                                } catch (Exception ex) {
+                                    System.err.println("❌ Erreur ouverture sélection: " + ex.getMessage());
+                                    ex.printStackTrace();
+                                }
+                            });
+                        }
+                    }
+                );
+            }
+        });
 
         Button btnTicket = new Button("🎫");
         btnTicket.setStyle("-fx-background-color: #5a67d8; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 14; -fx-cursor: hand; -fx-background-radius: 8;");
@@ -192,18 +249,311 @@ public class EtudiantActivitesController implements Initializable {
         btnTicket.setOnMouseExited(e  -> btnTicket.setStyle("-fx-background-color: #5a67d8; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 14; -fx-cursor: hand; -fx-background-radius: 8;"));
         btnTicket.setOnAction(e -> afficherTicket(activite));
 
-        HBox footer = new HBox(10, statutLabel, btnReserver, btnTicket);
+        // Bouton Jouer pour les activités de type "Jeux"
+        HBox footer;
+        if (activite.getType() != null && activite.getType().toLowerCase().contains("jeu")) {
+            Button btnJouer = new Button("🎮");
+            btnJouer.setStyle("-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 14; -fx-cursor: hand; -fx-background-radius: 8;");
+            btnJouer.setOnMouseEntered(e -> btnJouer.setStyle("-fx-background-color: #8e44ad; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 14; -fx-cursor: hand; -fx-background-radius: 8;"));
+            btnJouer.setOnMouseExited(e  -> btnJouer.setStyle("-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 14; -fx-cursor: hand; -fx-background-radius: 8;"));
+            btnJouer.setOnAction(e -> {
+                Stage parentStage = (Stage) activitesGrid.getScene().getWindow();
+                afficherPopupChoixJeu(parentStage, activite.getTitre());
+            });
+            
+            footer = new HBox(10, statutLabel, btnReserver, btnTicket, btnJouer);
+        } else {
+            footer = new HBox(10, statutLabel, btnReserver, btnTicket);
+        }
         footer.setAlignment(Pos.CENTER_LEFT);
         VBox.setMargin(footer, new Insets(8, 0, 0, 0));
 
-        content.getChildren().addAll(typeLabel, titreLabel, descLabel, datesLabel, dureeLabel, resLabel, footer);
+        // ── Notation étoiles ──────────────────────────────────────────────────
+        HBox starsRow = creerLigneEtoiles(activite);
+
+        content.getChildren().addAll(typeLabel, titreLabel, descLabel, datesLabel, dureeLabel, resLabel, starsRow, footer);
         card.getChildren().addAll(mapView, content);
         return card;
+    }
+
+    // ─── Notation étoiles ────────────────────────────────────────────────────
+
+    private HBox creerLigneEtoiles(Activite activite) {
+        HBox row = new HBox(6);
+        row.setAlignment(Pos.CENTER_LEFT);
+
+        // Récupérer note actuelle de l'étudiant et moyenne
+        int[] maNote = {0};
+        double[] moyenne = {0.0};
+        int[] nbNotes = {0};
+        try {
+            maNote[0]  = serviceNotation.getNoteEtudiant(activite.getIdActivite(), "Sophie Am.");
+            moyenne[0] = serviceNotation.getMoyenne(activite.getIdActivite());
+            nbNotes[0] = serviceNotation.getNombreNotes(activite.getIdActivite());
+        } catch (Exception ignored) {}
+
+        // 5 étoiles interactives
+        Label[] etoiles = new Label[5];
+        for (int i = 0; i < 5; i++) {
+            etoiles[i] = new Label(i < maNote[0] ? "★" : "☆");
+            etoiles[i].setStyle("-fx-font-size: 16px; -fx-text-fill: " +
+                                (i < maNote[0] ? "#f6ad55" : "#cbd5e0") +
+                                "; -fx-cursor: hand;");
+            final int note = i + 1;
+            // Hover
+            etoiles[i].setOnMouseEntered(e -> {
+                for (int j = 0; j < 5; j++)
+                    etoiles[j].setStyle("-fx-font-size: 16px; -fx-text-fill: " +
+                                        (j < note ? "#f6ad55" : "#cbd5e0") + "; -fx-cursor: hand;");
+            });
+            etoiles[i].setOnMouseExited(e -> {
+                for (int j = 0; j < 5; j++)
+                    etoiles[j].setStyle("-fx-font-size: 16px; -fx-text-fill: " +
+                                        (j < maNote[0] ? "#f6ad55" : "#cbd5e0") + "; -fx-cursor: hand;");
+            });
+            // Clic → vérification CAPTCHA puis notation
+            etoiles[i].setOnMouseClicked(e -> {
+                Stage parentStage = (Stage) activitesGrid.getScene().getWindow();
+                
+                // Alterner entre CAPTCHA simple et avancé
+                boolean utiliserCaptchaAvance = new java.util.Random().nextBoolean();
+                
+                if (utiliserCaptchaAvance) {
+                    CaptchaAvance.afficherCaptchaAvance(
+                        parentStage, 
+                        "noter cette activité", 
+                        success -> {
+                            if (success) {
+                                javafx.application.Platform.runLater(() -> {
+                                    ouvrirPopupNotation(activite, note, etoiles, maNote);
+                                });
+                            }
+                        }
+                    );
+                } else {
+                    CaptchaVerification.afficherVerification(
+                        parentStage, 
+                        "noter cette activité", 
+                        success -> {
+                            if (success) {
+                                javafx.application.Platform.runLater(() -> {
+                                    ouvrirPopupNotation(activite, note, etoiles, maNote);
+                                });
+                            }
+                        }
+                    );
+                }
+            });
+            row.getChildren().add(etoiles[i]);
+        }
+
+        // Moyenne affichée
+        Label lblMoy = new Label(nbNotes[0] > 0
+                ? String.format("%.1f (%d avis)", moyenne[0], nbNotes[0])
+                : "Pas encore noté");
+        lblMoy.setStyle("-fx-font-size: 10px; -fx-text-fill: #718096;");
+        row.getChildren().add(lblMoy);
+
+        return row;
+    }
+
+    private void ouvrirPopupNotation(Activite activite, int noteChoisie,
+                                     Label[] etoiles, int[] maNote) {
+        Stage popup = new Stage();
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.initStyle(javafx.stage.StageStyle.UNDECORATED);
+
+        VBox root = new VBox(16);
+        root.setAlignment(Pos.CENTER);
+        root.setPadding(new Insets(28));
+        root.setStyle("-fx-background-color: white; -fx-background-radius: 16; " +
+                      "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 20, 0, 0, 5);");
+        root.setPrefWidth(360);
+
+        Label titre = new Label("⭐ Noter l'activité");
+        titre.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3748;");
+
+        Label nomAct = new Label(activite.getTitre());
+        nomAct.setStyle("-fx-font-size: 13px; -fx-text-fill: #718096;");
+
+        // Étoiles dans le popup
+        HBox starsPopup = new HBox(8);
+        starsPopup.setAlignment(Pos.CENTER);
+        Label[] popupStars = new Label[5];
+        int[] selected = {noteChoisie};
+
+        for (int i = 0; i < 5; i++) {
+            popupStars[i] = new Label(i < noteChoisie ? "★" : "☆");
+            popupStars[i].setStyle("-fx-font-size: 28px; -fx-text-fill: " +
+                                   (i < noteChoisie ? "#f6ad55" : "#cbd5e0") + "; -fx-cursor: hand;");
+            final int n = i + 1;
+            popupStars[i].setOnMouseEntered(e -> {
+                for (int j = 0; j < 5; j++)
+                    popupStars[j].setStyle("-fx-font-size: 28px; -fx-text-fill: " +
+                                           (j < n ? "#f6ad55" : "#cbd5e0") + "; -fx-cursor: hand;");
+            });
+            popupStars[i].setOnMouseExited(e -> {
+                for (int j = 0; j < 5; j++)
+                    popupStars[j].setStyle("-fx-font-size: 28px; -fx-text-fill: " +
+                                           (j < selected[0] ? "#f6ad55" : "#cbd5e0") + "; -fx-cursor: hand;");
+            });
+            popupStars[i].setOnMouseClicked(e -> {
+                selected[0] = n;
+                for (int j = 0; j < 5; j++)
+                    popupStars[j].setStyle("-fx-font-size: 28px; -fx-text-fill: " +
+                                           (j < n ? "#f6ad55" : "#cbd5e0") + "; -fx-cursor: hand;");
+            });
+            starsPopup.getChildren().add(popupStars[i]);
+        }
+
+        // Commentaire
+        TextArea tfComment = new TextArea();
+        tfComment.setPromptText("Votre commentaire (optionnel)...");
+        tfComment.setPrefRowCount(3);
+        tfComment.setWrapText(true);
+        tfComment.setStyle("-fx-font-size: 12px; -fx-border-color: #e2e8f0; -fx-border-width: 1; " +
+                           "-fx-border-radius: 8; -fx-background-radius: 8;");
+
+        Button btnValider = new Button("✅ Valider ma note");
+        btnValider.setMaxWidth(Double.MAX_VALUE);
+        btnValider.setStyle("-fx-background-color: #f6ad55; -fx-text-fill: white; -fx-font-size: 13px; " +
+                            "-fx-font-weight: bold; -fx-padding: 11; -fx-background-radius: 10; -fx-cursor: hand;");
+        btnValider.setOnAction(e -> {
+            try {
+                serviceNotation.noterActivite(activite.getIdActivite(), "Sophie Am.",
+                        selected[0], tfComment.getText().trim());
+                maNote[0] = selected[0];
+                // Mettre à jour les étoiles dans la carte
+                for (int j = 0; j < 5; j++)
+                    etoiles[j].setStyle("-fx-font-size: 16px; -fx-text-fill: " +
+                                        (j < selected[0] ? "#f6ad55" : "#cbd5e0") + "; -fx-cursor: hand;");
+                popup.close();
+                afficherToast("Note " + selected[0] + "★ enregistrée !", "#f6ad55", "⭐");
+            } catch (Exception ex) {
+                afficherToast("Erreur: " + ex.getMessage(), "#e53e3e", "❌");
+            }
+        });
+
+        Button btnAnnuler = new Button("Annuler");
+        btnAnnuler.setMaxWidth(Double.MAX_VALUE);
+        btnAnnuler.setStyle("-fx-background-color: #e2e8f0; -fx-text-fill: #4a5568; -fx-font-size: 13px; " +
+                            "-fx-padding: 11; -fx-background-radius: 10; -fx-cursor: hand;");
+        btnAnnuler.setOnAction(e -> popup.close());
+
+        root.getChildren().addAll(titre, nomAct, starsPopup, tfComment, btnValider, btnAnnuler);
+
+        javafx.scene.Scene scene = new javafx.scene.Scene(root);
+        scene.setFill(Color.TRANSPARENT);
+        popup.setScene(scene);
+        popup.show();
+
+        javafx.geometry.Rectangle2D screen = javafx.stage.Screen.getPrimary().getVisualBounds();
+        popup.setX(screen.getWidth() / 2 - 180);
+        popup.setY(screen.getHeight() / 2 - 180);
+    }
+
+    // ─── Bannière jeu (pas de carte OSM pour les activités Jeux) ─────────────
+
+    private javafx.scene.layout.StackPane creerBanniereJeu(String nomActivite) {
+        final int H = 160;
+
+        // Fond violet dégradé via Canvas
+        javafx.scene.canvas.Canvas canvas = new javafx.scene.canvas.Canvas(600, H);
+        javafx.scene.canvas.GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        javafx.scene.paint.LinearGradient grad = new javafx.scene.paint.LinearGradient(
+                0, 0, 1, 1, true, javafx.scene.paint.CycleMethod.NO_CYCLE,
+                new javafx.scene.paint.Stop(0, javafx.scene.paint.Color.web("#7c3aed")),
+                new javafx.scene.paint.Stop(1, javafx.scene.paint.Color.web("#4c1d95")));
+        gc.setFill(grad);
+        gc.fillRect(0, 0, 600, H);
+
+        // Cercles décoratifs
+        gc.setFill(javafx.scene.paint.Color.web("#ffffff", 0.06));
+        gc.fillOval(-30, -30, 160, 160);
+        gc.fillOval(460, 60, 120, 120);
+        gc.fillOval(200, -20, 80, 80);
+
+        // Icône manette dessinée en formes
+        double cx = 300, cy = 80;
+        gc.setFill(javafx.scene.paint.Color.web("#ffffff", 0.9));
+        // Corps manette
+        gc.fillRoundRect(cx - 40, cy - 18, 80, 36, 18, 18);
+        // Poignées
+        gc.fillRoundRect(cx - 44, cy + 8, 22, 22, 10, 10);
+        gc.fillRoundRect(cx + 22, cy + 8, 22, 22, 10, 10);
+        // Croix directionnelle (gauche)
+        gc.setFill(javafx.scene.paint.Color.web("#7c3aed"));
+        gc.fillRect(cx - 32, cy - 6, 14, 5);
+        gc.fillRect(cx - 27, cy - 10, 5, 14);
+        // Boutons (droite)
+        gc.setFill(javafx.scene.paint.Color.web("#f87171"));
+        gc.fillOval(cx + 18, cy - 10, 8, 8);
+        gc.setFill(javafx.scene.paint.Color.web("#34d399"));
+        gc.fillOval(cx + 28, cy - 2, 8, 8);
+
+        // Titre
+        gc.setFill(javafx.scene.paint.Color.WHITE);
+        gc.setFont(javafx.scene.text.Font.font("Arial",
+                javafx.scene.text.FontWeight.BOLD, 15));
+        double tw = nomActivite.length() * 8.5;
+        gc.fillText(nomActivite, cx - tw / 2, cy + 38);
+
+        // Sous-titre
+        gc.setFill(javafx.scene.paint.Color.web("#ffffff", 0.65));
+        gc.setFont(javafx.scene.text.Font.font("Arial", 11));
+        String sub = "Activite de jeu interactive";
+        gc.fillText(sub, cx - sub.length() * 3.0, cy + 54);
+
+        // Le canvas doit s'étirer en largeur
+        javafx.scene.layout.StackPane stack = new javafx.scene.layout.StackPane(canvas);
+        stack.setPrefHeight(H);
+        stack.setMinHeight(H);
+        stack.setMaxHeight(H);
+        stack.setMaxWidth(Double.MAX_VALUE);
+
+        // Redessiner quand la largeur change
+        stack.widthProperty().addListener((obs, ov, nv) -> {
+            double w = nv.doubleValue();
+            if (w <= 0) return;
+            canvas.setWidth(w);
+            gc.setFill(grad);
+            gc.fillRect(0, 0, w, H);
+            gc.setFill(javafx.scene.paint.Color.web("#ffffff", 0.06));
+            gc.fillOval(-30, -30, 160, 160);
+            gc.fillOval(w - 140, 60, 120, 120);
+            gc.fillOval(w / 2 - 40, -20, 80, 80);
+            double cx2 = w / 2, cy2 = 80.0;
+            gc.setFill(javafx.scene.paint.Color.web("#ffffff", 0.9));
+            gc.fillRoundRect(cx2 - 40, cy2 - 18, 80, 36, 18, 18);
+            gc.fillRoundRect(cx2 - 44, cy2 + 8, 22, 22, 10, 10);
+            gc.fillRoundRect(cx2 + 22, cy2 + 8, 22, 22, 10, 10);
+            gc.setFill(javafx.scene.paint.Color.web("#7c3aed"));
+            gc.fillRect(cx2 - 32, cy2 - 6, 14, 5);
+            gc.fillRect(cx2 - 27, cy2 - 10, 5, 14);
+            gc.setFill(javafx.scene.paint.Color.web("#f87171"));
+            gc.fillOval(cx2 + 18, cy2 - 10, 8, 8);
+            gc.setFill(javafx.scene.paint.Color.web("#34d399"));
+            gc.fillOval(cx2 + 28, cy2 - 2, 8, 8);
+            gc.setFill(javafx.scene.paint.Color.WHITE);
+            gc.setFont(javafx.scene.text.Font.font("Arial",
+                    javafx.scene.text.FontWeight.BOLD, 15));
+            gc.fillText(nomActivite, cx2 - tw / 2, cy2 + 38);
+            gc.setFill(javafx.scene.paint.Color.web("#ffffff", 0.65));
+            gc.setFont(javafx.scene.text.Font.font("Arial", 11));
+            gc.fillText(sub, cx2 - sub.length() * 3.0, cy2 + 54);
+        });
+
+        return stack;
     }
 
     // ─── Carte assemblée depuis tuiles OSM ───────────────────────────────────
 
     private javafx.scene.layout.StackPane creerCarteOSM(double actLat, double actLon) {
+        return creerCarteOSM(actLat, actLon, 0);
+    }
+
+    private javafx.scene.layout.StackPane creerCarteOSM(double actLat, double actLon, int cardIndex) {
         final int ZOOM      = 14;
         final int TILE_SIZE = 256;
         final int MAP_H     = 160;
@@ -218,9 +568,9 @@ public class EtudiantActivitesController implements Initializable {
         double fracX = lon2tileXFrac(actLon, ZOOM) - centerTileX;
         double fracY = lat2tileYFrac(actLat, ZOOM) - centerTileY;
 
-        // Position absolue du marqueur dans la grille (tuile centrale = colonne COLS/2)
+        // Position absolue du marqueur dans la grille (tuile centrale = colonne COLS/2, ligne ROWS/2)
         int midCol = COLS / 2; // = 2
-        int midRow = 0;        // tuiles commencent à la ligne 0
+        int midRow = ROWS / 2; // = 1  (centre vertical)
         final double markerAbsX = (midCol + fracX) * TILE_SIZE;
         final double markerAbsY = (midRow + fracY) * TILE_SIZE;
 
@@ -236,7 +586,19 @@ public class EtudiantActivitesController implements Initializable {
                 iv.setPreserveRatio(false);
                 iv.setSmooth(true);
                 tileGrid.add(iv, dc, dr);
-                chargerTuile(iv, centerTileX + dc - midCol, centerTileY + dr, ZOOM);
+                final long delay = (long)(cardIndex) * 800L; // décaler par carte
+                if (delay == 0) {
+                    chargerTuile(iv, centerTileX + dc - midCol, centerTileY + dr - midRow, ZOOM);
+                } else {
+                    final int tx = centerTileX + dc - midCol;
+                    final int ty = centerTileY + dr - midRow;
+                    Thread delayThread = new Thread(() -> {
+                        try { Thread.sleep(delay); } catch (InterruptedException ignored) {}
+                        chargerTuile(iv, tx, ty, ZOOM);
+                    });
+                    delayThread.setDaemon(true);
+                    delayThread.start();
+                }
             }
         }
 
@@ -372,21 +734,35 @@ public class EtudiantActivitesController implements Initializable {
     }
 
     private void chargerTuile(javafx.scene.image.ImageView iv, int x, int y, int zoom) {
-        String url = "https://tile.openstreetmap.org/" + zoom + "/" + x + "/" + y + ".png";
+        chargerTuileAvecRetry(iv, x, y, zoom, 0);
+    }
+
+    private void chargerTuileAvecRetry(javafx.scene.image.ImageView iv, int x, int y, int zoom, int tentative) {
+        String[] subdomains = {"a", "b", "c"};
+        String sub = subdomains[(x + y + tentative) % 3];
+        String url = "https://" + sub + ".tile.openstreetmap.org/" + zoom + "/" + x + "/" + y + ".png";
+
         Thread t = new Thread(() -> {
+            if (tentative > 0) {
+                try { Thread.sleep(tentative * 600L); } catch (InterruptedException ignored) {}
+            }
             try {
                 java.net.HttpURLConnection conn = (java.net.HttpURLConnection)
                         new java.net.URL(url).openConnection();
                 conn.setRequestProperty("User-Agent", "MentalUpApp/1.0 JavaFX");
-                conn.setConnectTimeout(8000);
-                conn.setReadTimeout(8000);
-                if (conn.getResponseCode() == 200) {
+                conn.setRequestProperty("Accept", "image/png");
+                conn.setConnectTimeout(10000);
+                conn.setReadTimeout(10000);
+                int code = conn.getResponseCode();
+                if (code == 200) {
                     javafx.scene.image.Image img = new javafx.scene.image.Image(
                             conn.getInputStream(), 256, 256, false, true);
                     javafx.application.Platform.runLater(() -> iv.setImage(img));
+                } else if (tentative < 3) {
+                    chargerTuileAvecRetry(iv, x, y, zoom, tentative + 1);
                 }
             } catch (Exception e) {
-                System.err.println("Tuile échouée: " + url);
+                if (tentative < 3) chargerTuileAvecRetry(iv, x, y, zoom, tentative + 1);
             }
         });
         t.setDaemon(true);
@@ -632,7 +1008,7 @@ public class EtudiantActivitesController implements Initializable {
         qrView.setSmooth(true);
 
         // Générer QR via API gratuite (sans librairie)
-        Thread qrThread = new Thread(() -> {
+        Thread qrThread = new  Thread(() -> {
             try {
                 String encoded = java.net.URLEncoder.encode(qrData, java.nio.charset.StandardCharsets.UTF_8);
                 String url = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encoded;
@@ -698,6 +1074,7 @@ public class EtudiantActivitesController implements Initializable {
         if (t.contains("musique"))                        return "🎵";
         if (t.contains("nature"))                         return "🌿";
         if (t.contains("social"))                         return "👥";
+        if (t.contains("jeux") || t.contains("jeu"))      return "🎮";
         return "⚡";
     }
 
@@ -709,6 +1086,143 @@ public class EtudiantActivitesController implements Initializable {
         Label val = new Label(valeur); val.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: white;");
         box.getChildren().addAll(lbl, val);
         return box;
+    }
+
+    // ─── Popup choix du jeu ───────────────────────────────────────────────────
+
+    private void afficherPopupChoixJeu(Stage parentStage, String nomActivite) {
+        Stage popup = new Stage();
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.initOwner(parentStage);
+        popup.initStyle(javafx.stage.StageStyle.UNDECORATED);
+
+        VBox root = new VBox(0);
+        root.setAlignment(Pos.CENTER);
+        root.setPrefWidth(480);
+        root.setStyle("-fx-background-color: #1a1a2e; -fx-background-radius: 20; " +
+                      "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 30, 0, 0, 10);");
+
+        // ── Bandeau titre ─────────────────────────────────────────────────────
+        VBox header = new VBox(6);
+        header.setAlignment(Pos.CENTER);
+        header.setPadding(new Insets(28, 20, 22, 20));
+        header.setStyle("-fx-background-color: #9b59b6; -fx-background-radius: 20 20 0 0;");
+
+        Label lblEmoji = new Label("🎮");
+        lblEmoji.setStyle("-fx-font-size: 42px;");
+        Label lblTitre = new Label("ARCADE DES JEUX");
+        lblTitre.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white; " +
+                          "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 4, 0, 0, 2);");
+        Label lblSous = new Label("Choisissez votre défi !");
+        lblSous.setStyle("-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.85);");
+        header.getChildren().addAll(lblEmoji, lblTitre, lblSous);
+
+        // ── Grille de jeux ────────────────────────────────────────────────────
+        VBox jeux = new VBox(10);
+        jeux.setPadding(new Insets(20, 24, 10, 24));
+        jeux.setStyle("-fx-background-color: #16213e;");
+
+        String[][] configs = {
+            {"🎯", "Réaction Pro",  "Testez vos réflexes avec des combos !",  "#e67e22"},
+            {"🧠", "Mémoire",       "Entraînez votre cerveau avec des cartes !", "#3498db"},
+            {"🌀", "Labyrinthe",    "Trouvez la sortie du labyrinthe !",        "#27ae60"},
+            {"🐍", "Snake",         "Mangez sans vous mordre la queue !",       "#e74c3c"},
+            {"🎲", "Surprise",      "Jeu aléatoire pour les aventuriers !",     "#f39c12"},
+        };
+
+        for (String[] cfg : configs) {
+            HBox row = new HBox(14);
+            row.setAlignment(Pos.CENTER_LEFT);
+            row.setPadding(new Insets(12, 16, 12, 16));
+            row.setStyle("-fx-background-color: #1e2d4a; -fx-background-radius: 12; -fx-cursor: hand;");
+
+            Label ico = new Label(cfg[0]);
+            ico.setStyle("-fx-font-size: 26px; -fx-min-width: 36;");
+
+            VBox txt = new VBox(2);
+            Label nom = new Label(cfg[1]);
+            nom.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: white;");
+            Label desc = new Label(cfg[2]);
+            desc.setStyle("-fx-font-size: 11px; -fx-text-fill: #8892b0;");
+            txt.getChildren().addAll(nom, desc);
+            HBox.setHgrow(txt, Priority.ALWAYS);
+
+            Rectangle accent = new Rectangle(4, 40);
+            accent.setFill(javafx.scene.paint.Color.web(cfg[3]));
+            accent.setArcWidth(4); accent.setArcHeight(4);
+
+            row.getChildren().addAll(accent, ico, txt);
+
+            // Hover
+            row.setOnMouseEntered(ev -> row.setStyle(
+                    "-fx-background-color: #2a3f5f; -fx-background-radius: 12; -fx-cursor: hand;"));
+            row.setOnMouseExited(ev -> row.setStyle(
+                    "-fx-background-color: #1e2d4a; -fx-background-radius: 12; -fx-cursor: hand;"));
+
+            // Clic
+            final String nomJeu = cfg[1];
+            row.setOnMouseClicked(ev -> {
+                popup.close();
+                switch (nomJeu) {
+                    case "Réaction Pro" -> utils.JeuAmeliore.lancerJeuReactionAmeliore(parentStage, nomActivite);
+                    case "Mémoire"      -> utils.JeuMemoire.lancerJeuMemoire(parentStage, nomActivite);
+                    case "Labyrinthe"   -> utils.JeuLabyrinthe.lancerJeuLabyrinthe(parentStage, nomActivite);
+                    case "Snake"        -> utils.JeuSnake.lancerJeuSnake(parentStage, nomActivite);
+                    case "Surprise"     -> {
+                        int choix = new java.util.Random().nextInt(4);
+                        switch (choix) {
+                            case 0 -> utils.JeuAmeliore.lancerJeuReactionAmeliore(parentStage, nomActivite);
+                            case 1 -> utils.JeuMemoire.lancerJeuMemoire(parentStage, nomActivite);
+                            case 2 -> utils.JeuLabyrinthe.lancerJeuLabyrinthe(parentStage, nomActivite);
+                            case 3 -> utils.JeuSnake.lancerJeuSnake(parentStage, nomActivite);
+                        }
+                    }
+                }
+            });
+
+            jeux.getChildren().add(row);
+        }
+
+        // ── Bouton annuler ────────────────────────────────────────────────────
+        HBox footer = new HBox();
+        footer.setAlignment(Pos.CENTER);
+        footer.setPadding(new Insets(14, 24, 20, 24));
+        footer.setStyle("-fx-background-color: #16213e; -fx-background-radius: 0 0 20 20;");
+
+        Button btnAnnuler = new Button("✕  Annuler");
+        btnAnnuler.setPrefWidth(160); btnAnnuler.setPrefHeight(40);
+        btnAnnuler.setStyle("-fx-background-color: #2a3f5f; -fx-text-fill: #8892b0; " +
+                            "-fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand;");
+        btnAnnuler.setOnMouseEntered(ev -> btnAnnuler.setStyle(
+                "-fx-background-color: #e74c3c; -fx-text-fill: white; " +
+                "-fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand;"));
+        btnAnnuler.setOnMouseExited(ev -> btnAnnuler.setStyle(
+                "-fx-background-color: #2a3f5f; -fx-text-fill: #8892b0; " +
+                "-fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand;"));
+        btnAnnuler.setOnAction(ev -> popup.close());
+        footer.getChildren().add(btnAnnuler);
+
+        root.getChildren().addAll(header, jeux, footer);
+
+        // Animation d'entrée
+        root.setScaleX(0.5); root.setScaleY(0.5); root.setOpacity(0);
+        javafx.animation.ScaleTransition st = new javafx.animation.ScaleTransition(
+                javafx.util.Duration.millis(300), root);
+        st.setToX(1); st.setToY(1);
+        st.setInterpolator(javafx.animation.Interpolator.EASE_OUT);
+        javafx.animation.FadeTransition ft = new javafx.animation.FadeTransition(
+                javafx.util.Duration.millis(200), root);
+        ft.setToValue(1);
+        new javafx.animation.ParallelTransition(st, ft).play();
+
+        javafx.scene.Scene scene = new javafx.scene.Scene(root);
+        scene.setFill(Color.TRANSPARENT);
+        popup.setScene(scene);
+        popup.show();
+
+        // Centrer sur le parent
+        popup.setX(parentStage.getX() + (parentStage.getWidth()  - 480) / 2);
+        popup.setY(parentStage.getY() + (parentStage.getHeight() - 500) / 2);
     }
 
     private void afficherToast(String message, String couleur, String icone) {

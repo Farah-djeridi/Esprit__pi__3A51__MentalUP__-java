@@ -11,6 +11,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import models.Reservation;
+import services.ServiceActivite;
+import services.ServiceEmail;
 import services.ServiceReservation;
 
 import java.io.IOException;
@@ -33,12 +35,16 @@ public class ReservationAdminController implements Initializable {
     @FXML private Label lblMoisAnnee;
 
     private ServiceReservation serviceReservation;
+    private ServiceActivite    serviceActivite;
+    private ServiceEmail       serviceEmail;
     private List<Reservation> allReservations = new java.util.ArrayList<>();
     private java.time.YearMonth currentMonth = java.time.YearMonth.now();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         serviceReservation = new ServiceReservation();
+        serviceActivite    = new ServiceActivite();
+        serviceEmail       = new ServiceEmail();
         chargerReservations();
     }
 
@@ -285,7 +291,21 @@ public class ReservationAdminController implements Initializable {
                 default         -> "#718096";
             };
             afficherToast(msg, couleur, nouveauStatut.equals("ACCEPTEE") ? "✅" : "❌");
-        } catch (SQLException ex) {
+
+            // ── Envoi email automatique ───────────────────────────────────────
+            if ("ACCEPTEE".equals(nouveauStatut) || "REFUSEE".equals(nouveauStatut)) {
+                try {
+                    models.Activite activite = serviceActivite.getActiviteById(r.getIdActivite());
+                    if (activite != null) {
+                        serviceEmail.envoyerNotificationStatut(r, activite, nouveauStatut);
+                        afficherToast("📧 Email envoyé à " + r.getNomEtudiant(), "#4299e1", "📧");
+                    }
+                } catch (Exception emailEx) {
+                    System.err.println("Email non envoyé: " + emailEx.getMessage());
+                }
+            }
+
+        } catch (java.sql.SQLException ex) {
             afficherToast("Erreur: " + ex.getMessage(), "#e53e3e", "❌");
         }
     }
@@ -299,6 +319,99 @@ public class ReservationAdminController implements Initializable {
         val.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2d3748;");
         row.getChildren().addAll(lbl, val);
         return row;
+    }
+
+    // ─── Configuration Email ──────────────────────────────────────────────────
+
+    @FXML
+    private void configurerEmail() {
+        Stage popup = new Stage();
+        popup.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+        popup.setTitle("Configuration Email");
+
+        VBox root = new VBox(16);
+        root.setPadding(new Insets(28));
+        root.setStyle("-fx-background-color: white;");
+        root.setPrefWidth(420);
+
+        Label titre = new Label("📧 Configuration SMTP");
+        titre.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2d3748;");
+
+        Label info = new Label("Utilisez un App Password Gmail (pas votre mot de passe principal).\n" +
+                               "Activez la validation en 2 étapes → Mots de passe d'application.");
+        info.setStyle("-fx-font-size: 11px; -fx-text-fill: #718096; -fx-wrap-text: true;");
+        info.setMaxWidth(370);
+
+        // Champs
+        TextField tfEmail = new TextField(ServiceEmail.getEmailSender());
+        tfEmail.setPromptText("hello@demomailtrap.com");
+        tfEmail.setStyle("-fx-padding: 10; -fx-font-size: 13px; -fx-border-color: #e2e8f0; " +
+                         "-fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;");
+
+        TextField tfUsername = new TextField(ServiceEmail.getSmtpUsername());
+        tfUsername.setPromptText("Username Mailtrap (ex: abc123def456)");
+        tfUsername.setStyle("-fx-padding: 10; -fx-font-size: 13px; -fx-border-color: #e2e8f0; " +
+                            "-fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;");
+
+        PasswordField tfPassword = new PasswordField();
+        tfPassword.setPromptText("Password Mailtrap");
+        tfPassword.setStyle("-fx-padding: 10; -fx-font-size: 13px; -fx-border-color: #e2e8f0; " +
+                            "-fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;");
+
+        // Bouton tester
+        Label lblTest = new Label("");
+        lblTest.setStyle("-fx-font-size: 12px;");
+
+        Button btnTester = new Button("🔍 Tester la connexion");
+        btnTester.setStyle("-fx-background-color: #e2e8f0; -fx-text-fill: #4a5568; -fx-font-size: 13px; " +
+                           "-fx-padding: 10; -fx-background-radius: 8; -fx-cursor: hand;");
+        btnTester.setMaxWidth(Double.MAX_VALUE);
+        btnTester.setOnAction(e -> {
+            lblTest.setText("⏳ Test en cours...");
+            lblTest.setStyle("-fx-font-size: 12px; -fx-text-fill: #718096;");
+            ServiceEmail.setCredentials(tfEmail.getText().trim(), tfUsername.getText().trim(), tfPassword.getText().trim());
+            Thread t = new Thread(() -> {
+                boolean ok = ServiceEmail.testerConnexion();
+                javafx.application.Platform.runLater(() -> {
+                    if (ok) {
+                        lblTest.setText("✅ Connexion réussie !");
+                        lblTest.setStyle("-fx-font-size: 12px; -fx-text-fill: #38a169;");
+                    } else {
+                        lblTest.setText("❌ Échec — vérifiez vos credentials");
+                        lblTest.setStyle("-fx-font-size: 12px; -fx-text-fill: #e53e3e;");
+                    }
+                });
+            });
+            t.setDaemon(true); t.start();
+        });
+
+        Button btnSauvegarder = new Button("💾 Sauvegarder");
+        btnSauvegarder.setMaxWidth(Double.MAX_VALUE);
+        btnSauvegarder.setStyle("-fx-background-color: #4299e1; -fx-text-fill: white; -fx-font-size: 13px; " +
+                                "-fx-font-weight: bold; -fx-padding: 11; -fx-background-radius: 8; -fx-cursor: hand;");
+        btnSauvegarder.setOnAction(e -> {
+            ServiceEmail.setCredentials(tfEmail.getText().trim(), tfUsername.getText().trim(), tfPassword.getText().trim());
+            popup.close();
+            afficherToast("Configuration email sauvegardée !", "#4299e1", "📧");
+        });
+
+        Button btnFermer = new Button("Fermer");
+        btnFermer.setMaxWidth(Double.MAX_VALUE);
+        btnFermer.setStyle("-fx-background-color: #e2e8f0; -fx-text-fill: #4a5568; -fx-font-size: 13px; " +
+                           "-fx-padding: 11; -fx-background-radius: 8; -fx-cursor: hand;");
+        btnFermer.setOnAction(e -> popup.close());
+
+        Label lEmail = new Label("Email expéditeur (ex: hello@demomailtrap.com)");
+        lEmail.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #4a5568;");
+        Label lUser = new Label("Username SMTP Mailtrap");
+        lUser.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #4a5568;");
+        Label lPass = new Label("Password SMTP Mailtrap");
+        lPass.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #4a5568;");
+
+        root.getChildren().addAll(titre, info, lEmail, tfEmail, lUser, tfUsername,
+                                  lPass, tfPassword, btnTester, lblTest, btnSauvegarder, btnFermer);
+        popup.setScene(new Scene(root, 420, 500));
+        popup.showAndWait();
     }
 
     // ─── Navigation mois ─────────────────────────────────────────────────────

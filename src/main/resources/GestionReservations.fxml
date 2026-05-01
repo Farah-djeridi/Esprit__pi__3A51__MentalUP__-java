@@ -124,6 +124,16 @@
                         <Label text="Cette semaine" style="-fx-font-size: 11px; -fx-text-fill: #718096;"/>
                     </VBox>
                 </HBox>
+                <HBox spacing="14" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS"
+                      style="-fx-background-color: white; -fx-background-radius: 12;
+                             -fx-padding: 16 20; -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.07),8,0,0,2);">
+                    <Label text="💳" style="-fx-font-size: 26px;"/>
+                    <VBox spacing="2">
+                        <Label fx:id="lblPaiements" text="0"
+                               style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #3182ce;"/>
+                        <Label text="Paiements reçus" style="-fx-font-size: 11px; -fx-text-fill: #718096;"/>
+                    </VBox>
+                </HBox>
             </HBox>
 
             <!-- Graphiques -->

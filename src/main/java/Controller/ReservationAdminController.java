@@ -29,6 +29,7 @@ public class ReservationAdminController implements Initializable {
     @FXML private Label lblTotal;
     @FXML private Label lblAujourdhui;
     @FXML private Label lblSemaine;
+    @FXML private Label lblPaiements;
     @FXML private HBox chartBarContainer;
     @FXML private VBox chartDonutContainer;
     @FXML private GridPane calendarGrid;
@@ -65,6 +66,15 @@ public class ReservationAdminController implements Initializable {
                     !r.getDateReservation().isBefore(today.minusDays(7))).count();
             if (lblAujourdhui != null) lblAujourdhui.setText(String.valueOf(nbAujourdhui));
             if (lblSemaine   != null) lblSemaine.setText(String.valueOf(nbSemaine));
+
+            // Stat paiements
+            long nbPaies = allReservations.stream()
+                .filter(r -> "PAYE".equals(r.getStatutPaiement())).count();
+            double totalMontant = allReservations.stream()
+                .filter(r -> "PAYE".equals(r.getStatutPaiement()))
+                .mapToDouble(models.Reservation::getMontant).sum();
+            if (lblPaiements != null) lblPaiements.setText(
+                nbPaies + (totalMontant > 0 ? "\n" + String.format("%.0f TND", totalMontant) : ""));
 
             // Graphiques
             if (chartBarContainer  != null) dessinerBarChart();
@@ -744,7 +754,7 @@ public class ReservationAdminController implements Initializable {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // Badge statut
+        // Badge statut réservation
         String statut = r.getStatut();
         String statutColor = switch (statut) {
             case "ACCEPTEE" -> "#38a169";
@@ -759,6 +769,24 @@ public class ReservationAdminController implements Initializable {
         Label lblStatut = new Label(statutText);
         lblStatut.setStyle("-fx-background-color: " + statutColor + "22; -fx-text-fill: " + statutColor + "; " +
                            "-fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 4 10; -fx-background-radius: 20;");
+
+        // Badge paiement
+        String statutPaiement = r.getStatutPaiement();
+        String paiColor = "PAYE".equals(statutPaiement) ? "#3182ce" : "#718096";
+        String paiText  = "PAYE".equals(statutPaiement)
+                ? "💳 Payé" + (r.getMontant() > 0 ? " " + String.format("%.2f TND", r.getMontant()) : "")
+                : "💰 Non payé";
+        Label lblPaiement = new Label(paiText);
+        lblPaiement.setStyle("-fx-background-color: " + paiColor + "22; -fx-text-fill: " + paiColor + "; " +
+                             "-fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 4 10; -fx-background-radius: 20;");
+
+        // Méthode de paiement
+        if (r.getMethodePaiement() != null && !r.getMethodePaiement().isEmpty()) {
+            lblPaiement.setText(paiText + "  •  " + r.getMethodePaiement());
+        }
+
+        VBox vbStatuts = new VBox(4, lblStatut, lblPaiement);
+        vbStatuts.setAlignment(Pos.CENTER_RIGHT);
 
         // Boutons
         Button btnEdit = new Button("✏ Modifier");
@@ -780,7 +808,7 @@ public class ReservationAdminController implements Initializable {
         HBox actions = new HBox(10, btnEdit, btnDel);
         actions.setAlignment(Pos.CENTER_RIGHT);
 
-        card.getChildren().addAll(idLbl, vbActivite, vbEtudiant, vbPlace, vbDate, spacer, lblStatut, actions);
+        card.getChildren().addAll(idLbl, vbActivite, vbEtudiant, vbPlace, vbDate, spacer, vbStatuts, actions);
 
         // Hover
         card.setOnMouseEntered(e -> card.setStyle("-fx-background-color: #f8fafc; -fx-background-radius: 14; " +

@@ -321,7 +321,7 @@ public class CaptchaAvance {
             // Rotation affichée = initiale - correction (on tourne dans le sens inverse)
             double rotationAffichee = (rotationInitiale - correction + 360) % 360;
             imageLabel.setRotate(rotationAffichee);
-            angleLabel.setText("Angle: " + Math.round(correction) + "°");
+            angleLabel.setText("Angle image: " + Math.round(rotationAffichee) + "°");
 
             // Succès si l'image est droite (rotationAffichee proche de 0° ou 360°)
             boolean droite = rotationAffichee < 10 || rotationAffichee > 350;

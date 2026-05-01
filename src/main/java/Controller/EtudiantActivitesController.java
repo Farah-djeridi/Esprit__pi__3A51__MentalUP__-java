@@ -46,6 +46,7 @@ public class EtudiantActivitesController implements Initializable {
         serviceActivite    = new ServiceActivite();
         serviceReservation = new ServiceReservation();
         serviceNotation    = new ServiceNotation();
+        corrigerCoordonnees();
         chargerActivites();
 
         searchField.textProperty().addListener((obs, oldVal, newVal) -> {
@@ -61,6 +62,36 @@ public class EtudiantActivitesController implements Initializable {
                 afficherActivites(filtrees);
             }
         });
+    }
+
+    // Assigner des coordonnées Tunis aux activités sans coordonnées
+    private void corrigerCoordonnees() {
+        // Avenue Habib Bourguiba, Tunis — zone urbaine dense avec données OSM complètes
+        try {
+            java.sql.Connection conn = utils.MyDataBase.getInstance().getConnection();
+            // Réinitialiser les coordonnées incorrectes (hors zone urbaine)
+            conn.createStatement().executeUpdate(
+                "UPDATE activite SET latitude=0, longitude=0 " +
+                "WHERE (latitude < 36.7 OR latitude > 37.0 OR longitude < 9.8 OR longitude > 10.6) " +
+                "AND latitude != 0");
+            // Assigner des coordonnées valides
+            java.sql.ResultSet rs = conn.createStatement()
+                    .executeQuery("SELECT id_activite FROM activite WHERE latitude=0 AND longitude=0");
+            while (rs.next()) {
+                int id = rs.getInt("id_activite");
+                // Autour de l'Avenue Bourguiba — toutes dans la même zone urbaine
+                double lat = 36.8190 + (id % 3) * 0.002;
+                double lon = 10.1658 + (id % 3) * 0.002;
+                java.sql.PreparedStatement ps = conn.prepareStatement(
+                        "UPDATE activite SET latitude=?, longitude=? WHERE id_activite=?");
+                ps.setDouble(1, lat);
+                ps.setDouble(2, lon);
+                ps.setInt(3, id);
+                ps.executeUpdate();
+            }
+        } catch (Exception e) {
+            System.err.println("corrigerCoordonnees: " + e.getMessage());
+        }
     }
 
     // ─── Assistant ────────────────────────────────────────────────────────────
@@ -141,12 +172,8 @@ public class EtudiantActivitesController implements Initializable {
         // ── Carte OpenStreetMap ───────────────────────────────────────────────
         double lat = activite.getLatitude();
         double lon = activite.getLongitude();
-        if (lat == 0.0 && lon == 0.0) {
-            double off = (activite.getIdActivite() % 20) * 0.005;
-            lat = 36.8065 + off;
-            lon = 10.1815 + off;
-        }
-        javafx.scene.layout.StackPane mapView = creerCarteOSM(lat, lon, index);
+        if (lat == 0.0 && lon == 0.0) { lat = 36.8065; lon = 10.1815; }
+        javafx.scene.layout.StackPane mapView = creerCarteOSM(lat, lon);
 
         // ── Contenu texte ─────────────────────────────────────────────────────
         VBox content = new VBox(10);
@@ -550,27 +577,20 @@ public class EtudiantActivitesController implements Initializable {
     // ─── Carte assemblée depuis tuiles OSM ───────────────────────────────────
 
     private javafx.scene.layout.StackPane creerCarteOSM(double actLat, double actLon) {
-        return creerCarteOSM(actLat, actLon, 0);
-    }
-
-    private javafx.scene.layout.StackPane creerCarteOSM(double actLat, double actLon, int cardIndex) {
         final int ZOOM      = 14;
         final int TILE_SIZE = 256;
         final int MAP_H     = 160;
         final int COLS      = 5;
         final int ROWS      = 3;
 
-        // Tuile centrale = tuile de l'activité
         final int centerTileX = lon2tileX(actLon, ZOOM);
         final int centerTileY = lat2tileY(actLat, ZOOM);
 
-        // Position fractionnaire dans la tuile centrale (0..1)
         double fracX = lon2tileXFrac(actLon, ZOOM) - centerTileX;
         double fracY = lat2tileYFrac(actLat, ZOOM) - centerTileY;
 
-        // Position absolue du marqueur dans la grille (tuile centrale = colonne COLS/2, ligne ROWS/2)
-        int midCol = COLS / 2; // = 2
-        int midRow = ROWS / 2; // = 1  (centre vertical)
+        int midCol = COLS / 2;
+        int midRow = ROWS / 2;
         final double markerAbsX = (midCol + fracX) * TILE_SIZE;
         final double markerAbsY = (midRow + fracY) * TILE_SIZE;
 
@@ -586,19 +606,7 @@ public class EtudiantActivitesController implements Initializable {
                 iv.setPreserveRatio(false);
                 iv.setSmooth(true);
                 tileGrid.add(iv, dc, dr);
-                final long delay = (long)(cardIndex) * 800L; // décaler par carte
-                if (delay == 0) {
-                    chargerTuile(iv, centerTileX + dc - midCol, centerTileY + dr - midRow, ZOOM);
-                } else {
-                    final int tx = centerTileX + dc - midCol;
-                    final int ty = centerTileY + dr - midRow;
-                    Thread delayThread = new Thread(() -> {
-                        try { Thread.sleep(delay); } catch (InterruptedException ignored) {}
-                        chargerTuile(iv, tx, ty, ZOOM);
-                    });
-                    delayThread.setDaemon(true);
-                    delayThread.start();
-                }
+                chargerTuile(iv, centerTileX + dc - midCol, centerTileY + dr - midRow, ZOOM);
             }
         }
 
@@ -616,7 +624,6 @@ public class EtudiantActivitesController implements Initializable {
         javafx.scene.shape.Polygon pin = new javafx.scene.shape.Polygon(
                 0.0, 10.0, 7.0, -2.0, -7.0, -2.0);
         pin.setFill(javafx.scene.paint.Color.web("#e53e3e"));
-
         markerNode.getChildren().addAll(circle, pin);
 
         // ── Pane principal ────────────────────────────────────────────────────
@@ -632,17 +639,13 @@ public class EtudiantActivitesController implements Initializable {
         clip.setHeight(MAP_H);
         mapPane.setClip(clip);
 
-        // Offset initial : centrer la carte sur le marqueur
         final double[] offset = {0.0, 0.0};
-
-        // Centrer la grille : on veut que markerAbsX soit au centre de la carte
-        // On calcule l'offset initial après que la largeur soit connue
         tileGrid.setLayoutX(offset[0]);
         tileGrid.setLayoutY(offset[1]);
         markerNode.setLayoutX(markerAbsX + offset[0] - 8);
         markerNode.setLayoutY(markerAbsY + offset[1] - 26);
 
-        // Centrer automatiquement quand la largeur est disponible
+        // Centrer quand la largeur est disponible
         mapPane.widthProperty().addListener((obs, ov, nv) -> {
             if (nv.doubleValue() > 0 && offset[0] == 0.0) {
                 offset[0] = nv.doubleValue() / 2.0 - markerAbsX;
@@ -660,7 +663,6 @@ public class EtudiantActivitesController implements Initializable {
         btnPlus.setLayoutX(8);  btnPlus.setLayoutY(8);
         btnMoins.setLayoutX(8); btnMoins.setLayoutY(36);
 
-        // Attribution
         javafx.scene.control.Label attrib = new javafx.scene.control.Label("© OpenStreetMap");
         attrib.setStyle("-fx-font-size: 9px; -fx-text-fill: #555; -fx-background-color: rgba(255,255,255,0.7); -fx-padding: 1 4;");
         attrib.setMouseTransparent(true);
@@ -688,7 +690,6 @@ public class EtudiantActivitesController implements Initializable {
             offset[1] = offsetAtDrag[1] + dy;
             tileGrid.setLayoutX(offset[0]);
             tileGrid.setLayoutY(offset[1]);
-            // Marqueur suit la grille → reste sur la localisation
             markerNode.setLayoutX(markerAbsX + offset[0] - 8);
             markerNode.setLayoutY(markerAbsY + offset[1] - 26);
         });
@@ -696,10 +697,8 @@ public class EtudiantActivitesController implements Initializable {
         mapPane.setOnMouseReleased(e ->
             mapPane.setStyle("-fx-background-color: #f2efe9; -fx-cursor: grab;"));
 
-        // ── Zoom +/- ──────────────────────────────────────────────────────────
-        // (recharge les tuiles — simple rechargement à zoom fixe +1/-1)
-        btnPlus.setOnAction(e -> { /* zoom in visuel : scale */ scaleMap(tileGrid, markerNode, 1.2, offset, markerAbsX, markerAbsY); });
-        btnMoins.setOnAction(e -> { scaleMap(tileGrid, markerNode, 1/1.2, offset, markerAbsX, markerAbsY); });
+        btnPlus.setOnAction(e  -> scaleMap(tileGrid, markerNode, 1.2,   offset, markerAbsX, markerAbsY));
+        btnMoins.setOnAction(e -> scaleMap(tileGrid, markerNode, 1/1.2, offset, markerAbsX, markerAbsY));
 
         return new javafx.scene.layout.StackPane(mapPane);
     }
@@ -734,35 +733,23 @@ public class EtudiantActivitesController implements Initializable {
     }
 
     private void chargerTuile(javafx.scene.image.ImageView iv, int x, int y, int zoom) {
-        chargerTuileAvecRetry(iv, x, y, zoom, 0);
-    }
-
-    private void chargerTuileAvecRetry(javafx.scene.image.ImageView iv, int x, int y, int zoom, int tentative) {
-        String[] subdomains = {"a", "b", "c"};
-        String sub = subdomains[(x + y + tentative) % 3];
-        String url = "https://" + sub + ".tile.openstreetmap.org/" + zoom + "/" + x + "/" + y + ".png";
-
+        String[] subs = {"a", "b", "c"};
+        String url = "https://" + subs[Math.abs(x + y) % 3] +
+                ".tile.openstreetmap.org/" + zoom + "/" + x + "/" + y + ".png";
         Thread t = new Thread(() -> {
-            if (tentative > 0) {
-                try { Thread.sleep(tentative * 600L); } catch (InterruptedException ignored) {}
-            }
             try {
                 java.net.HttpURLConnection conn = (java.net.HttpURLConnection)
                         new java.net.URL(url).openConnection();
                 conn.setRequestProperty("User-Agent", "MentalUpApp/1.0 JavaFX");
-                conn.setRequestProperty("Accept", "image/png");
-                conn.setConnectTimeout(10000);
-                conn.setReadTimeout(10000);
-                int code = conn.getResponseCode();
-                if (code == 200) {
+                conn.setConnectTimeout(8000);
+                conn.setReadTimeout(8000);
+                if (conn.getResponseCode() == 200) {
                     javafx.scene.image.Image img = new javafx.scene.image.Image(
                             conn.getInputStream(), 256, 256, false, true);
                     javafx.application.Platform.runLater(() -> iv.setImage(img));
-                } else if (tentative < 3) {
-                    chargerTuileAvecRetry(iv, x, y, zoom, tentative + 1);
                 }
             } catch (Exception e) {
-                if (tentative < 3) chargerTuileAvecRetry(iv, x, y, zoom, tentative + 1);
+                System.err.println("Tuile échouée: " + url);
             }
         });
         t.setDaemon(true);
@@ -783,6 +770,7 @@ public class EtudiantActivitesController implements Initializable {
         double latRad = Math.toRadians(lat);
         return (1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * (1 << zoom);
     }
+
 
     // ─── Sélection de place ───────────────────────────────────────────────────
 
@@ -909,13 +897,9 @@ public class EtudiantActivitesController implements Initializable {
         btnConfirmer.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 25; -fx-cursor: hand; -fx-background-radius: 8;");
         btnConfirmer.setOnAction(e -> {
             if (placeSelectionnee[0] == null) { afficherToast("Veuillez sélectionner une place!", "#ed8936", "⚠️"); return; }
-            try {
-                serviceReservation.ajouterReservation(
-                        new Reservation(activite.getIdActivite(), "Sophie Am.", placeSelectionnee[0], LocalDate.now()));
-                popup.close();
-                afficherToast("Place " + placeSelectionnee[0] + " réservée !", "#27ae60", "✅");
-                chargerActivites();
-            } catch (SQLException ex) { afficherToast("Erreur: " + ex.getMessage(), "#e53e3e", "❌"); }
+            // Ouvrir le paiement avant de confirmer
+            popup.close();
+            ouvrirPaiement(activite, placeSelectionnee[0]);
         });
 
         HBox footerBtns = new HBox(15);
@@ -925,6 +909,241 @@ public class EtudiantActivitesController implements Initializable {
         root.getChildren().addAll(titre, ecran, grille, legende, footerBtns);
         popup.setScene(new Scene(root, 750, 620));
         popup.showAndWait();
+    }
+
+    // ─── Paiement ─────────────────────────────────────────────────────────────
+
+    private void ouvrirPaiement(Activite activite, String place) {
+        Stage popup = new Stage();
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.initStyle(javafx.stage.StageStyle.UNDECORATED);
+
+        VBox root = new VBox(0);
+        root.setAlignment(Pos.CENTER);
+        root.setPrefWidth(480);
+        root.setStyle("-fx-background-color: #1a1a2e; -fx-background-radius: 20; " +
+                      "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 30, 0, 0, 10);");
+
+        // ── Header ────────────────────────────────────────────────────────────
+        VBox header = new VBox(6);
+        header.setAlignment(Pos.CENTER);
+        header.setPadding(new Insets(28, 20, 22, 20));
+        header.setStyle("-fx-background-color: #27ae60; -fx-background-radius: 20 20 0 0;");
+        Label lblIcon  = new Label("💳");
+        lblIcon.setStyle("-fx-font-size: 38px;");
+        Label lblTitre = new Label("PAIEMENT");
+        lblTitre.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;");
+        Label lblSous  = new Label(activite.getTitre() + "  •  Place " + place);
+        lblSous.setStyle("-fx-font-size: 12px; -fx-text-fill: rgba(255,255,255,0.85);");
+        header.getChildren().addAll(lblIcon, lblTitre, lblSous);
+
+        // ── Formulaire ────────────────────────────────────────────────────────
+        VBox form = new VBox(14);
+        form.setPadding(new Insets(24, 28, 20, 28));
+        form.setStyle("-fx-background-color: #16213e;");
+
+        // Montant
+        HBox montantRow = new HBox(10);
+        montantRow.setAlignment(Pos.CENTER_LEFT);
+        montantRow.setPadding(new Insets(12, 16, 12, 16));
+        montantRow.setStyle("-fx-background-color: #0f3460; -fx-background-radius: 10;");
+        Label lblMontantTxt = new Label("Montant à payer :");
+        lblMontantTxt.setStyle("-fx-font-size: 13px; -fx-text-fill: #8892b0;");
+        Region sp = new Region(); HBox.setHgrow(sp, Priority.ALWAYS);
+        Label lblMontant = new Label("25.00 TND");
+        lblMontant.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #27ae60;");
+        montantRow.getChildren().addAll(lblMontantTxt, sp, lblMontant);
+
+        // Méthode de paiement
+        Label lblMethode = new Label("Méthode de paiement");
+        lblMethode.setStyle("-fx-font-size: 12px; -fx-text-fill: #8892b0; -fx-font-weight: bold;");
+
+        javafx.scene.control.ToggleGroup tg = new javafx.scene.control.ToggleGroup();
+        HBox methodesRow = new HBox(10);
+        methodesRow.setAlignment(Pos.CENTER_LEFT);
+
+        for (String[] m : new String[][]{
+                {"💳", "Carte bancaire"},
+                {"📱", "Paiement mobile"},
+                {"🏦", "Virement"}}) {
+            javafx.scene.control.ToggleButton btn = new javafx.scene.control.ToggleButton(m[0] + " " + m[1]);
+            btn.setToggleGroup(tg);
+            btn.setStyle("-fx-background-color: #0f3460; -fx-text-fill: #8892b0; " +
+                         "-fx-font-size: 11px; -fx-padding: 8 12; -fx-background-radius: 8; -fx-cursor: hand;");
+            btn.selectedProperty().addListener((obs, ov, nv) ->
+                btn.setStyle(nv
+                    ? "-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-size: 11px; -fx-padding: 8 12; -fx-background-radius: 8; -fx-cursor: hand;"
+                    : "-fx-background-color: #0f3460; -fx-text-fill: #8892b0; -fx-font-size: 11px; -fx-padding: 8 12; -fx-background-radius: 8; -fx-cursor: hand;"));
+            methodesRow.getChildren().add(btn);
+        }
+        ((javafx.scene.control.ToggleButton) methodesRow.getChildren().get(0)).setSelected(true);
+
+        // Numéro de carte
+        Label lblCarte = new Label("Numéro de carte");
+        lblCarte.setStyle("-fx-font-size: 12px; -fx-text-fill: #8892b0; -fx-font-weight: bold;");
+        TextField tfCarte = new TextField();
+        tfCarte.setPromptText("1234  5678  9012  3456");
+        tfCarte.setStyle("-fx-background-color: #0f3460; -fx-text-fill: white; -fx-prompt-text-fill: #4a5568; " +
+                         "-fx-font-size: 15px; -fx-padding: 12; -fx-background-radius: 8; -fx-border-color: transparent;");
+        // Formatage automatique
+        tfCarte.textProperty().addListener((obs, ov, nv) -> {
+            String digits = nv.replaceAll("[^0-9]", "").substring(0, Math.min(nv.replaceAll("[^0-9]", "").length(), 16));
+            StringBuilder formatted = new StringBuilder();
+            for (int i = 0; i < digits.length(); i++) {
+                if (i > 0 && i % 4 == 0) formatted.append("  ");
+                formatted.append(digits.charAt(i));
+            }
+            if (!formatted.toString().equals(nv)) {
+                tfCarte.setText(formatted.toString());
+                tfCarte.positionCaret(formatted.length());
+            }
+        });
+
+        // Expiry + CVV
+        HBox row2 = new HBox(12);
+        VBox boxExp = new VBox(6);
+        Label lblExp = new Label("Date d'expiration");
+        lblExp.setStyle("-fx-font-size: 12px; -fx-text-fill: #8892b0; -fx-font-weight: bold;");
+        TextField tfExp = new TextField();
+        tfExp.setPromptText("MM/AA");
+        tfExp.setStyle("-fx-background-color: #0f3460; -fx-text-fill: white; -fx-prompt-text-fill: #4a5568; " +
+                       "-fx-font-size: 14px; -fx-padding: 12; -fx-background-radius: 8; -fx-border-color: transparent;");
+        boxExp.getChildren().addAll(lblExp, tfExp);
+        HBox.setHgrow(boxExp, Priority.ALWAYS);
+
+        VBox boxCvv = new VBox(6);
+        Label lblCvv = new Label("CVV");
+        lblCvv.setStyle("-fx-font-size: 12px; -fx-text-fill: #8892b0; -fx-font-weight: bold;");
+        TextField tfCvv = new TextField();
+        tfCvv.setPromptText("•••");
+        tfCvv.setStyle("-fx-background-color: #0f3460; -fx-text-fill: white; -fx-prompt-text-fill: #4a5568; " +
+                       "-fx-font-size: 14px; -fx-padding: 12; -fx-background-radius: 8; -fx-border-color: transparent;");
+        tfCvv.setPrefWidth(90);
+        boxCvv.getChildren().addAll(lblCvv, tfCvv);
+        row2.getChildren().addAll(boxExp, boxCvv);
+
+        form.getChildren().addAll(montantRow, lblMethode, methodesRow, lblCarte, tfCarte, row2);
+
+        // ── Boutons ───────────────────────────────────────────────────────────
+        HBox btns = new HBox(12);
+        btns.setAlignment(Pos.CENTER);
+        btns.setPadding(new Insets(0, 28, 24, 28));
+        btns.setStyle("-fx-background-color: #16213e; -fx-background-radius: 0 0 20 20;");
+
+        Button btnAnnuler = new Button("✕  Annuler");
+        btnAnnuler.setPrefWidth(160); btnAnnuler.setPrefHeight(44);
+        btnAnnuler.setStyle("-fx-background-color: #2a3f5f; -fx-text-fill: #8892b0; " +
+                            "-fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand;");
+        btnAnnuler.setOnAction(ev -> popup.close());
+
+        Button btnPayer = new Button("💳  Payer 25.00 TND");
+        btnPayer.setPrefWidth(200); btnPayer.setPrefHeight(44);
+        btnPayer.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; " +
+                          "-fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand;");
+        btnPayer.setOnMouseEntered(ev -> btnPayer.setOpacity(0.85));
+        btnPayer.setOnMouseExited(ev  -> btnPayer.setOpacity(1.0));
+        btnPayer.setOnAction(ev -> {
+            // Validation basique
+            String digits = tfCarte.getText().replaceAll("[^0-9]", "");
+            if (digits.length() < 16) {
+                afficherToast("Numéro de carte invalide", "#e53e3e", "❌"); return;
+            }
+            if (tfExp.getText().trim().isEmpty()) {
+                afficherToast("Date d'expiration requise", "#e53e3e", "❌"); return;
+            }
+            if (tfCvv.getText().trim().length() < 3) {
+                afficherToast("CVV invalide", "#e53e3e", "❌"); return;
+            }
+            // Récupérer la méthode sélectionnée
+            String methode = "Carte bancaire";
+            if (tg.getSelectedToggle() != null) {
+                methode = ((javafx.scene.control.ToggleButton) tg.getSelectedToggle())
+                        .getText().replaceAll("^[^ ]+ ", "");
+            }
+            final String methodeFinal = methode;
+            popup.close();
+            afficherAnimationPaiement(activite, place, methodeFinal);
+        });
+
+        btns.getChildren().addAll(btnAnnuler, btnPayer);
+        root.getChildren().addAll(header, form, btns);
+
+        // Animation d'entrée
+        root.setScaleX(0.8); root.setScaleY(0.8); root.setOpacity(0);
+        javafx.animation.ScaleTransition st = new javafx.animation.ScaleTransition(
+                javafx.util.Duration.millis(250), root);
+        st.setToX(1); st.setToY(1);
+        st.setInterpolator(javafx.animation.Interpolator.EASE_OUT);
+        javafx.animation.FadeTransition ft = new javafx.animation.FadeTransition(
+                javafx.util.Duration.millis(200), root);
+        ft.setToValue(1);
+        new javafx.animation.ParallelTransition(st, ft).play();
+
+        javafx.scene.Scene scene = new javafx.scene.Scene(root);
+        scene.setFill(Color.TRANSPARENT);
+        popup.setScene(scene);
+        popup.show();
+
+        javafx.geometry.Rectangle2D screen = javafx.stage.Screen.getPrimary().getVisualBounds();
+        popup.setX(screen.getWidth() / 2 - 240);
+        popup.setY(screen.getHeight() / 2 - 280);
+    }
+
+    private void afficherAnimationPaiement(Activite activite, String place, String methode) {
+        Stage popup = new Stage();
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.initStyle(javafx.stage.StageStyle.UNDECORATED);
+
+        VBox root = new VBox(16);
+        root.setAlignment(Pos.CENTER);
+        root.setPadding(new Insets(40));
+        root.setPrefWidth(360);
+        root.setStyle("-fx-background-color: #1a1a2e; -fx-background-radius: 20; " +
+                      "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 30, 0, 0, 10);");
+
+        Label lblIcon = new Label("⏳");
+        lblIcon.setStyle("-fx-font-size: 48px;");
+        Label lblMsg = new Label("Traitement du paiement...");
+        lblMsg.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: white;");
+
+        javafx.scene.control.ProgressBar progress = new javafx.scene.control.ProgressBar(0);
+        progress.setPrefWidth(280);
+        progress.setStyle("-fx-accent: #27ae60;");
+
+        root.getChildren().addAll(lblIcon, lblMsg, progress);
+
+        javafx.scene.Scene scene = new javafx.scene.Scene(root);
+        scene.setFill(Color.TRANSPARENT);
+        popup.setScene(scene);
+        popup.show();
+
+        javafx.geometry.Rectangle2D screen = javafx.stage.Screen.getPrimary().getVisualBounds();
+        popup.setX(screen.getWidth() / 2 - 180);
+        popup.setY(screen.getHeight() / 2 - 100);
+
+        // Animation de progression
+        javafx.animation.Timeline tl = new javafx.animation.Timeline(
+            new javafx.animation.KeyFrame(javafx.util.Duration.millis(0),
+                new javafx.animation.KeyValue(progress.progressProperty(), 0)),
+            new javafx.animation.KeyFrame(javafx.util.Duration.millis(1800),
+                new javafx.animation.KeyValue(progress.progressProperty(), 1))
+        );
+        tl.setOnFinished(e -> {
+            popup.close();
+            // Enregistrer la réservation avec infos paiement
+            try {
+                Reservation r = new Reservation(activite.getIdActivite(), "Sophie Am.", place, LocalDate.now());
+                r.setMontant(25.00);
+                r.setStatutPaiement("PAYE");
+                r.setMethodePaiement(methode);
+                serviceReservation.ajouterReservation(r);
+                chargerActivites();
+                afficherToast("✅ Paiement réussi ! Place " + place + " réservée.", "#27ae60", "💳");
+            } catch (SQLException ex) {
+                afficherToast("Erreur réservation: " + ex.getMessage(), "#e53e3e", "❌");
+            }
+        });
+        tl.play();
     }
 
     // ─── Ticket ───────────────────────────────────────────────────────────────

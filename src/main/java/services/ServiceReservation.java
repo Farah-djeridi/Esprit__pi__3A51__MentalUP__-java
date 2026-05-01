@@ -19,7 +19,6 @@ public class ServiceReservation {
 
     private void creerTableSiNecessaire() {
         try (Statement st = connection.createStatement()) {
-            // Créer la table si elle n'existe pas
             st.executeUpdate(
                 "CREATE TABLE IF NOT EXISTS reservation (" +
                 "id_reservation INT AUTO_INCREMENT PRIMARY KEY, " +
@@ -27,11 +26,19 @@ public class ServiceReservation {
                 "nom_etudiant VARCHAR(100) NOT NULL, " +
                 "place VARCHAR(10) NOT NULL, " +
                 "date_reservation DATE NOT NULL, " +
-                "statut VARCHAR(20) DEFAULT 'EN_ATTENTE')");
-            // Ajouter la colonne statut si elle n'existe pas encore
-            try {
-                st.executeUpdate("ALTER TABLE reservation ADD COLUMN statut VARCHAR(20) DEFAULT 'EN_ATTENTE'");
-            } catch (SQLException ignored) {} // colonne déjà existante
+                "statut VARCHAR(20) DEFAULT 'EN_ATTENTE', " +
+                "montant DECIMAL(10,2) DEFAULT 0.00, " +
+                "statut_paiement VARCHAR(30) DEFAULT 'EN_ATTENTE_PAIEMENT', " +
+                "methode_paiement VARCHAR(50) DEFAULT NULL)");
+            // Ajouter les colonnes si elles n'existent pas encore
+            for (String col : new String[]{
+                "ALTER TABLE reservation ADD COLUMN statut VARCHAR(20) DEFAULT 'EN_ATTENTE'",
+                "ALTER TABLE reservation ADD COLUMN montant DECIMAL(10,2) DEFAULT 0.00",
+                "ALTER TABLE reservation ADD COLUMN statut_paiement VARCHAR(30) DEFAULT 'EN_ATTENTE_PAIEMENT'",
+                "ALTER TABLE reservation ADD COLUMN methode_paiement VARCHAR(50) DEFAULT NULL"
+            }) {
+                try { st.executeUpdate(col); } catch (SQLException ignored) {}
+            }
         } catch (SQLException e) {
             System.err.println("Erreur création table reservation: " + e.getMessage());
         }
@@ -46,12 +53,15 @@ public class ServiceReservation {
     }
 
     public void ajouterReservation(Reservation r) throws SQLException {
-        String sql = "INSERT INTO reservation (id_activite, nom_etudiant, place, date_reservation) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO reservation (id_activite, nom_etudiant, place, date_reservation, montant, statut_paiement, methode_paiement) VALUES (?, ?, ?, ?, ?, ?, ?)";
         PreparedStatement ps = connection.prepareStatement(sql);
         ps.setInt(1, r.getIdActivite());
         ps.setString(2, r.getNomEtudiant());
         ps.setString(3, r.getPlace());
         ps.setDate(4, Date.valueOf(r.getDateReservation()));
+        ps.setDouble(5, r.getMontant());
+        ps.setString(6, r.getStatutPaiement());
+        ps.setString(7, r.getMethodePaiement());
         ps.executeUpdate();
     }
 
@@ -88,6 +98,9 @@ public class ServiceReservation {
             r.setDateReservation(rs.getDate("date_reservation").toLocalDate());
             r.setTitreActivite(rs.getString("titre_activite"));
             try { r.setStatut(rs.getString("statut")); } catch (Exception ignored) {}
+            try { r.setMontant(rs.getDouble("montant")); } catch (Exception ignored) {}
+            try { r.setStatutPaiement(rs.getString("statut_paiement")); } catch (Exception ignored) {}
+            try { r.setMethodePaiement(rs.getString("methode_paiement")); } catch (Exception ignored) {}
             list.add(r);
         }
         return list;

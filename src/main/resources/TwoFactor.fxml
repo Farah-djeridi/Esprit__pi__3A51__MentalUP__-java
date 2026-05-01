@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
@@ -13,7 +13,7 @@
     <HBox AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0"
           AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
 
-        <!-- ═══ PANNEAU GAUCHE BLEU ═══ -->
+        <!-- ÔòÉÔòÉÔòÉ PANNEAU GAUCHE BLEU ÔòÉÔòÉÔòÉ -->
         <VBox prefWidth="360" alignment="CENTER" spacing="20"
               style="-fx-background-color: #2C5F8A; -fx-padding: 50 36;">
 
@@ -28,25 +28,25 @@
             <Label text="Mental Up"
                    style="-fx-text-fill: white; -fx-font-size: 26px; -fx-font-weight: bold;"/>
 
-            <!-- Icône cadenas -->
-            <Label text="🔐"
+            <!-- Ic├┤ne cadenas -->
+            <Label text="­ƒöÉ"
                    style="-fx-font-size: 60px;"/>
 
             <Label text="Double Authentification"
                    style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;"/>
 
-            <Label text="Une couche de sécurité&#10;supplémentaire pour&#10;protéger votre compte."
+            <Label text="Une couche de s├®curit├®&#10;suppl├®mentaire pour&#10;prot├®ger votre compte."
                    style="-fx-text-fill: rgba(255,255,255,0.75); -fx-font-size: 13px;
                           -fx-text-alignment: center; -fx-alignment: center; -fx-wrap-text: true;"/>
 
-            <!-- Badges sécurité -->
+            <!-- Badges s├®curit├® -->
             <VBox spacing="10" alignment="CENTER" style="-fx-padding: 10 0 0 0;">
                 <HBox alignment="CENTER" spacing="8"
                       style="-fx-background-color: rgba(255,255,255,0.12);
                              -fx-background-radius: 20; -fx-padding: 8 20;
                              -fx-border-color: rgba(255,255,255,0.2);
                              -fx-border-radius: 20; -fx-border-width: 1;">
-                    <Label text="✅" style="-fx-font-size: 13px;"/>
+                    <Label text="Ô£à" style="-fx-font-size: 13px;"/>
                     <Label text="Code valide 5 minutes"
                            style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 12px;"/>
                 </HBox>
@@ -55,25 +55,25 @@
                              -fx-background-radius: 20; -fx-padding: 8 20;
                              -fx-border-color: rgba(255,255,255,0.2);
                              -fx-border-radius: 20; -fx-border-width: 1;">
-                    <Label text="📧" style="-fx-font-size: 13px;"/>
-                    <Label text="Envoyé sur votre email"
+                    <Label text="­ƒôº" style="-fx-font-size: 13px;"/>
+                    <Label text="Envoy├® sur votre email"
                            style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 12px;"/>
                 </HBox>
             </VBox>
         </VBox>
 
-        <!-- ═══ PANNEAU DROIT ═══ -->
+        <!-- ÔòÉÔòÉÔòÉ PANNEAU DROIT ÔòÉÔòÉÔòÉ -->
         <VBox HBox.hgrow="ALWAYS" alignment="CENTER" spacing="0"
               style="-fx-background-color: white; -fx-padding: 50 60;">
 
-            <Label text="Vérification en deux étapes"
+            <Label text="V├®rification en deux ├®tapes"
                    style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;
                           -fx-padding: 0 0 8 0;"/>
 
             <Label fx:id="lblEmail" text=""
                    style="-fx-font-size: 13px; -fx-text-fill: #7A9CB8; -fx-padding: 0 0 30 0;"/>
 
-            <!-- ═══ 6 CASES DE SAISIE ═══ -->
+            <!-- ÔòÉÔòÉÔòÉ 6 CASES DE SAISIE ÔòÉÔòÉÔòÉ -->
             <HBox spacing="12" alignment="CENTER" style="-fx-padding: 0 0 20 0;">
 
                 <TextField fx:id="txtCode1" maxWidth="55" prefHeight="65"
@@ -100,8 +100,8 @@
                                   -fx-background-radius: 12;
                                   -fx-text-fill: #2C5F8A;"/>
 
-                <!-- Séparateur visuel -->
-                <Label text="—" style="-fx-text-fill: #C8DDF0; -fx-font-size: 20px;"/>
+                <!-- S├®parateur visuel -->
+                <Label text="ÔÇö" style="-fx-text-fill: #C8DDF0; -fx-font-size: 20px;"/>
 
                 <TextField fx:id="txtCode4" maxWidth="55" prefHeight="65"
                            style="-fx-font-size: 28px; -fx-font-weight: bold;
@@ -136,8 +136,8 @@
             <Label fx:id="lblError" text="" wrapText="true"
                    style="-fx-font-size: 12px; -fx-padding: 0 0 16 0;"/>
 
-            <!-- Bouton Vérifier -->
-            <Button fx:id="btnVerify" text="✔  Vérifier le code" onAction="#handleVerify"
+            <!-- Bouton V├®rifier -->
+            <Button fx:id="btnVerify" text="Ô£ö  V├®rifier le code" onAction="#handleVerify"
                     maxWidth="Infinity"
                     style="-fx-background-color: #2C5F8A; -fx-text-fill: white;
                            -fx-font-size: 14px; -fx-font-weight: bold;
@@ -147,14 +147,14 @@
 
                 <!-- Renvoyer le code -->
                 <HBox alignment="CENTER" spacing="6">
-                    <Label text="Vous n'avez pas reçu le code ?"
+                    <Label text="Vous n'avez pas re├ºu le code ?"
                            style="-fx-text-fill: #7A9CB8; -fx-font-size: 12px;"/>
                     <Hyperlink fx:id="btnResend" text="Renvoyer" onAction="#handleResend"
                                style="-fx-text-fill: #2C5F8A; -fx-font-weight: bold; -fx-font-size: 12px;"/>
                 </HBox>
 
                 <!-- Annuler -->
-                <Hyperlink text="← Retour au login" onAction="#handleCancel"
+                <Hyperlink text="ÔåÉ Retour au login" onAction="#handleCancel"
                            style="-fx-text-fill: #A0B4C8; -fx-font-size: 12px;"/>
             </VBox>
         </VBox>

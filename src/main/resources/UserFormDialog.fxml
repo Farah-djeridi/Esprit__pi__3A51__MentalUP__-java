@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.shape.*?>
@@ -16,7 +16,7 @@
         <Label fx:id="lblTitle" text="Nouvel utilisateur"
                style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Button text="✕" onAction="#handleCancel"
+        <Button text="Ô£ò" onAction="#handleCancel"
                 style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white;
                        -fx-background-radius: 50; -fx-padding: 4 9; -fx-cursor: hand; -fx-font-size: 13px;"/>
     </HBox>
@@ -26,8 +26,8 @@
 
         <HBox spacing="14">
             <VBox spacing="6" HBox.hgrow="ALWAYS">
-                <Label text="Prénom" style="-fx-font-size: 12px; -fx-text-fill: #5A6C7D; -fx-font-weight: bold;"/>
-                <TextField fx:id="txtPrenom" promptText="Prénom"
+                <Label text="Pr├®nom" style="-fx-font-size: 12px; -fx-text-fill: #5A6C7D; -fx-font-weight: bold;"/>
+                <TextField fx:id="txtPrenom" promptText="Pr├®nom"
                            style="-fx-background-color: #F8F9FF; -fx-border-color: #D8E6F0;
                                   -fx-border-radius: 8; -fx-background-radius: 8;
                                   -fx-padding: 9 12; -fx-font-size: 13px;"/>
@@ -46,7 +46,7 @@
             <HBox alignment="CENTER_LEFT" spacing="8"
                   style="-fx-background-color: #F8F9FF; -fx-border-color: #D8E6F0;
                          -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 0 12; -fx-pref-height: 40;">
-                <Label text="✉" style="-fx-text-fill: #7A9CB8; -fx-font-size: 13px;"/>
+                <Label text="Ô£ë" style="-fx-text-fill: #7A9CB8; -fx-font-size: 13px;"/>
                 <TextField fx:id="txtEmail" promptText="email@exemple.com"
                            style="-fx-background-color: transparent; -fx-border-color: transparent;
                                   -fx-font-size: 13px;" HBox.hgrow="ALWAYS"/>
@@ -60,17 +60,17 @@
             <HBox alignment="CENTER_LEFT" spacing="8"
                   style="-fx-background-color: #F8F9FF; -fx-border-color: #D8E6F0;
                          -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 0 12; -fx-pref-height: 40;">
-                <Label text="🔒" style="-fx-text-fill: #7A9CB8; -fx-font-size: 13px;"/>
-                <PasswordField fx:id="txtPassword" promptText="••••••••"
+                <Label text="­ƒöÆ" style="-fx-text-fill: #7A9CB8; -fx-font-size: 13px;"/>
+                <PasswordField fx:id="txtPassword" promptText="ÔÇóÔÇóÔÇóÔÇóÔÇóÔÇóÔÇóÔÇó"
                                style="-fx-background-color: transparent; -fx-border-color: transparent;
                                       -fx-font-size: 13px;" HBox.hgrow="ALWAYS"/>
             </HBox>
         </VBox>
 
         <VBox spacing="6">
-            <Label text="Rôle" style="-fx-font-size: 12px; -fx-text-fill: #5A6C7D; -fx-font-weight: bold;"/>
+            <Label text="R├┤le" style="-fx-font-size: 12px; -fx-text-fill: #5A6C7D; -fx-font-weight: bold;"/>
             <HBox spacing="10">
-                <Button fx:id="btnEtudiant" text="Étudiant" onAction="#selectEtudiant"
+                <Button fx:id="btnEtudiant" text="├ëtudiant" onAction="#selectEtudiant"
                         HBox.hgrow="ALWAYS" maxWidth="Infinity"
                         style="-fx-background-color: #2C5F8A; -fx-text-fill: white;
                                -fx-background-radius: 8; -fx-pref-height: 38; -fx-cursor: hand;"/>

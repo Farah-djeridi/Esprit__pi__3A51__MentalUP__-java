@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
@@ -16,7 +16,7 @@
 
         <VBox spacing="0">
 
-            <!-- ═══ BARRE DE NAVIGATION TOP ═══ -->
+            <!-- ÔòÉÔòÉÔòÉ BARRE DE NAVIGATION TOP ÔòÉÔòÉÔòÉ -->
             <HBox alignment="CENTER_LEFT" spacing="0"
                   style="-fx-background-color: #2C5F8A; -fx-padding: 0 30; -fx-pref-height: 70;">
                 <!-- Logo + Titre -->
@@ -47,7 +47,7 @@
                     <Button text="Rendez-vous"
                             style="-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.85);
                                    -fx-font-size: 13px; -fx-padding: 22 14; -fx-cursor: hand;"/>
-                    <Button text="Activités"
+                    <Button text="Activit├®s"
                             style="-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.85);
                                    -fx-font-size: 13px; -fx-padding: 22 14; -fx-cursor: hand;"/>
                 </HBox>
@@ -58,11 +58,11 @@
                     <VBox spacing="1">
                         <Label fx:id="lblNavName" text=""
                                style="-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;"/>
-                        <Label fx:id="lblNavRole" text="Étudiant"
+                        <Label fx:id="lblNavRole" text="├ëtudiant"
                                style="-fx-text-fill: rgba(255,255,255,0.65); -fx-font-size: 11px;"/>
                     </VBox>
-                    <!-- ⋮ menu -->
-                    <Button fx:id="menuButton" text="⋮" onAction="#onMenuClicked"
+                    <!-- Ôï« menu -->
+                    <Button fx:id="menuButton" text="Ôï«" onAction="#onMenuClicked"
                             style="-fx-background-color: rgba(255,255,255,0.15);
                                    -fx-text-fill: white; -fx-background-radius: 50;
                                    -fx-font-size: 18px; -fx-padding: 2 10; -fx-cursor: hand;
@@ -70,7 +70,7 @@
                 </HBox>
             </HBox>
 
-            <!-- ═══ BANNER PROFIL BLEUE ═══ -->
+            <!-- ÔòÉÔòÉÔòÉ BANNER PROFIL BLEUE ÔòÉÔòÉÔòÉ -->
             <VBox alignment="CENTER" spacing="10"
                   style="-fx-background-color: #3A75A8; -fx-padding: 40 0 30 0; -fx-min-height: 200;">
 
@@ -83,12 +83,12 @@
                                preserveRatio="false"/>
                     <Circle fx:id="avatarCircleMask" radius="50"
                             style="-fx-fill: transparent;"/>
-                    <!-- Overlay icône caméra -->
+                    <!-- Overlay ic├┤ne cam├®ra -->
                     <StackPane style="-fx-background-color: rgba(44,95,138,0.6);
                                       -fx-background-radius: 50; -fx-min-width: 112;
                                       -fx-min-height: 112; -fx-opacity: 0;"
                                fx:id="cameraOverlay">
-                        <Label text="📷" style="-fx-font-size: 24px;"/>
+                        <Label text="­ƒôÀ" style="-fx-font-size: 24px;"/>
                     </StackPane>
                     <!-- Initiales si pas d'avatar -->
                     <Label fx:id="avatarInitials" text="SK"
@@ -98,13 +98,13 @@
                 <Label fx:id="lblBannerName" text=""
                        style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
                 <HBox alignment="CENTER" spacing="6">
-                    <Label text="✉" style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 13px;"/>
+                    <Label text="Ô£ë" style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 13px;"/>
                     <Label fx:id="lblBannerEmail" text=""
                            style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 13px;"/>
                 </HBox>
             </VBox>
 
-            <!-- ═══ FORMULAIRE BLANC ═══ -->
+            <!-- ÔòÉÔòÉÔòÉ FORMULAIRE BLANC ÔòÉÔòÉÔòÉ -->
             <VBox style="-fx-background-color: white; -fx-padding: 30 80 40 80; -fx-spacing: 0;">
 
                 <!-- Titre section -->
@@ -112,14 +112,14 @@
                       style="-fx-padding: 0 0 16 0;
                              -fx-border-color: transparent transparent #E8EFF6 transparent;
                              -fx-border-width: 0 0 1.5 0;">
-                    <Label text="👤" style="-fx-font-size: 18px;"/>
+                    <Label text="­ƒæñ" style="-fx-font-size: 18px;"/>
                     <Label text="Informations personnelles"
                            style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;"/>
                 </HBox>
 
                 <VBox spacing="18" style="-fx-padding: 24 0 0 0;">
 
-                    <!-- Prénom + Nom -->
+                    <!-- Pr├®nom + Nom -->
                     <HBox spacing="20">
                         <VBox spacing="6" HBox.hgrow="ALWAYS">
                             <Label text="Prenom"
@@ -128,7 +128,7 @@
                                   style="-fx-background-color: #F0F6FF;
                                          -fx-border-color: #C8DDF0; -fx-border-radius: 8;
                                          -fx-background-radius: 8; -fx-padding: 0 14; -fx-pref-height: 46;">
-                                <Label text="👤" style="-fx-text-fill: #7A9CB8; -fx-font-size: 13px;"/>
+                                <Label text="­ƒæñ" style="-fx-text-fill: #7A9CB8; -fx-font-size: 13px;"/>
                                 <TextField fx:id="txtPrenom"
                                            style="-fx-background-color: transparent;
                                                   -fx-border-color: transparent;
@@ -143,7 +143,7 @@
                                   style="-fx-background-color: #F0F6FF;
                                          -fx-border-color: #C8DDF0; -fx-border-radius: 8;
                                          -fx-background-radius: 8; -fx-padding: 0 14; -fx-pref-height: 46;">
-                                <Label text="🪪" style="-fx-text-fill: #7A9CB8; -fx-font-size: 13px;"/>
+                                <Label text="­ƒ¬¬" style="-fx-text-fill: #7A9CB8; -fx-font-size: 13px;"/>
                                 <TextField fx:id="txtNom"
                                            style="-fx-background-color: transparent;
                                                   -fx-border-color: transparent;
@@ -161,7 +161,7 @@
                               style="-fx-background-color: #F0F6FF;
                                      -fx-border-color: #C8DDF0; -fx-border-radius: 8;
                                      -fx-background-radius: 8; -fx-padding: 0 14; -fx-pref-height: 46;">
-                            <Label text="✉" style="-fx-text-fill: #7A9CB8; -fx-font-size: 14px;"/>
+                            <Label text="Ô£ë" style="-fx-text-fill: #7A9CB8; -fx-font-size: 14px;"/>
                             <TextField fx:id="txtEmail"
                                        style="-fx-background-color: transparent;
                                               -fx-border-color: transparent;
@@ -170,12 +170,12 @@
                         </HBox>
                     </VBox>
 
-                    <!-- Séparateur mot de passe -->
+                    <!-- S├®parateur mot de passe -->
                     <HBox alignment="CENTER_LEFT" spacing="10"
                           style="-fx-padding: 10 0 0 0;
                                  -fx-border-color: transparent transparent #E8EFF6 transparent;
                                  -fx-border-width: 0 0 1.5 0;">
-                        <Label text="🔒" style="-fx-font-size: 16px;"/>
+                        <Label text="­ƒöÆ" style="-fx-font-size: 16px;"/>
                         <Label text="Changer le mot de passe"
                                style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;"/>
                         <Label text="(optionnel)"
@@ -190,7 +190,7 @@
                               style="-fx-background-color: #F0F6FF; -fx-border-color: #C8DDF0;
                                      -fx-border-radius: 8; -fx-background-radius: 8;
                                      -fx-padding: 0 14; -fx-pref-height: 44;">
-                            <Label text="🔒" style="-fx-text-fill: #7A9CB8; -fx-font-size: 13px;"/>
+                            <Label text="­ƒöÆ" style="-fx-text-fill: #7A9CB8; -fx-font-size: 13px;"/>
                             <PasswordField fx:id="txtCurrentPassword"
                                            promptText="Laisser vide si pas de changement"
                                            style="-fx-background-color: transparent; -fx-border-color: transparent;
@@ -206,7 +206,7 @@
                                   style="-fx-background-color: #F0F6FF; -fx-border-color: #C8DDF0;
                                          -fx-border-radius: 8; -fx-background-radius: 8;
                                          -fx-padding: 0 14; -fx-pref-height: 44;">
-                                <PasswordField fx:id="txtNewPassword" promptText="Min. 8 caractères"
+                                <PasswordField fx:id="txtNewPassword" promptText="Min. 8 caract├¿res"
                                                style="-fx-background-color: transparent; -fx-border-color: transparent;
                                                       -fx-font-size: 13px;" HBox.hgrow="ALWAYS"/>
                             </HBox>
@@ -231,12 +231,12 @@
 
                     <!-- Boutons action -->
                     <HBox spacing="12" style="-fx-padding: 8 0 0 0;">
-                        <Button text="✔  Enregistrer les modifications" onAction="#handleSave"
+                        <Button text="Ô£ö  Enregistrer les modifications" onAction="#handleSave"
                                 HBox.hgrow="ALWAYS" maxWidth="Infinity"
                                 style="-fx-background-color: #2C5F8A; -fx-text-fill: white;
                                        -fx-font-size: 14px; -fx-font-weight: bold;
                                        -fx-pref-height: 46; -fx-background-radius: 8; -fx-cursor: hand;"/>
-                        <Button text="⏻  Déconnexion" onAction="#handleLogout"
+                        <Button text="ÔÅ╗  D├®connexion" onAction="#handleLogout"
                                 style="-fx-background-color: white; -fx-text-fill: #E74C3C;
                                        -fx-border-color: #E74C3C; -fx-border-radius: 8;
                                        -fx-background-radius: 8; -fx-font-size: 13px;

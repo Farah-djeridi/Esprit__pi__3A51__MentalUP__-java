@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
@@ -36,7 +36,7 @@
                 <HBox fx:id="navHome" onMouseClicked="#goHome"
                       alignment="CENTER_LEFT" spacing="12"
                       style="-fx-padding: 12 14; -fx-background-radius: 10; -fx-cursor: hand;">
-                    <Label text="🏠" style="-fx-font-size: 15px;"/>
+                    <Label text="­ƒÅá" style="-fx-font-size: 15px;"/>
                     <Label text="Accueil" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
                 </HBox>
 
@@ -44,21 +44,21 @@
                     <HBox fx:id="navRdv" onMouseClicked="#toggleRdvMenu"
                           alignment="CENTER_LEFT" spacing="12"
                           style="-fx-padding: 12 14; -fx-background-radius: 10; -fx-cursor: hand;">
-                        <Label text="📅" style="-fx-font-size: 15px;"/>
+                        <Label text="­ƒôà" style="-fx-font-size: 15px;"/>
                         <Label text="Rendez-vous" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
                         <Region HBox.hgrow="ALWAYS"/>
-                        <Label fx:id="arrowRdv" text="▶" style="-fx-text-fill: #6a8a9a; -fx-font-size: 10px;"/>
+                        <Label fx:id="arrowRdv" text="ÔûÂ" style="-fx-text-fill: #6a8a9a; -fx-font-size: 10px;"/>
                     </HBox>
                     <VBox fx:id="submenuRdv" spacing="2" style="-fx-padding: 4 0 4 20;">
                         <HBox fx:id="navVoirRdv" onMouseClicked="#goVoirRendezVous"
                               alignment="CENTER_LEFT" spacing="10"
                               style="-fx-padding: 10 12; -fx-background-radius: 8; -fx-cursor: hand;">
-                            <Label text="• Voir les rendez-vous" style="-fx-text-fill: #b0c4d4; -fx-font-size: 13px;"/>
+                            <Label text="ÔÇó Voir les rendez-vous" style="-fx-text-fill: #b0c4d4; -fx-font-size: 13px;"/>
                         </HBox>
                         <HBox fx:id="navCalendrier" onMouseClicked="#goCalendrier"
                               alignment="CENTER_LEFT" spacing="10"
                               style="-fx-padding: 10 12; -fx-background-radius: 8; -fx-cursor: hand;">
-                            <Label text="• Mon calendrier" style="-fx-text-fill: #b0c4d4; -fx-font-size: 13px;"/>
+                            <Label text="ÔÇó Mon calendrier" style="-fx-text-fill: #b0c4d4; -fx-font-size: 13px;"/>
                         </HBox>
                     </VBox>
                 </VBox>
@@ -67,21 +67,21 @@
                     <HBox fx:id="navDossiers" onMouseClicked="#toggleDossiersMenu"
                           alignment="CENTER_LEFT" spacing="12"
                           style="-fx-padding: 12 14; -fx-background-radius: 10; -fx-cursor: hand;">
-                        <Label text="🗂️" style="-fx-font-size: 15px;"/>
-                        <Label text="Dossiers médicaux" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
+                        <Label text="­ƒùé´©Å" style="-fx-font-size: 15px;"/>
+                        <Label text="Dossiers m├®dicaux" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
                         <Region HBox.hgrow="ALWAYS"/>
-                        <Label fx:id="arrowDossiers" text="▶" style="-fx-text-fill: #6a8a9a; -fx-font-size: 10px;"/>
+                        <Label fx:id="arrowDossiers" text="ÔûÂ" style="-fx-text-fill: #6a8a9a; -fx-font-size: 10px;"/>
                     </HBox>
                     <VBox fx:id="submenuDossiers" spacing="2" style="-fx-padding: 4 0 4 20;">
                         <HBox fx:id="navConsulterDossiers" onMouseClicked="#goConsulterDossiers"
                               alignment="CENTER_LEFT" spacing="10"
                               style="-fx-padding: 10 12; -fx-background-radius: 8; -fx-cursor: hand;">
-                            <Label text="• Consulter dossiers" style="-fx-text-fill: #b0c4d4; -fx-font-size: 13px;"/>
+                            <Label text="ÔÇó Consulter dossiers" style="-fx-text-fill: #b0c4d4; -fx-font-size: 13px;"/>
                         </HBox>
                         <HBox fx:id="navNouveauDossier" onMouseClicked="#goNouveauDossier"
                               alignment="CENTER_LEFT" spacing="10"
                               style="-fx-padding: 10 12; -fx-background-radius: 8; -fx-cursor: hand;">
-                            <Label text="• Nouveau dossier" style="-fx-text-fill: #b0c4d4; -fx-font-size: 13px;"/>
+                            <Label text="ÔÇó Nouveau dossier" style="-fx-text-fill: #b0c4d4; -fx-font-size: 13px;"/>
                         </HBox>
                     </VBox>
                 </VBox>
@@ -89,21 +89,21 @@
                 <HBox fx:id="navActivites" onMouseClicked="#goActivites"
                       alignment="CENTER_LEFT" spacing="12"
                       style="-fx-padding: 12 14; -fx-background-radius: 10; -fx-cursor: hand;">
-                    <Label text="⚡" style="-fx-font-size: 15px;"/>
-                    <Label text="Activités" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
+                    <Label text="ÔÜí" style="-fx-font-size: 15px;"/>
+                    <Label text="Activit├®s" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
                 </HBox>
 
                 <HBox fx:id="navRessources" onMouseClicked="#goRessources"
                       alignment="CENTER_LEFT" spacing="12"
                       style="-fx-padding: 12 14; -fx-background-radius: 10; -fx-cursor: hand;">
-                    <Label text="📚" style="-fx-font-size: 15px;"/>
+                    <Label text="­ƒôÜ" style="-fx-font-size: 15px;"/>
                     <Label text="Ressources" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
                 </HBox>
 
                 <HBox fx:id="navStats" onMouseClicked="#goStats"
                       alignment="CENTER_LEFT" spacing="12"
                       style="-fx-padding: 12 14; -fx-background-radius: 10; -fx-cursor: hand;">
-                    <Label text="📊" style="-fx-font-size: 15px;"/>
+                    <Label text="­ƒôè" style="-fx-font-size: 15px;"/>
                     <Label text="Statistiques" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
                 </HBox>
 
@@ -111,9 +111,9 @@
 
             <Region VBox.vgrow="ALWAYS"/>
 
-            <!-- APERÇU RAPIDE -->
+            <!-- APER├çU RAPIDE -->
             <VBox spacing="14" style="-fx-padding: 20; -fx-background-color: #154a5f;">
-                <Label text="APERÇU RAPIDE" style="-fx-text-fill: #6a8a9a; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                <Label text="APER├çU RAPIDE" style="-fx-text-fill: #6a8a9a; -fx-font-size: 11px; -fx-font-weight: bold;"/>
                 <HBox alignment="CENTER_LEFT" spacing="10">
                     <Label text="Patients actifs" style="-fx-text-fill: #b0c4d4; -fx-font-size: 13px;"/>
                     <Region HBox.hgrow="ALWAYS"/>
@@ -131,7 +131,7 @@
                 </HBox>
             </VBox>
 
-            <!-- ✅ PROFIL + BOUTON 3 POINTS -->
+            <!-- Ô£à PROFIL + BOUTON 3 POINTS -->
             <VBox spacing="10" style="-fx-padding: 16 16 20 16;
                                       -fx-border-color: #2a5a6f; -fx-border-width: 1 0 0 0;">
                 <HBox alignment="CENTER_LEFT" spacing="10">
@@ -146,8 +146,8 @@
                         <Label fx:id="lblPsyRole" text="Psychologue"
                                style="-fx-text-fill: #6a8a9a; -fx-font-size: 11px;"/>
                     </VBox>
-                    <!-- ✅ Bouton 3 points -->
-                    <Button fx:id="menuButton" text="⋮" onAction="#onMenuClicked"
+                    <!-- Ô£à Bouton 3 points -->
+                    <Button fx:id="menuButton" text="Ôï«" onAction="#onMenuClicked"
                             style="-fx-background-color: rgba(255,255,255,0.1);
                                    -fx-text-fill: white; -fx-background-radius: 50;
                                    -fx-font-size: 18px; -fx-font-weight: bold;
@@ -172,7 +172,7 @@
                 <Region HBox.hgrow="ALWAYS"/>
                 <HBox alignment="CENTER" spacing="12">
                     <Label fx:id="currentDate" style="-fx-text-fill: #5A6C7D; -fx-font-size: 13px;"/>
-                    <Button fx:id="notifBtn" text="🔔" onAction="#showNotifications"
+                    <Button fx:id="notifBtn" text="­ƒöö" onAction="#showNotifications"
                             style="-fx-background-color: transparent; -fx-text-fill: #5A6C7D;
                                    -fx-cursor: hand; -fx-font-size: 18px; -fx-padding: 6;"/>
                 </HBox>
@@ -184,18 +184,18 @@
                         VBox.vgrow="ALWAYS">
                 <VBox spacing="25" style="-fx-padding: 28 32 32 32;">
 
-                    <!-- BANNIÈRE -->
+                    <!-- BANNI├êRE -->
                     <HBox style="-fx-background-color: #1a4a5f; -fx-background-radius: 24; -fx-padding: 32 38;"
                           alignment="CENTER_LEFT">
                         <VBox spacing="12" HBox.hgrow="ALWAYS">
-                            <Label text="Bienvenue 👩‍⚕️"
+                            <Label text="Bienvenue ­ƒæ®ÔÇìÔÜò´©Å"
                                    style="-fx-text-fill: #b0c4d4; -fx-font-size: 16px; -fx-font-weight: bold;"/>
-                            <Label text="Prenez soin de vos patients avec sérénité"
+                            <Label text="Prenez soin de vos patients avec s├®r├®nit├®"
                                    style="-fx-text-fill: white; -fx-font-size: 26px; -fx-font-weight: bold;"/>
-                            <Label text="Consultez votre agenda, suivez vos dossiers et organisez vos activités."
+                            <Label text="Consultez votre agenda, suivez vos dossiers et organisez vos activit├®s."
                                    style="-fx-text-fill: #b0c4d4; -fx-font-size: 14px;" wrapText="true"/>
                         </VBox>
-                        <Label text="🌿" style="-fx-font-size: 80px; -fx-opacity: 0.2;"/>
+                        <Label text="­ƒî┐" style="-fx-font-size: 80px; -fx-opacity: 0.2;"/>
                     </HBox>
 
                     <!-- CARTES STATS -->
@@ -203,28 +203,28 @@
                         <VBox spacing="14" HBox.hgrow="ALWAYS"
                               style="-fx-background-color: white; -fx-background-radius: 18;
                                      -fx-padding: 20; -fx-border-color: #E8ECF0; -fx-border-width: 1;">
-                            <Label text="📅  Rendez-vous aujourd'hui" style="-fx-text-fill: #5A6C7D; -fx-font-size: 13px;"/>
+                            <Label text="­ƒôà  Rendez-vous aujourd'hui" style="-fx-text-fill: #5A6C7D; -fx-font-size: 13px;"/>
                             <Label fx:id="rdvCount" text="5" style="-fx-text-fill: #1a4a5f; -fx-font-size: 38px; -fx-font-weight: bold;"/>
                             <Label text="vs 3 hier" style="-fx-text-fill: #50C878; -fx-font-size: 12px;"/>
                         </VBox>
                         <VBox spacing="14" HBox.hgrow="ALWAYS"
                               style="-fx-background-color: white; -fx-background-radius: 18;
                                      -fx-padding: 20; -fx-border-color: #E8ECF0; -fx-border-width: 1;">
-                            <Label text="🗂️  Dossiers actifs" style="-fx-text-fill: #5A6C7D; -fx-font-size: 13px;"/>
+                            <Label text="­ƒùé´©Å  Dossiers actifs" style="-fx-text-fill: #5A6C7D; -fx-font-size: 13px;"/>
                             <Label fx:id="dossierCount" text="20" style="-fx-text-fill: #1a4a5f; -fx-font-size: 38px; -fx-font-weight: bold;"/>
                             <Label text="+4 ce mois" style="-fx-text-fill: #50C878; -fx-font-size: 12px;"/>
                         </VBox>
                         <VBox spacing="14" HBox.hgrow="ALWAYS"
                               style="-fx-background-color: white; -fx-background-radius: 18;
                                      -fx-padding: 20; -fx-border-color: #E8ECF0; -fx-border-width: 1;">
-                            <Label text="⚡  Activités récentes" style="-fx-text-fill: #5A6C7D; -fx-font-size: 13px;"/>
+                            <Label text="ÔÜí  Activit├®s r├®centes" style="-fx-text-fill: #5A6C7D; -fx-font-size: 13px;"/>
                             <Label fx:id="activiteCount" text="8" style="-fx-text-fill: #1a4a5f; -fx-font-size: 38px; -fx-font-weight: bold;"/>
                             <Label text="Cette semaine" style="-fx-text-fill: #97BBE4; -fx-font-size: 12px;"/>
                         </VBox>
                         <VBox spacing="14" HBox.hgrow="ALWAYS"
                               style="-fx-background-color: white; -fx-background-radius: 18;
                                      -fx-padding: 20; -fx-border-color: #E8ECF0; -fx-border-width: 1;">
-                            <Label text="⭐  Satisfaction" style="-fx-text-fill: #5A6C7D; -fx-font-size: 13px;"/>
+                            <Label text="Ô¡É  Satisfaction" style="-fx-text-fill: #5A6C7D; -fx-font-size: 13px;"/>
                             <Label text="98%" style="-fx-text-fill: #F39C12; -fx-font-size: 38px; -fx-font-weight: bold;"/>
                             <Label text="+2% ce trimestre" style="-fx-text-fill: #50C878; -fx-font-size: 12px;"/>
                         </VBox>
@@ -234,16 +234,16 @@
                     <VBox spacing="15"
                           style="-fx-background-color: white; -fx-background-radius: 18;
                                  -fx-padding: 22; -fx-border-color: #E8ECF0; -fx-border-width: 1;">
-                        <Label text="⚡ Actions rapides"
+                        <Label text="ÔÜí Actions rapides"
                                style="-fx-text-fill: #1a4a5f; -fx-font-size: 18px; -fx-font-weight: bold;"/>
                         <HBox spacing="15">
-                            <Button text="📅 Nouveau rendez-vous" onAction="#goCalendrier"
+                            <Button text="­ƒôà Nouveau rendez-vous" onAction="#goCalendrier"
                                     style="-fx-background-color: #1a4a5f; -fx-text-fill: white;
                                            -fx-background-radius: 25; -fx-padding: 10 22; -fx-cursor: hand;"/>
-                            <Button text="🗂️ Nouveau dossier" onAction="#goNouveauDossier"
+                            <Button text="­ƒùé´©Å Nouveau dossier" onAction="#goNouveauDossier"
                                     style="-fx-background-color: #2c6e8a; -fx-text-fill: white;
                                            -fx-background-radius: 25; -fx-padding: 10 22; -fx-cursor: hand;"/>
-                            <Button text="📊 Voir statistiques" onAction="#goStats"
+                            <Button text="­ƒôè Voir statistiques" onAction="#goStats"
                                     style="-fx-background-color: #34495E; -fx-text-fill: white;
                                            -fx-background-radius: 25; -fx-padding: 10 22; -fx-cursor: hand;"/>
                         </HBox>

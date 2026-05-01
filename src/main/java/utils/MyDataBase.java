@@ -7,19 +7,24 @@ import java.sql.SQLException;
 public class MyDataBase {
 
     private static MyDataBase instance;
-    private final String URL      = AppConfig.get("db.url",      "jdbc:mysql://127.0.0.1:3306/projet3a51");
-    private final String USERNAME = AppConfig.get("db.username",  "root");
-    private final String PASSWORD = AppConfig.get("db.password",  "");
     private Connection cnx;
 
     private MyDataBase() {
+        String url      = "jdbc:mysql://127.0.0.1:3306/projet3a51";
+        String username = "root";
+        String password = "";
+        // Utiliser AppConfig si disponible
         try {
-            this.cnx = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            System.out.println("Connexion a la base de donnees reussie !");
+            url      = AppConfig.get("db.url",      url);
+            username = AppConfig.get("db.username",  username);
+            password = AppConfig.get("db.password",  password);
+        } catch (Exception ignored) {}
+
+        try {
+            this.cnx = DriverManager.getConnection(url, username, password);
+            System.out.println("Connexion à la base de données réussie!");
         } catch (SQLException e) {
-            System.err.println("ERREUR de connexion MySQL : " + e.getMessage());
-            System.err.println("  Verifiez que XAMPP est demarre et que la base existe.");
-            System.err.println("  URL : " + URL);
+            System.err.println("Erreur de connexion MySQL : " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -30,16 +35,19 @@ public class MyDataBase {
         return instance;
     }
 
+    /** Utilisé par le module user (main) */
     public Connection getCnx() {
         try {
-            if (cnx == null || cnx.isClosed()) {
-                System.out.println("Reconnexion a la base...");
-                cnx = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-                System.out.println("Reconnexion reussie !");
-            }
+            if (cnx == null || cnx.isClosed())
+                cnx = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/projet3a51", "root", "");
         } catch (SQLException e) {
-            System.err.println("Reconnexion echouee : " + e.getMessage());
+            System.err.println("Reconnexion échouée : " + e.getMessage());
         }
         return cnx;
+    }
+
+    /** Utilisé par le module activiter */
+    public Connection getConnection() {
+        return getCnx();
     }
 }

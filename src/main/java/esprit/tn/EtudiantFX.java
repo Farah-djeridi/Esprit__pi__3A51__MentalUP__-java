@@ -6,13 +6,13 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class MainFX extends Application {
+public class EtudiantFX extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/GestionActivite.fxml"));
-        primaryStage.setTitle("Gestion des Activités - MentalUp");
-        primaryStage.setScene(new Scene(root, 1200, 800));
+        Parent root = FXMLLoader.load(getClass().getResource("/EtudiantActivites.fxml"));
+        primaryStage.setTitle("MentalUp - Espace Étudiant");
+        primaryStage.setScene(new Scene(root, 1280, 850));
         primaryStage.show();
     }
 

@@ -24,7 +24,7 @@ import javafx.scene.Scene;
 import java.awt.Desktop;
 import java.net.URI;
 import java.util.Optional;
-import Services.PDFService;
+import services.PDFService;
 import Models.Dossier;
 import Services.ServiceDossier;
 import services.SmsService;

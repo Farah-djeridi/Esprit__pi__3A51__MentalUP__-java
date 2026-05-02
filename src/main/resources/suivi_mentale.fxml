@@ -1,0 +1,687 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.shape.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="Controllor.SuiviMentaleController"
+            prefWidth="1500" prefHeight="920"
+            style="-fx-background-color: linear-gradient(to bottom, #f4f8ff, #eef4fb);">
+
+    <left>
+        <VBox prefWidth="240"
+              style="-fx-background-color: linear-gradient(to bottom, #D6E8F7, #2C5F8A);">
+
+            <VBox alignment="CENTER"
+                  spacing="8"
+                  style="-fx-padding: 22 0 18 0;
+                         -fx-border-color: transparent transparent rgba(255,255,255,0.12) transparent;
+                         -fx-border-width: 0 0 1 0;">
+
+                <StackPane style="-fx-background-color: rgba(255,255,255,0.18);
+                                  -fx-background-radius: 50;
+                                  -fx-padding: 10;">
+                    <ImageView fx:id="logoImage"
+                               fitWidth="72"
+                               fitHeight="72"
+                               preserveRatio="true"/>
+                </StackPane>
+
+                <Label text="MentalUp"
+                       style="-fx-text-fill: #123553;
+                              -fx-font-size: 18px;
+                              -fx-font-weight: bold;"/>
+
+                <Label text="Bien-être étudiant"
+                       style="-fx-text-fill: #355f84;
+                              -fx-font-size: 12px;
+                              -fx-font-weight: 600;"/>
+            </VBox>
+
+            <VBox spacing="4" style="-fx-padding: 20 14 0 14;" VBox.vgrow="ALWAYS">
+
+                <HBox alignment="CENTER_LEFT" spacing="12"
+                      fx:id="navAccueil"
+                      onMouseClicked="#onNavHomeClicked"
+                      onMouseEntered="#onNavHoverEnter"
+                      onMouseExited="#onNavHoverExit"
+                      style="-fx-background-color: transparent;
+                             -fx-background-radius: 8;
+                             -fx-padding: 10 14;
+                             -fx-cursor: hand;">
+                    <Label text="🏠" style="-fx-font-size: 16px; -fx-text-fill: white;"/>
+                    <Label text="Accueil"
+                           style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 500;"/>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="12"
+                      fx:id="navSuivi"
+                      onMouseClicked="#onNavSuiviClicked"
+                      onMouseEntered="#onNavHoverEnter"
+                      onMouseExited="#onNavHoverExit"
+                      style="-fx-background-color: #1E4568;
+                             -fx-background-radius: 8;
+                             -fx-padding: 10 14;
+                             -fx-cursor: hand;
+                             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 2);">
+                    <Label text="📈" style="-fx-font-size: 16px; -fx-text-fill: white;"/>
+                    <Label text="Suivi"
+                           style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="12"
+                      fx:id="navObjectifs"
+                      onMouseClicked="#onNavObjectifsClicked"
+                      onMouseEntered="#onNavHoverEnter"
+                      onMouseExited="#onNavHoverExit"
+                      style="-fx-background-color: transparent;
+                             -fx-background-radius: 8;
+                             -fx-padding: 10 14;
+                             -fx-cursor: hand;">
+                    <Label text="🎯" style="-fx-font-size: 16px; -fx-text-fill: white;"/>
+                    <Label text="Objectifs"
+                           style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 500;"/>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="12"
+                      fx:id="navRdv"
+                      onMouseClicked="#onNavRdvClicked"
+                      onMouseEntered="#onNavHoverEnter"
+                      onMouseExited="#onNavHoverExit"
+                      style="-fx-background-color: transparent;
+                             -fx-background-radius: 8;
+                             -fx-padding: 10 14;
+                             -fx-cursor: hand;">
+                    <Label text="📅" style="-fx-font-size: 16px; -fx-text-fill: white;"/>
+                    <Label text="Rendez-vous"
+                           style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 500;"/>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="12"
+                      fx:id="navForum"
+                      onMouseClicked="#onNavBlogClicked"
+                      onMouseEntered="#onNavHoverEnter"
+                      onMouseExited="#onNavHoverExit"
+                      style="-fx-background-color: transparent;
+                             -fx-background-radius: 8;
+                             -fx-padding: 10 14;
+                             -fx-cursor: hand;">
+                    <Label text="💬" style="-fx-font-size: 16px; -fx-text-fill: white;"/>
+                    <Label text="Forum"
+                           style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 500;"/>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="12"
+                      fx:id="navActivites"
+                      onMouseClicked="#onNavActivitesClicked"
+                      onMouseEntered="#onNavHoverEnter"
+                      onMouseExited="#onNavHoverExit"
+                      style="-fx-background-color: transparent;
+                             -fx-background-radius: 8;
+                             -fx-padding: 10 14;
+                             -fx-cursor: hand;">
+                    <Label text="⚡" style="-fx-font-size: 16px; -fx-text-fill: white;"/>
+                    <Label text="Activités"
+                           style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 500;"/>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="12"
+                      fx:id="navRessources"
+                      onMouseClicked="#onNavRessourcesClicked"
+                      onMouseEntered="#onNavHoverEnter"
+                      onMouseExited="#onNavHoverExit"
+                      style="-fx-background-color: transparent;
+                             -fx-background-radius: 8;
+                             -fx-padding: 10 14;
+                             -fx-cursor: hand;">
+                    <Label text="📚" style="-fx-font-size: 16px; -fx-text-fill: white;"/>
+                    <Label text="Ressources"
+                           style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 500;"/>
+                </HBox>
+            </VBox>
+
+            <VBox spacing="6"
+                  style="-fx-padding: 16 14 20 14;
+                         -fx-border-color: rgba(255,255,255,0.2);
+                         -fx-border-width: 1 0 0 0;">
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Circle radius="18" style="-fx-fill: rgba(255,255,255,0.25);"/>
+                    <Label fx:id="avatarInitials" text="SA"
+                           style="-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-translate-x: -28;"/>
+                    <VBox spacing="1">
+                        <Label fx:id="labelUserName" text="Sophie Amara"
+                               style="-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                        <Label text="Étudiant"
+                               style="-fx-text-fill: rgba(255,255,255,0.65); -fx-font-size: 11px; -fx-font-weight: 500;"/>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="logoutButton" text="⏻" onAction="#onLogout"
+                            style="-fx-background-color: rgba(255,255,255,0.15);
+                                   -fx-text-fill: white;
+                                   -fx-background-radius: 6;
+                                   -fx-padding: 5 10;
+                                   -fx-cursor: hand;
+                                   -fx-font-size: 12px;
+                                   -fx-font-weight: bold;"/>
+                </HBox>
+            </VBox>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="0">
+            <VBox spacing="10" style="-fx-padding: 15 20 0 20;">
+
+                <VBox spacing="12"
+                      style="-fx-background-color: white;
+                             -fx-background-radius: 18;
+                             -fx-effect: dropshadow(gaussian, rgba(30,58,95,0.08), 12, 0, 0, 2);
+                             -fx-padding: 20 25 20 25;">
+
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <VBox spacing="2">
+                            <Label text="✨ MentalUp"
+                                   style="-fx-text-fill: #1e3a5f;
+                                          -fx-font-size: 19px;
+                                          -fx-font-weight: bold;"/>
+                            <Label text="Espace suivi mental"
+                                   style="-fx-text-fill: #7b8ba1;
+                                          -fx-font-size: 11px;"/>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="labelDate" text="mercredi 8 avril 2026"
+                               style="-fx-text-fill: #9aa8b8;
+                                      -fx-font-size: 11px;
+                                      -fx-font-weight: 600;"/>
+                    </HBox>
+
+                    <VBox spacing="10"
+                          style="-fx-background-color: linear-gradient(to right, #D6E8F7, #2C5F8A);
+                                 -fx-background-radius: 22;
+                                 -fx-padding: 28 26 28 26;
+                                 -fx-effect: dropshadow(gaussian, rgba(44,95,138,0.20), 12, 0, 0, 3);">
+
+                        <Label text="Journal de bien-être"
+                               style="-fx-text-fill: #123553;
+                                      -fx-font-size: 32px;
+                                      -fx-font-weight: 900;"/>
+
+                        <Label text="Suivez votre santé mentale au quotidien et visualisez votre progression"
+                               style="-fx-text-fill: #224b70;
+                                      -fx-font-size: 14px;
+                                      -fx-font-weight: 500;"/>
+                    </VBox>
+
+                    <HBox spacing="8">
+                        <Button fx:id="ajouterTabButton"
+                                text="➕ Nouveau Suivi"
+                                onAction="#showAjouterSection"
+                                style="-fx-background-color: linear-gradient(to right, #3b82f6, #2C5F8A);
+                                       -fx-text-fill: white;
+                                       -fx-font-size: 15px;
+                                       -fx-font-weight: 800;
+                                       -fx-background-radius: 24;
+                                       -fx-padding: 11 24;
+                                       -fx-cursor: hand;"/>
+
+                        <Button fx:id="statistiquesTabButton"
+                                text="📊 Statistiques"
+                                onAction="#showStatistiquesSection"
+                                style="-fx-background-color: #f8fbff;
+                                       -fx-text-fill: #234b7d;
+                                       -fx-font-size: 15px;
+                                       -fx-font-weight: 800;
+                                       -fx-border-color: #d7e5f7;
+                                       -fx-border-radius: 24;
+                                       -fx-background-radius: 24;
+                                       -fx-padding: 11 24;
+                                       -fx-cursor: hand;"/>
+
+                        <Button fx:id="historiqueTabButton"
+                                text="📅 Historique"
+                                onAction="#showHistoriqueSection"
+                                style="-fx-background-color: #f8fbff;
+                                       -fx-text-fill: #234b7d;
+                                       -fx-font-size: 15px;
+                                       -fx-font-weight: 800;
+                                       -fx-border-color: #d7e5f7;
+                                       -fx-border-radius: 24;
+                                       -fx-background-radius: 24;
+                                       -fx-padding: 11 24;
+                                       -fx-cursor: hand;"/>
+
+                        <Button fx:id="chatTabButton"
+                                text="🤖 Coach AI"
+                                onAction="#showChatSection"
+                                style="-fx-background-color: #f8fbff;
+                                       -fx-text-fill: #234b7d;
+                                       -fx-font-size: 15px;
+                                       -fx-font-weight: 800;
+                                       -fx-border-color: #d7e5f7;
+                                       -fx-border-radius: 24;
+                                       -fx-background-radius: 24;
+                                       -fx-padding: 11 24;
+                                       -fx-cursor: hand;"/>
+
+                        <Region HBox.hgrow="ALWAYS"/>
+
+                        <Button fx:id="pdfButton"
+                                text="📥 PDF"
+                                onAction="#exporterEnPdf"
+                                style="-fx-background-color: #fff1f1;
+                                       -fx-text-fill: #d94b4b;
+                                       -fx-font-size: 15px;
+                                       -fx-font-weight: 800;
+                                       -fx-border-color: #fadada;
+                                       -fx-border-radius: 24;
+                                       -fx-background-radius: 24;
+                                       -fx-padding: 11 24;
+                                       -fx-cursor: hand;"/>
+                    </HBox>
+                </VBox>
+
+                <Label fx:id="globalMessageLabel"
+                       text=""
+                       style="-fx-padding: 0;
+                              -fx-font-size: 0;
+                              -fx-background-color: transparent;"/>
+            </VBox>
+
+            <StackPane VBox.vgrow="ALWAYS" style="-fx-padding: 15 20 20 20;">
+                <children>
+                    <!-- SECTION AJOUT -->
+                    <ScrollPane fx:id="ajoutSectionScroll"
+                                fitToWidth="true"
+                                visible="true"
+                                managed="true"
+                                hbarPolicy="NEVER"
+                                style="-fx-background-color: transparent;
+                                       -fx-background: transparent;
+                                       -fx-border-color: transparent;">
+                        <content>
+                            <VBox fx:id="ajoutSection" spacing="4" style="-fx-padding: 0;">
+
+                                <VBox spacing="8"
+                                      style="-fx-background-color: white;
+                                             -fx-background-radius: 18;
+                                             -fx-effect: dropshadow(gaussian, rgba(30,58,95,0.05), 8, 0, 0, 2);
+                                             -fx-padding: 14;">
+
+                                    <HBox spacing="10" alignment="CENTER_LEFT">
+                                        <Label text="💡" style="-fx-font-size: 24px;"/>
+                                        <Label text="Message Bien-être"
+                                               style="-fx-text-fill: #1e3a5f;
+                                                      -fx-font-size: 18px;
+                                                      -fx-font-weight: 900;"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Button onAction="#actualiserCitationSeulement"
+                                                style="-fx-background-color: #f1f5f9;
+                                                       -fx-background-radius: 12;
+                                                       -fx-padding: 5 10;
+                                                       -fx-cursor: hand;">
+                                            <graphic>
+                                                <Label text="🔄" style="-fx-font-size: 14px;"/>
+                                            </graphic>
+                                        </Button>
+                                    </HBox>
+
+                                    <Label fx:id="conseilLabel"
+                                           text="Chargement du message bien-être..."
+                                           wrapText="true"
+                                           style="-fx-text-fill: #475569;
+                                                  -fx-font-size: 14px;
+                                                  -fx-font-weight: 600;
+                                                  -fx-font-style: italic;
+                                                  -fx-background-color: #f8fbff;
+                                                  -fx-background-radius: 14;
+                                                  -fx-padding: 14;
+                                                  -fx-border-color: #e2e8f0;
+                                                  -fx-border-radius: 14;"/>
+                                </VBox>
+
+                                <VBox spacing="14"
+                                      style="-fx-background-color: white;
+                                             -fx-background-radius: 18;
+                                             -fx-effect: dropshadow(gaussian, rgba(30,58,95,0.05), 8, 0, 0, 2);
+                                             -fx-padding: 16;">
+
+                                    <VBox spacing="4"
+                                          style="-fx-background-color: #fffbeb;
+                                                 -fx-background-radius: 12;
+                                                 -fx-padding: 10;
+                                                 -fx-border-color: #fef3c7;
+                                                 -fx-border-radius: 12;">
+                                        <Label text="🎯 Objectif lié"
+                                               style="-fx-text-fill: #92400e;
+                                                      -fx-font-size: 12px;
+                                                      -fx-font-weight: 800;"/>
+                                        <Label fx:id="objectifLieLabel"
+                                               text="Recherche de l'objectif en cours..."
+                                               wrapText="true"
+                                               style="-fx-text-fill: #b45309;
+                                                      -fx-font-size: 13px;
+                                                      -fx-font-weight: 600;"/>
+                                    </VBox>
+
+                                    <GridPane hgap="14" vgap="14">
+                                        <columnConstraints>
+                                            <ColumnConstraints percentWidth="50"/>
+                                            <ColumnConstraints percentWidth="50"/>
+                                        </columnConstraints>
+
+                                        <VBox spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="0">
+                                            <Label text="📅 Date du suivi"
+                                                   style="-fx-text-fill: #1e3a5f;
+                                                          -fx-font-size: 13px;
+                                                          -fx-font-weight: 800;"/>
+                                            <DatePicker fx:id="dateSuiviPicker"
+                                                        prefWidth="Infinity"
+                                                        style="-fx-background-color: #fbfdff;
+                                                               -fx-background-radius: 12;
+                                                               -fx-border-radius: 12;
+                                                               -fx-border-color: #dbe7f5;
+                                                               -fx-pref-height: 42px;"/>
+                                            <Label fx:id="dateErrorLabel" style="-fx-text-fill: #d94b4b; -fx-font-size: 10px;"/>
+                                        </VBox>
+
+                                        <VBox spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="1">
+                                            <Label text="😊 Humeur globale"
+                                                   style="-fx-text-fill: #1e3a5f;
+                                                          -fx-font-size: 13px;
+                                                          -fx-font-weight: 800;"/>
+                                            <ComboBox fx:id="humeurCombo"
+                                                      prefWidth="Infinity"
+                                                      style="-fx-background-color: #fbfdff;
+                                                             -fx-background-radius: 12;
+                                                             -fx-border-radius: 12;
+                                                             -fx-border-color: #dbe7f5;
+                                                             -fx-pref-height: 42px;"/>
+                                            <Label fx:id="humeurErrorLabel" style="-fx-text-fill: #d94b4b; -fx-font-size: 10px;"/>
+                                        </VBox>
+                                    </GridPane>
+
+                                    <GridPane hgap="14" vgap="14">
+                                        <columnConstraints>
+                                            <ColumnConstraints percentWidth="50"/>
+                                            <ColumnConstraints percentWidth="50"/>
+                                        </columnConstraints>
+
+                                        <VBox spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="0">
+                                            <Label text="🌙 Qualité du sommeil"
+                                                   style="-fx-text-fill: #1e3a5f;
+                                                          -fx-font-size: 13px;
+                                                          -fx-font-weight: 800;"/>
+                                            <ComboBox fx:id="qualiteSommeilCombo"
+                                                      prefWidth="Infinity"
+                                                      style="-fx-background-color: #fbfdff;
+                                                             -fx-background-radius: 12;
+                                                             -fx-border-radius: 12;
+                                                             -fx-border-color: #dbe7f5;
+                                                             -fx-pref-height: 42px;"/>
+                                            <Label fx:id="qualiteSommeilErrorLabel" style="-fx-text-fill: #d94b4b; -fx-font-size: 10px;"/>
+                                        </VBox>
+
+                                        <VBox spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="1">
+                                            <Label text="⏰ Heures de sommeil"
+                                                   style="-fx-text-fill: #1e3a5f;
+                                                          -fx-font-size: 13px;
+                                                          -fx-font-weight: 800;"/>
+                                            <TextField fx:id="heureSommeilField"
+                                                       promptText="Ex: 7.5"
+                                                       style="-fx-background-color: #fbfdff;
+                                                              -fx-background-radius: 12;
+                                                              -fx-border-radius: 12;
+                                                              -fx-border-color: #dbe7f5;
+                                                              -fx-pref-height: 42px;"/>
+                                            <Label fx:id="heureSommeilErrorLabel" style="-fx-text-fill: #d94b4b; -fx-font-size: 10px;"/>
+                                        </VBox>
+                                    </GridPane>
+
+                                    <GridPane hgap="14" vgap="14">
+                                        <columnConstraints>
+                                            <ColumnConstraints percentWidth="50"/>
+                                            <ColumnConstraints percentWidth="50"/>
+                                        </columnConstraints>
+
+                                        <VBox spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="0">
+                                            <Label text="📉 Taux de stress (0-10)"
+                                                   style="-fx-text-fill: #1e3a5f;
+                                                          -fx-font-size: 13px;
+                                                          -fx-font-weight: 800;"/>
+                                            <TextField fx:id="stressField"
+                                                       promptText="Ex: 3"
+                                                       style="-fx-background-color: #fbfdff;
+                                                              -fx-background-radius: 12;
+                                                              -fx-border-radius: 12;
+                                                              -fx-border-color: #dbe7f5;
+                                                              -fx-pref-height: 42px;"/>
+                                            <Label fx:id="stressErrorLabel" style="-fx-text-fill: #d94b4b; -fx-font-size: 10px;"/>
+                                        </VBox>
+
+                                        <VBox spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="1">
+                                            <Label text="⚡ Niveau d'énergie (0-10)"
+                                                   style="-fx-text-fill: #1e3a5f;
+                                                          -fx-font-size: 13px;
+                                                          -fx-font-weight: 800;"/>
+                                            <TextField fx:id="energieField"
+                                                       promptText="Ex: 8"
+                                                       style="-fx-background-color: #fbfdff;
+                                                              -fx-background-radius: 12;
+                                                              -fx-border-radius: 12;
+                                                              -fx-border-color: #dbe7f5;
+                                                              -fx-pref-height: 42px;"/>
+                                            <Label fx:id="energieErrorLabel" style="-fx-text-fill: #d94b4b; -fx-font-size: 10px;"/>
+                                        </VBox>
+                                    </GridPane>
+
+                                    <VBox spacing="6">
+                                        <Label text="📓 Journal émotionnel (Pensées du jour)"
+                                               style="-fx-text-fill: #1e3a5f;
+                                                      -fx-font-size: 13px;
+                                                      -fx-font-weight: 800;"/>
+                                        <TextArea fx:id="journalArea"
+                                                  promptText="Comment vous sentez-vous réellement ?"
+                                                  wrapText="true"
+                                                  prefRowCount="4"
+                                                  style="-fx-background-color: #fbfdff;
+                                                         -fx-background-radius: 12;
+                                                         -fx-border-radius: 12;
+                                                         -fx-border-color: #dbe7f5;
+                                                         -fx-padding: 10;"/>
+                                        <Label fx:id="journalErrorLabel" style="-fx-text-fill: #d94b4b; -fx-font-size: 10px;"/>
+                                    </VBox>
+
+                                    <Label fx:id="messageLabel" text=""
+                                           style="-fx-font-size: 12px; -fx-font-weight: bold;"/>
+
+                                    <HBox spacing="12" alignment="CENTER_RIGHT" style="-fx-padding: 5 0 0 0;">
+                                        <Button fx:id="clearButton"
+                                                text="🗑️ Vider"
+                                                onAction="#clearForm"
+                                                style="-fx-background-color: #f1f5f9;
+                                                       -fx-text-fill: #64748b;
+                                                       -fx-font-size: 14px;
+                                                       -fx-font-weight: 800;
+                                                       -fx-background-radius: 20;
+                                                       -fx-padding: 10 24;
+                                                       -fx-cursor: hand;"/>
+
+                                        <Button fx:id="saveButton"
+                                                text="💾 Enregistrer le suivi"
+                                                onAction="#saveSuivi"
+                                                style="-fx-background-color: linear-gradient(to right, #234b7d, #2f5d97);
+                                                       -fx-text-fill: white;
+                                                       -fx-font-size: 14px;
+                                                       -fx-font-weight: 900;
+                                                       -fx-background-radius: 20;
+                                                       -fx-padding: 10 28;
+                                                       -fx-cursor: hand;
+                                                       -fx-effect: dropshadow(gaussian, rgba(35,75,125,0.2), 8, 0, 0, 3);"/>
+                                    </HBox>
+                                </VBox>
+                            </VBox>
+                        </content>
+                    </ScrollPane>
+
+                    <!-- SECTION HISTORIQUE -->
+                    <ScrollPane fx:id="historiqueSectionScroll"
+                                fitToWidth="true"
+                                visible="false"
+                                managed="false"
+                                hbarPolicy="NEVER"
+                                style="-fx-background-color: transparent;
+                                       -fx-background: transparent;
+                                       -fx-border-color: transparent;">
+                        <content>
+                            <VBox fx:id="historiqueSection" spacing="4">
+
+                                <VBox spacing="8"
+                                      style="-fx-background-color: white;
+                                             -fx-background-radius: 18;
+                                             -fx-effect: dropshadow(gaussian, rgba(30,58,95,0.05), 8, 0, 0, 2);
+                                             -fx-padding: 14;">
+
+                                    <HBox spacing="10" alignment="CENTER_LEFT">
+                                        <Label text="🔍" style="-fx-font-size: 24px;"/>
+                                        <Label text="Rechercher un suivi"
+                                               style="-fx-text-fill: #1e3a5f;
+                                                      -fx-font-size: 18px;
+                                                      -fx-font-weight: 900;"/>
+                                    </HBox>
+
+                                    <GridPane hgap="12" vgap="10">
+                                        <columnConstraints>
+                                            <ColumnConstraints percentWidth="25"/>
+                                            <ColumnConstraints percentWidth="25"/>
+                                            <ColumnConstraints percentWidth="25"/>
+                                            <ColumnConstraints percentWidth="25"/>
+                                        </columnConstraints>
+
+                                        <VBox spacing="4" GridPane.rowIndex="0" GridPane.columnIndex="0">
+                                            <Label text="Date" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #64748b;"/>
+                                            <DatePicker fx:id="searchDateSuiviPicker" onAction="#onFilterChanged"
+                                                        prefWidth="Infinity" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e2e8f0;"/>
+                                        </VBox>
+
+                                        <VBox spacing="4" GridPane.rowIndex="0" GridPane.columnIndex="1">
+                                            <Label text="Humeur" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #64748b;"/>
+                                            <ComboBox fx:id="searchHumeurCombo" onAction="#onFilterChanged"
+                                                      prefWidth="Infinity" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e2e8f0;"/>
+                                        </VBox>
+
+                                        <VBox spacing="4" GridPane.rowIndex="0" GridPane.columnIndex="2">
+                                            <Label text="Sommeil" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #64748b;"/>
+                                            <ComboBox fx:id="searchQualiteSommeilCombo" onAction="#onFilterChanged"
+                                                      prefWidth="Infinity" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e2e8f0;"/>
+                                        </VBox>
+
+                                        <VBox spacing="4" GridPane.rowIndex="0" GridPane.columnIndex="3">
+                                            <Label text="Mots-clés journal" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #64748b;"/>
+                                            <TextField fx:id="searchJournalField" onKeyReleased="#onJournalSearchChanged"
+                                                       promptText="Chercher..." style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e2e8f0;"/>
+                                        </VBox>
+                                    </GridPane>
+
+                                    <HBox alignment="CENTER_RIGHT" style="-fx-padding: 5 0 0 0;">
+                                        <Button text="🔄 Réinitialiser" onAction="#resetFiltresHistorique"
+                                                style="-fx-background-color: transparent; -fx-text-fill: #3b82f6; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                                    </HBox>
+                                </VBox>
+
+                                <FlowPane fx:id="historiqueContainer"
+                                          hgap="14" vgap="14"
+                                          style="-fx-padding: 5 0 0 0;"/>
+                            </VBox>
+                        </content>
+                    </ScrollPane>
+
+                    <!-- SECTION STATISTIQUES -->
+                    <ScrollPane fx:id="statistiquesSectionScroll"
+                                fitToWidth="true"
+                                visible="false"
+                                managed="false"
+                                hbarPolicy="NEVER"
+                                style="-fx-background-color: transparent;
+                                       -fx-background: transparent;
+                                       -fx-border-color: transparent;">
+                        <content>
+                            <VBox fx:id="statistiquesSection" spacing="14">
+
+                                <HBox spacing="14">
+                                    <VBox HBox.hgrow="ALWAYS" spacing="6"
+                                          style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(30,58,95,0.05), 8, 0, 0, 2);">
+                                        <Label text="📊 Total Suivis" style="-fx-text-fill: #64748b; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                                        <Label fx:id="totalSuivisLabel" text="0" style="-fx-text-fill: #1e3a5f; -fx-font-size: 26px; -fx-font-weight: 900;"/>
+                                    </VBox>
+                                    <VBox HBox.hgrow="ALWAYS" spacing="6"
+                                          style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(30,58,95,0.05), 8, 0, 0, 2);">
+                                        <Label text="📉 Stress Moyen" style="-fx-text-fill: #64748b; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                                        <Label fx:id="stressMoyenLabel" text="0.0" style="-fx-text-fill: #ef4444; -fx-font-size: 26px; -fx-font-weight: 900;"/>
+                                    </VBox>
+                                    <VBox HBox.hgrow="ALWAYS" spacing="6"
+                                          style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(30,58,95,0.05), 8, 0, 0, 2);">
+                                        <Label text="🌙 Sommeil (h)" style="-fx-text-fill: #64748b; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                                        <Label fx:id="sommeilMoyenLabel" text="0.0" style="-fx-text-fill: #3b82f6; -fx-font-size: 26px; -fx-font-weight: 900;"/>
+                                    </VBox>
+                                    <VBox HBox.hgrow="ALWAYS" spacing="6"
+                                          style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(30,58,95,0.05), 8, 0, 0, 2);">
+                                        <Label text="🧠 Score Mental" style="-fx-text-fill: #64748b; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                                        <Label fx:id="scoreMentalMoyenLabel" text="0.0" style="-fx-text-fill: #10b981; -fx-font-size: 26px; -fx-font-weight: 900;"/>
+                                    </VBox>
+                                </HBox>
+
+                                <HBox spacing="14">
+                                    <VBox HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 18; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(30,58,95,0.05), 8, 0, 0, 2);">
+                                        <Label text="Répartition des humeurs" style="-fx-text-fill: #1e3a5f; -fx-font-size: 15px; -fx-font-weight: 800;"/>
+                                        <PieChart fx:id="pieChartHumeursStats" prefHeight="250"/>
+                                    </VBox>
+                                    <VBox HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 18; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(30,58,95,0.05), 8, 0, 0, 2);">
+                                        <Label text="Moyennes globales" style="-fx-text-fill: #1e3a5f; -fx-font-size: 15px; -fx-font-weight: 800;"/>
+                                        <BarChart fx:id="barChartMoyennes" prefHeight="250">
+                                            <xAxis><CategoryAxis fx:id="xAxisMoyennes" tickLabelFill="#475569" style="-fx-label-fill: #1e3a5f;"/></xAxis>
+                                            <yAxis><NumberAxis fx:id="yAxisMoyennes" upperBound="10.0" tickLabelFill="#475569" style="-fx-label-fill: #1e3a5f;"/></yAxis>
+                                        </BarChart>
+                                    </VBox>
+                                </HBox>
+
+                                <VBox style="-fx-background-color: white; -fx-background-radius: 18; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(30,58,95,0.05), 8, 0, 0, 2);">
+                                    <Label text="Évolution du Score Mental" style="-fx-text-fill: #1e3a5f; -fx-font-size: 15px; -fx-font-weight: 800;"/>
+                                    <LineChart fx:id="lineChartEvolutionScore" prefHeight="300">
+                                        <xAxis><CategoryAxis fx:id="xAxisEvolution" tickLabelFill="#475569" style="-fx-label-fill: #1e3a5f;"/></xAxis>
+                                        <yAxis><NumberAxis fx:id="yAxisEvolution" tickLabelFill="#475569" style="-fx-label-fill: #1e3a5f;"/></yAxis>
+                                    </LineChart>
+                                </VBox>
+                            </VBox>
+                        </content>
+                    </ScrollPane>
+
+                    <!-- SECTION CHAT -->
+                    <VBox fx:id="chatSection" spacing="12" visible="false" managed="false" style="-fx-padding: 0;">
+                        <VBox VBox.vgrow="ALWAYS" spacing="12" style="-fx-background-color: white; -fx-background-radius: 18; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(30,58,95,0.05), 8, 0, 0, 2);">
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <Label text="🤖" style="-fx-font-size: 24px;"/>
+                                <VBox>
+                                    <Label text="Coach MentalUp" style="-fx-text-fill: #1e3a5f; -fx-font-size: 17px; -fx-font-weight: 900;"/>
+                                    <Label text="Assistant IA disponible 24/7" style="-fx-text-fill: #10b981; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                                </VBox>
+                            </HBox>
+                            <TextArea fx:id="chatArea" VBox.vgrow="ALWAYS" editable="false" wrapText="true"
+                                      style="-fx-background-color: #f8fbff; -fx-background-radius: 14; -fx-border-color: #e2e8f0; -fx-border-radius: 14; -fx-font-size: 14px; -fx-padding: 10;"/>
+                            <HBox spacing="10">
+                                <TextField fx:id="chatInputField" HBox.hgrow="ALWAYS" promptText="Écrivez votre message ici..."
+                                           style="-fx-background-radius: 20; -fx-border-radius: 20; -fx-border-color: #cbd5e1; -fx-pref-height: 42px; -fx-padding: 0 16;"/>
+                                <Button fx:id="sendChatButton" text="Envoyer" onAction="#envoyerMessageChat"
+                                        style="-fx-background-color: #234b7d; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 0 24; -fx-cursor: hand;"/>
+                            </HBox>
+                        </VBox>
+                    </VBox>
+                </children>
+            </StackPane>
+        </VBox>
+    </center>
+</BorderPane>

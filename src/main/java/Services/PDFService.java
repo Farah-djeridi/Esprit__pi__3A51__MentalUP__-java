@@ -1,4 +1,4 @@
-package Services;
+package services;
 
 import Models.Dossier;
 import Models.RendezVous;
@@ -6,8 +6,8 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import java.awt.Color;
@@ -38,7 +38,7 @@ public class PDFService {
         contentStream.fill();
 
         // Logo
-        try (InputStream is = getClass().getResourceAsStream("/Images/logo.png")) { // Updated path
+        try (InputStream is = getClass().getResourceAsStream("/Images/logo.png")) {
             if (is != null) {
                 byte[] imageBytes = is.readAllBytes();
                 PDImageXObject logo = PDImageXObject.createFromByteArray(document, imageBytes, "logo");
@@ -51,14 +51,14 @@ public class PDFService {
         // Title and App Name
         contentStream.setNonStrokingColor(PRIMARY_COLOR);
         contentStream.beginText();
-        contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 24);
+        contentStream.setFont(PDType1Font.HELVETICA_BOLD, 24);
         contentStream.newLineAtOffset(110, 780);
         contentStream.showText("MentalUP");
         contentStream.endText();
 
         contentStream.setNonStrokingColor(TEXT_COLOR);
         contentStream.beginText();
-        contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
+        contentStream.setFont(PDType1Font.HELVETICA, 12);
         contentStream.newLineAtOffset(110, 765);
         contentStream.showText(title);
         contentStream.endText();
@@ -80,11 +80,11 @@ public class PDFService {
 
         contentStream.setNonStrokingColor(new Color(128, 128, 128));
         contentStream.beginText();
-        contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 8);
+        contentStream.setFont(PDType1Font.HELVETICA, 8);
         contentStream.newLineAtOffset(50, 40);
         contentStream.showText("Document confidentiel - Généré par MentalUp le " + LocalDateTime.now().format(dtFormatter));
         contentStream.endText();
-        
+
         contentStream.beginText();
         contentStream.newLineAtOffset(520, 40);
         contentStream.showText("Page " + pageNum);
@@ -106,19 +106,19 @@ public class PDFService {
 
                 contentStream.setNonStrokingColor(PRIMARY_COLOR);
                 contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 11);
+                contentStream.setFont(PDType1Font.HELVETICA_BOLD, 11);
                 contentStream.newLineAtOffset(65, 710);
                 contentStream.showText("INFORMATIONS GÉNÉRALES");
                 contentStream.endText();
 
                 contentStream.setNonStrokingColor(TEXT_COLOR);
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
-                
+                contentStream.setFont(PDType1Font.HELVETICA, 10);
+
                 contentStream.beginText();
                 contentStream.newLineAtOffset(65, 690);
                 contentStream.showText("Patient : " + (dossier.getPatientNom() != null ? dossier.getPatientNom() : "ID #" + dossier.getPatientId()));
                 contentStream.newLineAtOffset(0, -18);
-                contentStream.showText("Ouvert le : " + dossier.getDateCreation().toString());
+                contentStream.showText("Ouvert le : " + (dossier.getDateCreation() != null ? dossier.getDateCreation().toString() : "N/A"));
                 contentStream.newLineAtOffset(0, -18);
                 contentStream.showText("Niveau de Risque : ");
                 contentStream.endText();
@@ -126,12 +126,14 @@ public class PDFService {
                 // Risque Badge
                 String risque = dossier.getNiveauRisque() != null ? dossier.getNiveauRisque().toUpperCase() : "NORMAL";
                 Color risqueColor = new Color(52, 168, 83); // Green
-                if (risque.contains("HAUT") || risque.contains("ÉLEVÉ")) risqueColor = new Color(217, 48, 37); // Red
-                else if (risque.contains("MOYEN")) risqueColor = new Color(251, 188, 4); // Yellow/Orange
-                
+                if (risque.contains("HAUT") || risque.contains("ÉLEVÉ") || risque.contains("ELEVE"))
+                    risqueColor = new Color(217, 48, 37); // Red
+                else if (risque.contains("MOYEN") || risque.contains("MODERE"))
+                    risqueColor = new Color(251, 188, 4); // Yellow/Orange
+
                 contentStream.setNonStrokingColor(risqueColor);
                 contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 10);
+                contentStream.setFont(PDType1Font.HELVETICA_BOLD, 10);
                 contentStream.newLineAtOffset(150, 654);
                 contentStream.showText(risque);
                 contentStream.endText();
@@ -139,18 +141,19 @@ public class PDFService {
                 // Notes Section
                 contentStream.setNonStrokingColor(PRIMARY_COLOR);
                 contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 11);
+                contentStream.setFont(PDType1Font.HELVETICA_BOLD, 11);
                 contentStream.newLineAtOffset(50, 615);
                 contentStream.showText("NOTES CLINIQUES ET OBSERVATIONS");
                 contentStream.endText();
 
                 contentStream.setNonStrokingColor(TEXT_COLOR);
                 String notes = dossier.getNotesGenerales();
-                if (notes != null) {
+                if (notes != null && !notes.isEmpty()) {
                     contentStream.beginText();
-                    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
+                    contentStream.setFont(PDType1Font.HELVETICA, 10);
                     contentStream.newLineAtOffset(50, 600);
-                    
+
+                    // Simple text wrapping
                     String[] words = notes.split(" ");
                     StringBuilder line = new StringBuilder();
                     int y = 600;
@@ -160,33 +163,39 @@ public class PDFService {
                             contentStream.newLineAtOffset(0, -14);
                             y -= 14;
                             line = new StringBuilder();
+                            if (y < 450) break;
                         }
                         line.append(word).append(" ");
-                        if (y < 450) break; // Limit for now
                     }
-                    contentStream.showText(line.toString());
+                    if (line.length() > 0 && y >= 450) {
+                        contentStream.showText(line.toString());
+                    }
                     contentStream.endText();
                 }
 
                 // AI Summary Section if exists
                 if (dossier.getAiSummary() != null && !dossier.getAiSummary().isEmpty()) {
+                    int ySummary = 450;
                     contentStream.setNonStrokingColor(new Color(232, 240, 254));
-                    contentStream.addRect(50, 420, 500, 60);
+                    contentStream.addRect(50, ySummary - 30, 500, 50);
                     contentStream.fill();
-                    
+
                     contentStream.setNonStrokingColor(new Color(25, 103, 210));
                     contentStream.beginText();
-                    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 10);
-                    contentStream.newLineAtOffset(60, 465);
+                    contentStream.setFont(PDType1Font.HELVETICA_BOLD, 10);
+                    contentStream.newLineAtOffset(60, ySummary);
                     contentStream.showText("RÉSUMÉ IA (ANALYSE AUTOMATIQUE)");
                     contentStream.endText();
-                    
+
                     contentStream.setNonStrokingColor(TEXT_COLOR);
                     contentStream.beginText();
-                    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_OBLIQUE), 9);
-                    contentStream.newLineAtOffset(60, 445);
+                    contentStream.setFont(PDType1Font.HELVETICA_OBLIQUE, 9);
+                    contentStream.newLineAtOffset(60, ySummary - 15);
                     String summary = dossier.getAiSummary();
-                    contentStream.showText(summary.length() > 100 ? summary.substring(0, 97) + "..." : summary);
+                    if (summary.length() > 100) {
+                        summary = summary.substring(0, 97) + "...";
+                    }
+                    contentStream.showText(summary);
                     contentStream.endText();
                 }
 
@@ -194,7 +203,7 @@ public class PDFService {
                 int yTable = 380;
                 contentStream.setNonStrokingColor(PRIMARY_COLOR);
                 contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 11);
+                contentStream.setFont(PDType1Font.HELVETICA_BOLD, 11);
                 contentStream.newLineAtOffset(50, yTable);
                 contentStream.showText("HISTORIQUE DES SÉANCES");
                 contentStream.endText();
@@ -207,7 +216,7 @@ public class PDFService {
 
                 contentStream.setNonStrokingColor(Color.WHITE);
                 contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 9);
+                contentStream.setFont(PDType1Font.HELVETICA_BOLD, 9);
                 contentStream.newLineAtOffset(60, yTable);
                 contentStream.showText("DATE");
                 contentStream.newLineAtOffset(90, 0);
@@ -222,16 +231,16 @@ public class PDFService {
                 boolean zebra = false;
                 for (RendezVous r : history) {
                     if (yTable < 80) break;
-                    
+
                     if (zebra) {
                         contentStream.setNonStrokingColor(new Color(248, 249, 250));
                         contentStream.addRect(50, yTable - 5, 500, 20);
                         contentStream.fill();
                     }
-                    
+
                     contentStream.setNonStrokingColor(TEXT_COLOR);
                     contentStream.beginText();
-                    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 9);
+                    contentStream.setFont(PDType1Font.HELVETICA, 9);
                     contentStream.newLineAtOffset(60, yTable);
                     contentStream.showText(r.getDate() != null ? r.getDate().toString() : "N/A");
                     contentStream.newLineAtOffset(90, 0);
@@ -241,7 +250,7 @@ public class PDFService {
                     contentStream.newLineAtOffset(100, 0);
                     contentStream.showText(r.getLieu() != null ? r.getLieu() : "N/A");
                     contentStream.endText();
-                    
+
                     yTable -= 20;
                     zebra = !zebra;
                 }
@@ -262,13 +271,13 @@ public class PDFService {
 
                 contentStream.setNonStrokingColor(ACCENT_COLOR);
                 contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 12);
+                contentStream.setFont(PDType1Font.HELVETICA_BOLD, 12);
                 contentStream.newLineAtOffset(50, 715);
                 contentStream.showText("Période : " + period);
                 contentStream.endText();
 
                 int yPosition = 680;
-                
+
                 // Table Header
                 contentStream.setNonStrokingColor(PRIMARY_COLOR);
                 contentStream.addRect(50, yPosition - 5, 500, 22);
@@ -276,7 +285,7 @@ public class PDFService {
 
                 contentStream.setNonStrokingColor(Color.WHITE);
                 contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 9);
+                contentStream.setFont(PDType1Font.HELVETICA_BOLD, 9);
                 contentStream.newLineAtOffset(60, yPosition);
                 contentStream.showText("DATE");
                 contentStream.newLineAtOffset(80, 0);
@@ -292,31 +301,33 @@ public class PDFService {
                 yPosition -= 22;
                 boolean zebra = false;
                 contentStream.setNonStrokingColor(TEXT_COLOR);
-                
+
                 for (RendezVous r : rdvs) {
                     if (yPosition < 80) break;
-                    
+
                     if (zebra) {
                         contentStream.setNonStrokingColor(new Color(248, 249, 250));
                         contentStream.addRect(50, yPosition - 5, 500, 20);
                         contentStream.fill();
                     }
-                    
+
                     contentStream.setNonStrokingColor(TEXT_COLOR);
                     contentStream.beginText();
-                    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 9);
+                    contentStream.setFont(PDType1Font.HELVETICA, 9);
                     contentStream.newLineAtOffset(60, yPosition);
                     contentStream.showText(r.getDate() != null ? r.getDate().toString() : "N/A");
                     contentStream.newLineAtOffset(80, 0);
-                    contentStream.showText(r.getHeureDebut() != null ? r.getHeureDebut().toString().substring(0,5) : "N/A");
+                    String heure = r.getHeureDebut() != null ? r.getHeureDebut().toString() : "N/A";
+                    if (heure.length() > 5) heure = heure.substring(0, 5);
+                    contentStream.showText(heure);
                     contentStream.newLineAtOffset(70, 0);
                     contentStream.showText(r.getEtudiantId() != null ? "Patient #" + r.getEtudiantId() : "Libre");
                     contentStream.newLineAtOffset(140, 0);
-                    contentStream.showText(r.getStatut());
+                    contentStream.showText(r.getStatut() != null ? r.getStatut() : "N/A");
                     contentStream.newLineAtOffset(90, 0);
                     contentStream.showText(r.getLieu() != null ? r.getLieu() : "N/A");
                     contentStream.endText();
-                    
+
                     yPosition -= 20;
                     zebra = !zebra;
                 }
@@ -336,25 +347,28 @@ public class PDFService {
                 drawHeader(document, contentStream, "RAPPORT STATISTIQUE GLOBAL");
 
                 int y = 700;
-                
+
                 // Summary Box
                 contentStream.setNonStrokingColor(HEADER_BG);
                 contentStream.addRect(50, y - 50, 500, 60);
                 contentStream.fill();
-                
-                addStatLine(contentStream, "Nombre total de patients :", stats.get("totalPatients").toString(), y - 15);
+
+                Object totalPatients = stats.getOrDefault("totalPatients", 0);
+                addStatLine(contentStream, "Nombre total de patients :", String.valueOf(totalPatients), y - 15);
                 y -= 80;
 
                 contentStream.setNonStrokingColor(PRIMARY_COLOR);
                 contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 12);
+                contentStream.setFont(PDType1Font.HELVETICA_BOLD, 12);
                 contentStream.newLineAtOffset(50, y);
                 contentStream.showText("Volume d'activité par mois");
                 contentStream.endText();
                 y -= 25;
 
-                Map<String, Integer> rdvPerMonth = (Map<String, Integer>) stats.get("rdvPerMonth");
-                if (rdvPerMonth != null) {
+                Object rdvPerMonthObj = stats.get("rdvPerMonth");
+                if (rdvPerMonthObj instanceof Map) {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Integer> rdvPerMonth = (Map<String, Integer>) rdvPerMonthObj;
                     boolean zebra = false;
                     for (Map.Entry<String, Integer> entry : rdvPerMonth.entrySet()) {
                         if (zebra) {
@@ -362,10 +376,10 @@ public class PDFService {
                             contentStream.addRect(70, y - 5, 460, 18);
                             contentStream.fill();
                         }
-                        
+
                         contentStream.setNonStrokingColor(TEXT_COLOR);
                         contentStream.beginText();
-                        contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
+                        contentStream.setFont(PDType1Font.HELVETICA, 10);
                         contentStream.newLineAtOffset(80, y);
                         contentStream.showText(entry.getKey() + " : " + entry.getValue() + " rendez-vous");
                         contentStream.endText();
@@ -375,8 +389,9 @@ public class PDFService {
                 }
 
                 y -= 30;
-                addStatLine(contentStream, "Taux d'annulation global :", stats.get("cancellationRate").toString() + "%", y);
-                
+                Object cancellationRate = stats.getOrDefault("cancellationRate", 0);
+                addStatLine(contentStream, "Taux d'annulation global :", String.valueOf(cancellationRate) + "%", y);
+
                 drawFooter(contentStream, 1);
             }
             document.save(outputPath);
@@ -386,14 +401,14 @@ public class PDFService {
     private void addStatLine(PDPageContentStream stream, String label, String value, int y) throws IOException {
         stream.setNonStrokingColor(PRIMARY_COLOR);
         stream.beginText();
-        stream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 11);
+        stream.setFont(PDType1Font.HELVETICA_BOLD, 11);
         stream.newLineAtOffset(65, y);
         stream.showText(label);
         stream.endText();
 
         stream.setNonStrokingColor(TEXT_COLOR);
         stream.beginText();
-        stream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 11);
+        stream.setFont(PDType1Font.HELVETICA_BOLD, 11);
         stream.newLineAtOffset(300, y);
         stream.showText(value);
         stream.endText();

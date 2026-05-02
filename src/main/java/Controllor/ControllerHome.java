@@ -9,10 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -28,8 +25,25 @@ import Services.ServiceRating;
 import utils.MyDataBase;
 import Models.RendezVous;
 import services.ServiceRendezVous;
-import java.sql.*;
+import models.Notification;
+import services.NotificationService;
+import javafx.collections.FXCollections;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 public class ControllerHome {
 
@@ -37,16 +51,25 @@ public class ControllerHome {
     @FXML private VBox adv1, adv2, adv3, adv4;
     @FXML private HBox bannerBox;
     @FXML private Button startButton, notifButton, menuButton, logoutButton;
-    @FXML private HBox navAccueil, navSuivi, navRdv, navForum, navActivites, navRessources;
+    @FXML private HBox navAccueil, navSuivi, navObjectifs, navRdv, navForum, navActivites, navRessources;
     @FXML private Label badgeRdv, labelUserName, labelDate, avatarInitials, labelWelcome, labelUserRole;
     @FXML private HBox psyListContainer;
     @FXML private ImageView logoImage;
     @FXML private VBox rdvHomeContainer;
+    
+    // Notifications
+    @FXML private VBox notifPanel;
+    @FXML private ListView<Notification> notifListView;
+    @FXML private Label notifBadgeLabel;
+    @FXML private ComboBox<String> notifFilterCombo;
+    @FXML private Button clearAllNotifButton;
 
     private ContextMenu contextMenu;
     private final ServiceRating serviceRating = new ServiceRating();
     private final ServiceRendezVous serviceRdv = new ServiceRendezVous();
+    private final NotificationService notificationService = new NotificationService();
     private int etudiantId;
+    private boolean popupRappelDejaAffiche = false;
 
     @FXML
     public void initialize() {
@@ -88,6 +111,18 @@ public class ControllerHome {
         animateFade(card1, 400);
         animateFade(card2, 500);
         animateFade(card3, 600);
+
+        // 7. Notifications
+        if (notifPanel != null) {
+            notifPanel.setVisible(false);
+            notifPanel.setManaged(false);
+            notifPanel.setOpacity(0);
+        }
+        configurerFiltreNotifications();
+        configurerListViewNotifications();
+        verifierEtDeclencherRappelImmediat();
+        chargerNotifications();
+        mettreAJourBadgeNotif();
     }
 
     private void setupContextMenu() {
@@ -135,11 +170,13 @@ public class ControllerHome {
 
     // Navigation
     @FXML void onNavHomeClicked(MouseEvent event)      { loadPage("/Home.fxml", event); }
-    @FXML void onNavSuiviClicked(MouseEvent event)     { System.out.println("Suivi"); }
+    @FXML void onNavSuiviClicked(MouseEvent event)     { loadPage("/suivi_mentale.fxml", event); }
+    @FXML void onNavObjectifsClicked(MouseEvent event) { loadPage("/objvue.fxml", event); }
     @FXML void onNavRdvClicked(MouseEvent event)       { loadPage("/RendezVous_Etudiant.fxml", event); }
     @FXML void onNavBlogClicked(MouseEvent event)      { loadPage("/forum.fxml", event); }
     @FXML void onNavActivitesClicked(MouseEvent event) { System.out.println("Activités"); }
     @FXML void onNavRessourcesClicked(MouseEvent event){ loadPage("/StudentRessources.fxml", event); }
+    @FXML void onCardSuiviClicked(MouseEvent event)    { loadPage("/suivi_mentale.fxml", event); }
     @FXML void onNavRdvClicked_Btn(ActionEvent event)  { loadPage("/RendezVous_Etudiant.fxml", event); }
 
     // Hover sidebar
@@ -188,12 +225,6 @@ public class ControllerHome {
     }
 
     // Boutons actions
-    @FXML
-    private void onNotifications(ActionEvent event) {
-        Button btn = (Button) event.getSource();
-        scale(btn, 1.1, 150);
-        System.out.println("Notifications");
-    }
 
     @FXML
     private void onLogout(ActionEvent event) {
@@ -291,6 +322,172 @@ public class ControllerHome {
         statusBadge.setStyle(badgeStyle);
         row.getChildren().addAll(icon, info, spacer, statusBadge);
         return row;
+    }
+
+
+
+    // =========================================================================
+    // NOTIFICATIONS
+    // =========================================================================
+
+    private void verifierEtDeclencherRappelImmediat() {
+        try {
+            boolean rappelCree = notificationService.checkAndCreateDailyReminder(etudiantId);
+            if (rappelCree && !popupRappelDejaAffiche) {
+                popupRappelDejaAffiche = true;
+                afficherPopupRappel("Vous n'avez pas encore ajouté votre suivi mental aujourd'hui 🧠");
+            }
+        } catch (Exception e) {
+            System.err.println("Erreur rappel : " + e.getMessage());
+        }
+    }
+
+    private void afficherPopupRappel(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Rappel automatique");
+        alert.setHeaderText("Suivi mental");
+        alert.setContentText(message);
+        alert.show();
+    }
+
+    private void configurerFiltreNotifications() {
+        if (notifFilterCombo == null) return;
+        notifFilterCombo.setItems(FXCollections.observableArrayList(
+                "Tous", "progression_hausse", "progression_baisse", "progression_stable", "rappel_suivi"
+        ));
+        notifFilterCombo.setValue("Tous");
+    }
+
+    private void configurerListViewNotifications() {
+        if (notifListView == null) return;
+        notifListView.setCellFactory(listView -> new ListCell<Notification>() {
+            @Override
+            protected void updateItem(Notification notif, boolean empty) {
+                super.updateItem(notif, empty);
+                if (empty || notif == null) {
+                    setText(null); setGraphic(null); setStyle("-fx-background-color: transparent;");
+                    return;
+                }
+                String iconText = getIconForType(notif.getType());
+                Label iconLabel = new Label(iconText);
+                iconLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+                StackPane iconContainer = new StackPane(iconLabel);
+                iconContainer.setMinSize(34, 34);
+                iconContainer.setStyle(getIconContainerStyle(notif.getType()));
+
+                Label titleLabel = new Label(notif.getTitle() == null ? "Notification" : notif.getTitle());
+                titleLabel.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #1E3A5F;");
+                Label msgLabel = new Label(notif.getMessage() == null ? "" : notif.getMessage());
+                msgLabel.setWrapText(true);
+                msgLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #5B6B7A; -fx-font-weight: 500;");
+                Label dateLabel = new Label(getRelativeTime(notif.getCreatedAt()));
+                dateLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #8A9AAA;");
+
+                Circle unreadDot = new Circle(5);
+                unreadDot.setFill(notif.isRead() ? Color.TRANSPARENT : Color.web("#E74C3C"));
+
+                Button deleteBtn = new Button("✕");
+                deleteBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: #8A9AAA; -fx-cursor: hand;");
+                deleteBtn.setOnAction(e -> {
+                    notificationService.deleteNotificationById(notif.getId());
+                    chargerNotifications();
+                    mettreAJourBadgeNotif();
+                });
+
+                Region spacer = new Region();
+                HBox.setHgrow(spacer, Priority.ALWAYS);
+                HBox topRow = new HBox(8, unreadDot, iconContainer, titleLabel, spacer, dateLabel, deleteBtn);
+                topRow.setAlignment(Pos.CENTER_LEFT);
+                VBox content = new VBox(6, topRow, msgLabel);
+                content.setPadding(new Insets(12));
+                content.setStyle("-fx-background-color: white; -fx-background-radius: 14; -fx-border-color: #E6EEF8; -fx-border-radius: 14;");
+                setGraphic(content);
+                setText(null);
+                setStyle("-fx-background-color: transparent;");
+            }
+        });
+    }
+
+    private String getIconForType(String type) {
+        if (type == null) return "🔔";
+        switch (type) {
+            case "progression_hausse": return "📈";
+            case "progression_baisse": return "📉";
+            case "progression_stable": return "➖";
+            case "rappel_suivi": return "⏰";
+            default: return "🔔";
+        }
+    }
+
+    private String getIconContainerStyle(String type) {
+        String base = "-fx-background-radius: 999; -fx-border-radius: 999; -fx-border-width: 1; ";
+        if (type == null) return base + "-fx-background-color: #EEF4FB; -fx-border-color: #D8E5F2;";
+        switch (type) {
+            case "progression_hausse": return base + "-fx-background-color: #E8F8F0; -fx-border-color: #BFE8D1;";
+            case "progression_baisse": return base + "-fx-background-color: #FFF1F1; -fx-border-color: #F5C2C0;";
+            case "progression_stable": return base + "-fx-background-color: #FFF8E8; -fx-border-color: #F1DFB3;";
+            case "rappel_suivi": return base + "-fx-background-color: #EEF4FF; -fx-border-color: #C9D9F7;";
+            default: return base + "-fx-background-color: #EEF4FB; -fx-border-color: #D8E5F2;";
+        }
+    }
+
+    private String getRelativeTime(Timestamp ts) {
+        if (ts == null) return "";
+        LocalDateTime dt = ts.toLocalDateTime();
+        java.time.Duration d = java.time.Duration.between(dt, LocalDateTime.now());
+        long m = d.toMinutes();
+        if (m < 1) return "à l'instant";
+        if (m < 60) return "il y a " + m + " min";
+        long h = d.toHours();
+        if (h < 24) return "il y a " + h + " h";
+        long days = d.toDays();
+        if (days < 7) return "il y a " + days + " j";
+        return dt.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    }
+
+    private void chargerNotifications() {
+        String filter = notifFilterCombo != null ? notifFilterCombo.getValue() : "Tous";
+        List<Notification> list = notificationService.getNotificationsByUserAndType(etudiantId, filter);
+        if (notifListView != null) notifListView.setItems(FXCollections.observableArrayList(list));
+    }
+
+    private void mettreAJourBadgeNotif() {
+        if (notifBadgeLabel == null) return;
+        int count = notificationService.countUnreadNotifications(etudiantId);
+        notifBadgeLabel.setText(String.valueOf(count));
+        notifBadgeLabel.setVisible(count > 0);
+        notifBadgeLabel.setManaged(count > 0);
+    }
+
+    @FXML
+    private void onNotifFilterChanged(ActionEvent event) { chargerNotifications(); }
+
+    @FXML
+    private void onClearAllNotifications(ActionEvent event) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmation");
+        alert.setHeaderText("Supprimer toutes les notifications ?");
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            notificationService.deleteAllNotifications(etudiantId);
+            chargerNotifications();
+            mettreAJourBadgeNotif();
+        }
+    }
+
+    @FXML
+    private void onNotifications(ActionEvent event) {
+        if (notifPanel == null) return;
+        boolean open = !notifPanel.isVisible();
+        notifPanel.setVisible(open);
+        notifPanel.setManaged(open);
+        if (open) {
+            chargerNotifications();
+            notificationService.markAllAsRead(etudiantId);
+            mettreAJourBadgeNotif();
+            FadeTransition ft = new FadeTransition(Duration.millis(220), notifPanel);
+            ft.setFromValue(0); ft.setToValue(1); ft.play();
+        }
     }
 
     // Helpers

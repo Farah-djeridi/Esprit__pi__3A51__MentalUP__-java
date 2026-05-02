@@ -35,7 +35,6 @@
                 </VBox>
             </HBox>
 
-
             <VBox spacing="2" style="-fx-padding: 16 12 0 12;" VBox.vgrow="ALWAYS">
 
                 <!-- Accueil -->
@@ -68,27 +67,32 @@
                         <Label text="Suivi Mental"
                                style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px; -fx-font-weight: 500;"/>
                         <Region HBox.hgrow="ALWAYS"/>
-                        <Label fx:id="arrowSuivi" text="▶" style="-fx-text-fill: rgba(255,255,255,0.5); -fx-font-size: 11px;"/>
+                        <Label fx:id="arrowSuivi" text="▶"
+                               style="-fx-text-fill: rgba(255,255,255,0.5); -fx-font-size: 11px;"/>
                     </HBox>
 
-                    <!-- Sous-menu Suivi (masqué au départ) -->
-                    <VBox fx:id="submenuSuivi" spacing="2" style="-fx-padding: 4 0 6 28; -fx-display: none;">
+                    <VBox fx:id="submenuSuivi" spacing="2" style="-fx-padding: 4 0 6 28;">
                         <HBox alignment="CENTER_LEFT" spacing="10"
                               fx:id="navSuiviStats"
                               onMouseClicked="#onNavSuiviStatsClicked"
                               onMouseEntered="#onSubmenuHoverEnter"
                               onMouseExited="#onSubmenuHoverExit"
-                              style="-fx-background-radius: 6; -fx-padding: 8 12; -fx-cursor: hand;">
+                              style="-fx-background-radius: 6;
+                                     -fx-padding: 8 12;
+                                     -fx-cursor: hand;">
                             <Label text="📊" style="-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.55);"/>
-                            <Label text="Statistiques"
+                            <Label text="Liste des suivis"
                                    style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 13px; -fx-font-weight: 500;"/>
                         </HBox>
+
                         <HBox alignment="CENTER_LEFT" spacing="10"
                               fx:id="navObjectifs"
                               onMouseClicked="#onNavObjectifsClicked"
                               onMouseEntered="#onSubmenuHoverEnter"
                               onMouseExited="#onSubmenuHoverExit"
-                              style="-fx-background-radius: 6; -fx-padding: 8 12; -fx-cursor: hand;">
+                              style="-fx-background-radius: 6;
+                                     -fx-padding: 8 12;
+                                     -fx-cursor: hand;">
                             <Label text="🎯" style="-fx-font-size: 13px; -fx-text-fill: rgba(255,255,255,0.55);"/>
                             <Label text="Objectifs"
                                    style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 13px; -fx-font-weight: 500;"/>

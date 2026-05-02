@@ -19,7 +19,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import Models.RendezVous;
 import Models.Dossier;
-import Services.PDFService;
+import services.PDFService;
 import services.ServiceRendezVous;
 import Services.ServiceDossier;
 import services.ServiceUser;
@@ -186,8 +186,8 @@ public class ControllerHomeAdmin {
     @FXML void onNavUtilisateursClicked(MouseEvent event) { SceneManager.switchTo("/AdminUsers.fxml", "Gestion des Utilisateurs"); }
     @FXML void onNavRessourcesClicked(MouseEvent event) { SceneManager.switchTo("/AdminRessources.fxml", "Gestion des Ressources"); }
     
-    @FXML void onNavSuiviStatsClicked(MouseEvent event)  { System.out.println("Stats suivi"); }
-    @FXML void onNavObjectifsClicked(MouseEvent event)   { System.out.println("Objectifs"); }
+    @FXML void onNavSuiviStatsClicked(MouseEvent event)  { SceneManager.switchTo("AdminSuiviMental.fxml", "Suivis Mentaux - Admin"); }
+    @FXML void onNavObjectifsClicked(MouseEvent event)   { SceneManager.switchTo("AdminObjectif.fxml", "Objectifs - Admin"); }
     @FXML void onNavSujetsClicked(MouseEvent event)      { System.out.println("Sujets"); }
     @FXML void onNavCommentairesClicked(MouseEvent event){ System.out.println("Commentaires"); }
 

@@ -21,7 +21,7 @@ import javafx.collections.ObservableList;
 
 import services.ServiceRendezVous;
 import Services.ServiceDossier;
-import Services.PDFService;
+import services.PDFService;
 import Models.Dossier;
 import Models.RendezVous;
 

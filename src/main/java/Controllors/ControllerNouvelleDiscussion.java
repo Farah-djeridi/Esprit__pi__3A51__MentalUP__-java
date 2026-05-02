@@ -4,11 +4,14 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import javafx.scene.layout.VBox;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import models.Sujet;
 import services.ProfanityFilterService;
 import services.ServiceBan;
 import services.ServiceSujet;
 import services.ToxicityAnalysisService;
+import models.Ban;
 
 import java.time.LocalDate;
 import java.sql.Date;
@@ -145,14 +148,42 @@ public class ControllerNouvelleDiscussion {
             String contenu = contenuArea.getText().trim();
 
         if (serviceBan.isUserBanned(userId)) {
-            String banMessage = serviceBan.getBanMessage(userId);
+            Ban ban = serviceBan.getActiveBan(userId);
+
             Alert banAlert = new Alert(Alert.AlertType.ERROR);
             banAlert.setTitle("Accès refusé");
-            banAlert.setHeaderText("❌ Vous êtes banni du forum");
-            banAlert.setContentText(banMessage);
+            banAlert.setHeaderText(null);
 
-            DialogPane dialogPane = banAlert.getDialogPane();
-            dialogPane.setStyle("-fx-background-color: #F0F4FA; -fx-background-radius: 12;");
+            // Contenu personnalisé
+            VBox content = new VBox(10);
+            content.setPadding(new Insets(20));
+            content.setStyle("-fx-background-color: #F0F4FA; -fx-background-radius: 12;");
+
+            Label iconLabel = new Label("🚫");
+            iconLabel.setStyle("-fx-font-size: 40px; -fx-text-fill: #DC2626;");
+            iconLabel.setAlignment(Pos.CENTER);
+
+            Label titleLabel = new Label("❌ Vous êtes banni du forum");
+            titleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #DC2626;");
+            titleLabel.setAlignment(Pos.CENTER);
+
+            Label reasonLabel = new Label("📝 " + ban.getBanReason());
+            reasonLabel.setStyle("-fx-text-fill: #4A5A6A; -fx-font-size: 13px;");
+            reasonLabel.setWrapText(true);
+
+            Label expiryLabel = new Label("⏰ Fin du bannissement: " + ban.getBanExpiryDate());
+            expiryLabel.setStyle("-fx-text-fill: #DC2626; -fx-font-size: 12px; -fx-font-weight: bold;");
+
+            content.getChildren().addAll(iconLabel, titleLabel, reasonLabel, expiryLabel);
+
+            banAlert.getDialogPane().setContent(content);
+            banAlert.getDialogPane().setStyle("-fx-background-color: #F0F4FA; -fx-background-radius: 16;");
+            banAlert.getDialogPane().setPrefWidth(400);
+
+            Button okButton = (Button) banAlert.getDialogPane().lookupButton(ButtonType.OK);
+            okButton.setText("J'ai compris");
+            okButton.setStyle("-fx-background-color: #DC2626; -fx-text-fill: white; -fx-cursor: hand; " +
+                    "-fx-background-radius: 8; -fx-padding: 8 24; -fx-font-weight: bold;");
 
             banAlert.showAndWait();
             closeWindow();

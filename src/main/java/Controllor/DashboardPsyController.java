@@ -20,7 +20,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import services.ServiceRendezVous;
-import Services.ServiceDossier;
+import services.ServiceDossier;
 import services.PDFService;
 import Models.Dossier;
 import Models.RendezVous;

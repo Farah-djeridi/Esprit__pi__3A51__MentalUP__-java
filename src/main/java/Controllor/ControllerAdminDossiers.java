@@ -1,7 +1,7 @@
 package Controllor;
 
 import Models.Dossier;
-import Services.ServiceDossier;
+import services.ServiceDossier;
 import javafx.animation.FadeTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

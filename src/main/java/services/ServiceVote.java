@@ -1,0 +1,194 @@
+package services;
+
+import models.Vote;
+import utils.MyDataBase;
+
+import java.sql.*;
+
+
+import utils.SessionManager;
+import models.User;
+
+public class ServiceVote {
+
+    private Connection cnx;
+
+    private int getCurrentUserId() {
+        User user = SessionManager.getInstance().getCurrentUser();
+        return (user != null) ? user.getId() : 2; // Fallback to 2 if no session
+    }
+
+    public ServiceVote() {
+        this.cnx = MyDataBase.getInstance().getCnx();
+    }
+    public Vote getUserVoteOnSujet(int sujetId) {
+        String req = "SELECT * FROM vote WHERE user_id = ? AND sujet_id = ?";
+        try {
+            PreparedStatement pstm = cnx.prepareStatement(req);
+            pstm.setInt(1, getCurrentUserId());
+            pstm.setInt(2, sujetId);
+            ResultSet rs = pstm.executeQuery();
+
+            if (rs.next()) {
+                Vote vote = new Vote();
+                vote.setId(rs.getInt("id"));
+                vote.setType(rs.getString("type"));
+                vote.setUser_id(rs.getInt("user_id"));
+                vote.setSujet_id(rs.getInt("sujet_id"));
+                vote.setCreated_at(rs.getTimestamp("created_at"));
+                return vote;
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
+    public void voteForSujet(int sujetId, String voteType) {
+        Vote existingVote = getUserVoteOnSujet(sujetId);
+
+        try {
+            if (existingVote == null) {
+                String req = "INSERT INTO vote (type, user_id, sujet_id, created_at) VALUES (?, ?, ?, NOW())";
+                PreparedStatement pstm = cnx.prepareStatement(req);
+                pstm.setString(1, voteType);
+                pstm.setInt(2, getCurrentUserId());
+                pstm.setInt(3, sujetId);
+                pstm.executeUpdate();
+
+                updateSujetCounters(sujetId, voteType, "add");
+
+            } else if (!existingVote.getType().equals(voteType)) {
+
+                String req = "UPDATE vote SET type = ?, created_at = NOW() WHERE id = ?";
+                PreparedStatement pstm = cnx.prepareStatement(req);
+                pstm.setString(1, voteType);
+                pstm.setInt(2, existingVote.getId());
+                pstm.executeUpdate();
+
+                updateSujetCounters(sujetId, existingVote.getType(), "remove");
+                updateSujetCounters(sujetId, voteType, "add");
+            }
+
+            System.out.println("Vote enregistré avec succès !");
+
+        } catch (SQLException e) {
+            System.out.println("Erreur lors du vote : " + e.getMessage());
+        }
+    }
+
+    public void removeVoteFromSujet(int sujetId) {
+        Vote existingVote = getUserVoteOnSujet(sujetId);
+
+        if (existingVote != null) {
+            try {
+                String req = "DELETE FROM vote WHERE id = ?";
+                PreparedStatement pstm = cnx.prepareStatement(req);
+                pstm.setInt(1, existingVote.getId());
+                pstm.executeUpdate();
+
+                updateSujetCounters(sujetId, existingVote.getType(), "remove");
+
+                System.out.println("Vote supprimé !");
+
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    private void updateSujetCounters(int sujetId, String voteType, String action) {
+        String column = voteType.equals("like") ? "nb_likes" : "nb_dislikes";
+        String operation = action.equals("add") ? "+" : "-";
+
+        String req = "UPDATE sujet SET " + column + " = " + column + " " + operation + " 1 WHERE id = ?";
+
+        try {
+            PreparedStatement pstm = cnx.prepareStatement(req);
+            pstm.setInt(1, sujetId);
+            pstm.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Erreur mise à jour compteurs : " + e.getMessage());
+        }
+    }
+
+    public Vote getUserVoteOnCommentaire(int commentaireId) {
+        String req = "SELECT * FROM vote WHERE user_id = ? AND commentaire_id = ?";
+        try {
+            PreparedStatement pstm = cnx.prepareStatement(req);
+            pstm.setInt(1, getCurrentUserId());
+            pstm.setInt(2, commentaireId);
+            ResultSet rs = pstm.executeQuery();
+
+            if (rs.next()) {
+                Vote vote = new Vote();
+                vote.setId(rs.getInt("id"));
+                vote.setType(rs.getString("type"));
+                vote.setUser_id(rs.getInt("user_id"));
+                vote.setCommentaire_id(rs.getInt("commentaire_id"));
+                vote.setCreated_at(rs.getTimestamp("created_at"));
+                return vote;
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
+    public void voteForCommentaire(int commentaireId, String voteType) {
+        Vote existingVote = getUserVoteOnCommentaire(commentaireId);
+
+        try {
+            if (existingVote == null) {
+                String req = "INSERT INTO vote (type, user_id, commentaire_id, created_at) VALUES (?, ?, ?, NOW())";
+                PreparedStatement pstm = cnx.prepareStatement(req);
+                pstm.setString(1, voteType);
+                pstm.setInt(2, getCurrentUserId());
+                pstm.setInt(3, commentaireId);
+                pstm.executeUpdate();
+                updateCommentaireCounters(commentaireId, voteType, "add");
+            } else if (!existingVote.getType().equals(voteType)) {
+                String req = "UPDATE vote SET type = ?, created_at = NOW() WHERE id = ?";
+                PreparedStatement pstm = cnx.prepareStatement(req);
+                pstm.setString(1, voteType);
+                pstm.setInt(2, existingVote.getId());
+                pstm.executeUpdate();
+                updateCommentaireCounters(commentaireId, existingVote.getType(), "remove");
+                updateCommentaireCounters(commentaireId, voteType, "add");
+            }
+        } catch (SQLException e) {
+            System.out.println("Erreur lors du vote: " + e.getMessage());
+        }
+    }
+
+    public void removeVoteFromCommentaire(int commentaireId) {
+        Vote existingVote = getUserVoteOnCommentaire(commentaireId);
+
+        if (existingVote != null) {
+            try {
+                String req = "DELETE FROM vote WHERE id = ?";
+                PreparedStatement pstm = cnx.prepareStatement(req);
+                pstm.setInt(1, existingVote.getId());
+                pstm.executeUpdate();
+                updateCommentaireCounters(commentaireId, existingVote.getType(), "remove");
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    private void updateCommentaireCounters(int commentaireId, String voteType, String action) {
+        String column = voteType.equals("like") ? "nb_likes" : "nb_dislikes";
+        String operation = action.equals("add") ? "+" : "-";
+
+        String req = "UPDATE commentaire SET " + column + " = " + column + " " + operation + " 1 WHERE id = ?";
+
+        try {
+            PreparedStatement pstm = cnx.prepareStatement(req);
+            pstm.setInt(1, commentaireId);
+            pstm.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Erreur mise à jour compteurs commentaire: " + e.getMessage());
+        }
+    }
+}

@@ -3,15 +3,6 @@
 /workspace.xml
 # Editor-based HTTP Client requests
 /httpRequests/
-<<<<<<< HEAD
-<<<<<<< HEAD
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
-=======
->>>>>>> RDV
-=======
-# Datasource local storage ignored files
-/dataSources/
-/dataSources.local.xml
->>>>>>> origin/suivimentale

@@ -35,6 +35,7 @@ build/
 .vscode/
 src/main/resources/groq.properties
 src/main/resources/config.properties
+src/main/resources/config/config.properties
 ### Mac OS ###
 .DS_Store
 Thumbs.db

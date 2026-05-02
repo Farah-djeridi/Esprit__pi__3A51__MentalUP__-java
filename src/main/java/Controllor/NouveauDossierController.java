@@ -1,7 +1,7 @@
 package Controllor;
 
 import Models.Dossier;
-import Services.ServiceDossier;
+import services.ServiceDossier;
 import services.ServiceRendezVous;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

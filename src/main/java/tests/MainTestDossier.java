@@ -1,7 +1,7 @@
 package tests;
 
 import Models.Dossier;
-import Services.ServiceDossier;
+import services.ServiceDossier;
 
 import java.sql.Date;
 import java.util.List;

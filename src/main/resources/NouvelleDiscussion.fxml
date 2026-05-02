@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="Controllor.ControllerNouvelleDiscussion"
+      spacing="18"
+      prefWidth="520" prefHeight="520"
+      style="-fx-background-color: #F0F4FA; -fx-background-radius: 24;">
+
+    <padding>
+        <Insets top="24" right="24" bottom="24" left="24"/>
+    </padding>
+
+    <VBox spacing="12">
+        <HBox alignment="CENTER_LEFT" spacing="12">
+            <Label text="✨"
+                   style="-fx-font-size: 28px;"/>
+            <Label text="Nouvelle Discussion"
+                   style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1A2B3C;"/>
+        </HBox>
+        <Label text="Partagez votre expérience ou posez une question à la communauté"
+               style="-fx-font-size: 12px; -fx-text-fill: #6B7C8D; -fx-padding: 0 0 0 40;"/>
+    </VBox>
+
+    <Separator style="-fx-opacity: 0.5;"/>
+
+    <VBox spacing="8">
+        <Label text="📌 Titre de la discussion"
+               style="-fx-font-weight: bold; -fx-text-fill: #1A2B3C; -fx-font-size: 13px;"/>
+        <TextField fx:id="titreField"
+                   promptText="Ex: Comment gérer le stress des examens ?"
+                   style="-fx-padding: 12;
+                          -fx-background-radius: 16;
+                          -fx-border-color: #E2E8F0;
+                          -fx-border-radius: 16;
+                          -fx-background-color: rgba(255,255,255,0.9);
+                          -fx-font-size: 13px;"/>
+    </VBox>
+
+    <VBox spacing="8">
+        <Label text="💬 Contenu"
+               style="-fx-font-weight: bold; -fx-text-fill: #1A2B3C; -fx-font-size: 13px;"/>
+        <TextArea fx:id="contenuArea"
+                  promptText="Décrivez votre situation, vos questions ou vos expériences..."
+                  prefHeight="160"
+                  wrapText="true"
+                  style="-fx-padding: 12;
+                         -fx-background-radius: 16;
+                         -fx-border-color: #E2E8F0;
+                         -fx-border-radius: 16;
+                         -fx-background-color: rgba(255,255,255,0.9);
+                         -fx-font-size: 13px;"/>
+    </VBox>
+
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <CheckBox fx:id="anonymeCheckBox" text="📝 Poster anonymement"
+                  style="-fx-text-fill: #4A5A6A; -fx-font-size: 13px; -fx-font-weight: 500;"/>
+        <Label text="(Votre identité ne sera pas visible)"
+               style="-fx-text-fill: #94A3B8; -fx-font-size: 11px; -fx-font-style: italic;"/>
+    </HBox>
+
+    <HBox alignment="CENTER_RIGHT">
+        <Label fx:id="charCountLabel" text="0 / 5000 caractères"
+               style="-fx-text-fill: #94A3B8; -fx-font-size: 11px;"/>
+    </HBox>
+
+    <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
+        <Button fx:id="cancelButton" text="Annuler"
+                style="-fx-background-color: transparent;
+                       -fx-text-fill: #6B7C8D;
+                       -fx-font-weight: 600;
+                       -fx-cursor: hand;
+                       -fx-padding: 8 22;
+                       -fx-background-radius: 25;
+                       -fx-border-color: #E2E8F0;
+                       -fx-border-radius: 25;
+                       -fx-border-width: 1;"/>
+
+        <Button fx:id="submitButton" text="✨ Publier la discussion"
+                style="-fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #3A6FA8, #2C5F8A);
+                       -fx-text-fill: white;
+                       -fx-font-weight: bold;
+                       -fx-background-radius: 25;
+                       -fx-cursor: hand;
+                       -fx-padding: 9 28;
+                       -fx-effect: dropshadow(gaussian, rgba(44,95,138,0.3), 8, 0, 0, 2);"/>
+    </HBox>
+
+</VBox>

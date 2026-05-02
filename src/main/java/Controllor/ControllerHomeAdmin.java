@@ -2,7 +2,6 @@ package Controllor;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -12,6 +11,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
+import javafx.scene.Node;
 import javafx.stage.Stage;
 import javafx.scene.chart.PieChart;
 import javafx.collections.FXCollections;
@@ -21,7 +21,7 @@ import Models.RendezVous;
 import Models.Dossier;
 import services.PDFService;
 import services.ServiceRendezVous;
-import Services.ServiceDossier;
+import services.ServiceDossier;
 import services.ServiceUser;
 import models.User;
 import utils.SceneManager;
@@ -59,10 +59,13 @@ public class ControllerHomeAdmin {
                 .format(java.time.format.DateTimeFormatter
                         .ofPattern("EEEE d MMMM yyyy", java.util.Locale.FRENCH)));
 
-        // 2. Menus
-        submenuSuivi.setVisible(false); submenuSuivi.setManaged(false);
-        submenuForum.setVisible(false); submenuForum.setManaged(false);
-        arrowSuivi.setText("▶"); arrowForum.setText("▶");
+        submenuSuivi.setVisible(false);
+        submenuSuivi.setManaged(false);
+        submenuForum.setVisible(false);
+        submenuForum.setManaged(false);
+
+        arrowSuivi.setText("▶");
+        arrowForum.setText("▶");
 
         // 3. Logo
         try { logoImage.setImage(new Image(getClass().getResourceAsStream("/Images/logo.png"))); }
@@ -128,7 +131,7 @@ public class ControllerHomeAdmin {
     }
 
     @FXML
-    void handleDownloadGlobalPDF(ActionEvent event) {
+    public void handleDownloadGlobalPDF(ActionEvent event) {
         try {
             PDFService pdfService = new PDFService();
             Map<String, Object> stats = new HashMap<>();
@@ -165,64 +168,64 @@ public class ControllerHomeAdmin {
         }
     }
 
-    @FXML void toggleSuiviMenu(MouseEvent event) {
+    @FXML public void toggleSuiviMenu(MouseEvent event) {
         suiviOpen = !suiviOpen;
         submenuSuivi.setVisible(suiviOpen); submenuSuivi.setManaged(suiviOpen);
         arrowSuivi.setText(suiviOpen ? "▼" : "▶");
     }
 
-    @FXML void toggleForumMenu(MouseEvent event) {
+    @FXML public void toggleForumMenu(MouseEvent event) {
         forumOpen = !forumOpen;
         submenuForum.setVisible(forumOpen); submenuForum.setManaged(forumOpen);
         arrowForum.setText(forumOpen ? "▼" : "▶");
     }
 
     // Navigation
-    @FXML void onNavHomeClicked(MouseEvent event)     { setActiveNav(navAccueil); }
-    @FXML void onNavRdvClicked(MouseEvent event)      { loadPage(event, "/AdminRdv.fxml"); }
-    @FXML void onNavActivitesClicked(MouseEvent event){ setActiveNav(navActivites); }
-    @FXML void onNavContenusClicked(MouseEvent event) { SceneManager.switchTo("/AdminRessources.fxml", "Gestion des Ressources"); }
-    @FXML void onNavDossiersClicked(MouseEvent event) { loadPage(event, "/AdminDossiers.fxml"); }
-    @FXML void onNavUtilisateursClicked(MouseEvent event) { SceneManager.switchTo("/AdminUsers.fxml", "Gestion des Utilisateurs"); }
-    @FXML void onNavRessourcesClicked(MouseEvent event) { SceneManager.switchTo("/AdminRessources.fxml", "Gestion des Ressources"); }
-    
-    @FXML void onNavSuiviStatsClicked(MouseEvent event)  { SceneManager.switchTo("AdminSuiviMental.fxml", "Suivis Mentaux - Admin"); }
-    @FXML void onNavObjectifsClicked(MouseEvent event)   { SceneManager.switchTo("AdminObjectif.fxml", "Objectifs - Admin"); }
-    @FXML void onNavSujetsClicked(MouseEvent event)      { System.out.println("Sujets"); }
-    @FXML void onNavCommentairesClicked(MouseEvent event){ System.out.println("Commentaires"); }
+    @FXML public void onNavHomeClicked(MouseEvent event)     { setActiveNav(navAccueil); }
+    @FXML public void onNavRdvClicked(MouseEvent event)      { SceneManager.switchTo("AdminRdv.fxml", "Gestion des Rendez-vous"); }
+    @FXML public void onNavActivitesClicked(MouseEvent event){ setActiveNav(navActivites); }
+    @FXML public void onNavContenusClicked(MouseEvent event) { SceneManager.switchTo("AdminRessources.fxml", "Gestion des Ressources"); }
+    @FXML public void onNavDossiersClicked(MouseEvent event) { SceneManager.switchTo("AdminDossiers.fxml", "Gestion des Dossiers"); }
+    @FXML public void onNavUtilisateursClicked(MouseEvent event) { SceneManager.switchTo("AdminUsers.fxml", "Gestion des Utilisateurs"); }
+    @FXML public void onNavRessourcesClicked(MouseEvent event) { SceneManager.switchTo("AdminRessources.fxml", "Gestion des Ressources"); }
+ 
+    @FXML public void onNavSuiviStatsClicked(MouseEvent event)  { SceneManager.switchTo("AdminSuiviMental.fxml", "Suivis Mentaux - Admin"); }
+    @FXML public void onNavObjectifsClicked(MouseEvent event)   { SceneManager.switchTo("AdminObjectif.fxml", "Objectifs - Admin"); }
+    @FXML public void onNavSujetsClicked(MouseEvent event)      { SceneManager.switchTo("AdminSujet.fxml", "Gestion des Sujets"); }
+    @FXML public void onNavCommentairesClicked(MouseEvent event){ SceneManager.switchTo("AdminCommentaire.fxml", "Gestion des Commentaires"); }
 
-    @FXML private void onNavHoverEnter(MouseEvent event) {
+    @FXML public void onNavHoverEnter(MouseEvent event) {
         HBox src = (HBox) event.getSource();
         if (!src.getStyle().contains("#34495E"))
             src.setStyle("-fx-background-color: rgba(52,73,94,0.5); -fx-background-radius: 8; -fx-padding: 10 14; -fx-cursor: hand;");
-    }
-    @FXML private void onNavHoverExit(MouseEvent event) {
+        }
+    @FXML public void onNavHoverExit(MouseEvent event) {
         HBox src = (HBox) event.getSource();
         if (!src.getStyle().contains("#34495E"))
             src.setStyle("-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 14; -fx-cursor: hand;");
-    }
-    @FXML private void onSubmenuHoverEnter(MouseEvent event) {
+        }
+    @FXML public void onSubmenuHoverEnter(MouseEvent event) {
         HBox src = (HBox) event.getSource();
         src.setStyle("-fx-background-color: #34495E; -fx-background-radius: 6; -fx-padding: 8 12; -fx-cursor: hand;");
     }
-    @FXML private void onSubmenuHoverExit(MouseEvent event) {
+    @FXML public void onSubmenuHoverExit(MouseEvent event) {
         HBox src = (HBox) event.getSource();
         src.setStyle("-fx-background-radius: 6; -fx-padding: 8 12; -fx-cursor: hand;");
     }
 
-    @FXML private void onNotifications(ActionEvent event) { System.out.println("Notifications"); }
-    
-    @FXML private void onLogout(ActionEvent event) {
+    @FXML public void onNotifications(ActionEvent event) { System.out.println("Notifications"); }
+
+    @FXML public void onLogout(ActionEvent event) {
         SessionManager.getInstance().logout();
         SceneManager.goToLogin();
     }
 
-    @FXML private void onAddUser(ActionEvent event) { SceneManager.switchTo("AdminUsers.fxml", "Gestion des Utilisateurs"); }
-    @FXML private void onViewStats(ActionEvent event) { SceneManager.switchTo("StatsAdmin.fxml", "Statistiques"); }
-
-    @FXML private void onCreateRdv(ActionEvent event) { System.out.println("Créer RDV"); }
-    @FXML private void onModerateForum(ActionEvent event) { System.out.println("Modérer forum"); }
-    @FXML private void onExportData(ActionEvent event) { System.out.println("Exporter données"); }
+    @FXML public void onAddUser(ActionEvent event) { SceneManager.switchTo("AdminUsers.fxml", "Gestion des Utilisateurs"); }
+    @FXML public void onViewStats(ActionEvent event) { SceneManager.switchTo("StatsAdmin.fxml", "Statistiques"); }
+ 
+    @FXML public void onCreateRdv(ActionEvent event) { System.out.println("Créer RDV"); }
+    @FXML public void onModerateForum(ActionEvent event) { SceneManager.switchTo("AdminSujet.fxml", "Modération Forum"); }
+    @FXML public void onExportData(ActionEvent event) { System.out.println("Exporter données"); }
 
     private void setActiveNav(HBox active) {
         HBox[] all = {navAccueil, navSuivi, navForum, navRdv, navActivites, navContenus, navDossiers, navUtilisateurs, navRessources};

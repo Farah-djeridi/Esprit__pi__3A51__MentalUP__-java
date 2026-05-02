@@ -26,7 +26,7 @@ import java.net.URI;
 import java.util.Optional;
 import services.PDFService;
 import Models.Dossier;
-import Services.ServiceDossier;
+import services.ServiceDossier;
 import services.SmsService;
 public class RendezVousController {
 

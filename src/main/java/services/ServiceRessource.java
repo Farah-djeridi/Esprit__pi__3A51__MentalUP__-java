@@ -18,7 +18,7 @@ public class ServiceRessource implements IService<Ressource> {
 
     @Override
     public void add(Ressource ressource) {
-        String query = "INSERT INTO ressource (titre, description, type, lien, image, date_publication, nb_vues, categorie_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO ressource (titre, description, type, lien, image, date_publication, nb_vues, categorie_id, moderation_status, moderation_score) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try {
             PreparedStatement pst = cnx.prepareStatement(query);
             pst.setString(1, ressource.getTitre());
@@ -34,6 +34,9 @@ public class ServiceRessource implements IService<Ressource> {
             } else {
                 pst.setNull(8, java.sql.Types.INTEGER);
             }
+            
+            pst.setString(9, ressource.getModerationStatus());
+            pst.setDouble(10, ressource.getModerationScore());
             
             pst.executeUpdate();
             System.out.println("Ressource ajoutee avec succes");
@@ -62,6 +65,15 @@ public class ServiceRessource implements IService<Ressource> {
                 r.setNbVues(rs.getInt("nb_vues"));
                 r.setCategorieId(rs.getInt("categorie_id"));
                 r.setCategorieNom(rs.getString("categorie_nom"));
+                // Fallback to "SAFE" and 0.0 if column doesn't exist or is null
+                try {
+                    String modStatus = rs.getString("moderation_status");
+                    r.setModerationStatus(modStatus != null ? modStatus : "SAFE");
+                    r.setModerationScore(rs.getDouble("moderation_score"));
+                } catch (SQLException ex) {
+                    r.setModerationStatus("SAFE");
+                    r.setModerationScore(0.0);
+                }
                 ressources.add(r);
             }
         } catch (SQLException e) {
@@ -72,7 +84,7 @@ public class ServiceRessource implements IService<Ressource> {
 
     @Override
     public void update(Ressource ressource) {
-        String query = "UPDATE ressource SET titre = ?, description = ?, type = ?, lien = ?, image = ?, categorie_id = ? WHERE id = ?";
+        String query = "UPDATE ressource SET titre = ?, description = ?, type = ?, lien = ?, image = ?, categorie_id = ?, moderation_status = ?, moderation_score = ? WHERE id = ?";
         try {
             PreparedStatement pst = cnx.prepareStatement(query);
             pst.setString(1, ressource.getTitre());
@@ -87,7 +99,10 @@ public class ServiceRessource implements IService<Ressource> {
                 pst.setNull(6, java.sql.Types.INTEGER);
             }
             
-            pst.setInt(7, ressource.getId());
+            pst.setString(7, ressource.getModerationStatus());
+            pst.setDouble(8, ressource.getModerationScore());
+            pst.setInt(9, ressource.getId());
+            
             pst.executeUpdate();
             System.out.println("Ressource modifiee avec succes");
         } catch (SQLException e) {
@@ -138,6 +153,14 @@ public class ServiceRessource implements IService<Ressource> {
                 r.setNbVues(rs.getInt("nb_vues"));
                 r.setCategorieId(rs.getInt("categorie_id"));
                 r.setCategorieNom(rs.getString("categorie_nom"));
+                try {
+                    String modStatus = rs.getString("moderation_status");
+                    r.setModerationStatus(modStatus != null ? modStatus : "SAFE");
+                    r.setModerationScore(rs.getDouble("moderation_score"));
+                } catch (SQLException ex) {
+                    r.setModerationStatus("SAFE");
+                    r.setModerationScore(0.0);
+                }
                 ressources.add(r);
             }
         } catch (SQLException e) {

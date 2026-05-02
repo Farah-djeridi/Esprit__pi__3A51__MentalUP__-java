@@ -2,6 +2,7 @@
 .admin-sidebar {
     -fx-background-color: #2C3E50;
 }
+
 .admin-btn-primary {
     -fx-background-color: #27AE60;
     -fx-text-fill: white;
@@ -9,9 +10,11 @@
     -fx-background-radius: 6;
     -fx-cursor: hand;
 }
+
 .admin-btn-primary:hover {
     -fx-background-color: #219653;
 }
+
 .admin-btn-warning {
     -fx-background-color: #F39C12;
     -fx-text-fill: white;
@@ -19,9 +22,11 @@
     -fx-background-radius: 6;
     -fx-cursor: hand;
 }
+
 .admin-btn-warning:hover {
     -fx-background-color: #D68910;
 }
+
 .admin-btn-danger {
     -fx-background-color: #E74C3C;
     -fx-text-fill: white;
@@ -29,9 +34,11 @@
     -fx-background-radius: 6;
     -fx-cursor: hand;
 }
+
 .admin-btn-danger:hover {
     -fx-background-color: #C0392B;
 }
+
 .admin-btn-secondary {
     -fx-background-color: #95A5A6;
     -fx-text-fill: white;
@@ -39,15 +46,18 @@
     -fx-background-radius: 6;
     -fx-cursor: hand;
 }
+
 .admin-btn-secondary:hover {
     -fx-background-color: #7F8C8D;
 }
+
 .form-card {
     -fx-background-color: white;
     -fx-padding: 20;
     -fx-background-radius: 8;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 2);
 }
+
 .modern-text-field {
     -fx-background-color: #F5F7FA;
     -fx-border-color: #D0DDE8;
@@ -55,6 +65,7 @@
     -fx-background-radius: 4;
     -fx-padding: 8;
 }
+
 .modern-text-field:focused {
     -fx-border-color: #27AE60;
 }
@@ -65,30 +76,38 @@
     -fx-border-color: #ECF0F1;
     -fx-border-radius: 8;
 }
+
 .table-view .column-header-background {
     -fx-background-color: #ECF0F1;
 }
-.table-view .column-header, .table-view .filler {
+
+.table-view .column-header,
+.table-view .filler {
     -fx-size: 35;
     -fx-border-width: 0 0 1 0;
     -fx-border-color: #D0DDE8;
     -fx-background-color: transparent;
 }
+
 .table-view .column-header .label {
     -fx-text-fill: #2C3E50;
     -fx-font-weight: bold;
 }
+
 .table-view .table-row-cell {
     -fx-background-color: white;
     -fx-border-color: transparent transparent #F5F7FA transparent;
     -fx-border-width: 0 0 1 0;
 }
+
 .table-view .table-row-cell:odd {
     -fx-background-color: #F9FBFC;
 }
+
 .table-view .table-row-cell:selected {
     -fx-background-color: rgba(39, 174, 96, 0.2);
 }
+
 .table-view .table-row-cell:hover {
     -fx-background-color: rgba(39, 174, 96, 0.1);
 }
@@ -97,17 +116,20 @@
 .student-bg {
     -fx-background-color: #F5F7FA;
 }
+
 .student-card {
     -fx-background-color: white;
     -fx-background-radius: 12;
     -fx-padding: 16;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 2);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 10, 0, 0, 2);
 }
+
 .student-card:hover {
     -fx-effect: dropshadow(gaussian, rgba(74, 144, 226, 0.3), 15, 0, 0, 4);
     -fx-scale-x: 1.03;
     -fx-scale-y: 1.03;
 }
+
 .student-btn-primary {
     -fx-background-color: #4A90E2;
     -fx-text-fill: white;
@@ -115,9 +137,11 @@
     -fx-background-radius: 8;
     -fx-cursor: hand;
 }
+
 .student-btn-primary:hover {
     -fx-background-color: #357ABD;
 }
+
 .badge-type {
     -fx-background-color: #E8F0FE;
     -fx-text-fill: #2C5F8A;
@@ -125,4 +149,320 @@
     -fx-background-radius: 10;
     -fx-font-size: 11px;
     -fx-font-weight: bold;
+}
+
+/* --- Modern Dashboard SaaS Styles --- */
+.modern-sidebar {
+    -fx-background-color: #1E293B;
+}
+
+.dashboard-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 10, 0, 0, 4);
+    -fx-cursor: hand;
+}
+
+.dashboard-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.15), 15, 0, 0, 6);
+}
+
+.stat-value {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E293B;
+}
+
+.stat-title {
+    -fx-font-size: 14px;
+    -fx-text-fill: #64748B;
+    -fx-font-weight: 600;
+}
+
+.stat-icon-bg {
+    -fx-background-color: rgba(59, 130, 246, 0.1);
+    -fx-background-radius: 8;
+    -fx-padding: 12;
+}
+
+.modern-chart {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-padding: 15;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 10, 0, 0, 4);
+}
+
+/* Modernized Table Buttons */
+.modern-btn-icon {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+    -fx-padding: 6 10;
+    -fx-background-radius: 6;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.modern-btn-icon:hover {
+    -fx-background-color: #F1F5F9;
+}
+
+.modern-btn-edit {
+    -fx-text-fill: #3B82F6;
+    -fx-border-color: #3B82F6;
+    -fx-border-radius: 6;
+}
+
+.modern-btn-delete {
+    -fx-text-fill: #EF4444;
+    -fx-border-color: #EF4444;
+    -fx-border-radius: 6;
+}
+
+.modern-btn-view {
+    -fx-text-fill: #10B981;
+    -fx-border-color: #10B981;
+    -fx-border-radius: 6;
+}
+
+/* Override existing buttons to match SaaS */
+.admin-btn-primary {
+    -fx-background-color: #3B82F6;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-padding: 8 16;
+}
+
+.admin-btn-primary:hover {
+    -fx-background-color: #2563EB;
+}
+
+.admin-btn-warning {
+    -fx-background-color: #F59E0B;
+}
+
+.admin-btn-warning:hover {
+    -fx-background-color: #D97706;
+}
+
+.admin-btn-danger {
+    -fx-background-color: #EF4444;
+}
+
+.admin-btn-danger:hover {
+    -fx-background-color: #DC2626;
+}
+
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: transparent;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 10, 0, 0, 4);
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #F8FAFC;
+    -fx-background-radius: 12 12 0 0;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #E2E8F0 transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #64748B;
+    -fx-font-weight: bold;
+}
+
+.table-view .table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #F1F5F9 transparent;
+}
+
+.table-view .table-row-cell:hover {
+    -fx-background-color: #F8FAFC;
+}
+
+.table-view .table-row-cell:selected {
+    -fx-background-color: rgba(59, 130, 246, 0.1);
+}
+
+/* --- Badges IA --- */
+.badge-safe {
+    -fx-background-color: #D1FAE5;
+    -fx-text-fill: #065F46;
+    -fx-padding: 4 10;
+    -fx-background-radius: 12;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+}
+
+.badge-warning {
+    -fx-background-color: #FEF3C7;
+    -fx-text-fill: #92400E;
+    -fx-padding: 4 10;
+    -fx-background-radius: 12;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+}
+
+.badge-toxic {
+    -fx-background-color: #FEE2E2;
+    -fx-text-fill: #991B1B;
+    -fx-padding: 4 10;
+    -fx-background-radius: 12;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+}
+
+.ia-score-label {
+    -fx-font-size: 10px;
+    -fx-text-fill: #64748B;
+}
+
+/* --- Modern Student Card (SaaS Style) --- */
+.student-card-modern {
+    -fx-background-color: white;
+    -fx-background-radius: 15px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 10, 0, 0, 5);
+}
+
+.student-btn-secondary {
+    -fx-background-color: transparent;
+    -fx-border-color: #4A90E2;
+    -fx-border-radius: 8px;
+    -fx-text-fill: #4A90E2;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-padding: 8px 15px;
+    -fx-cursor: hand;
+}
+
+.student-btn-secondary:hover {
+    -fx-background-color: rgba(74, 144, 226, 0.1);
+}
+
+/* --- Detail View --- */
+.detail-bg {
+    -fx-background-color: #F5F7FA;
+}
+
+.detail-card {
+    -fx-background-color: white;
+    -fx-background-radius: 15px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 15, 0, 0, 5);
+}
+
+.detail-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E293B;
+}
+
+.detail-desc {
+    -fx-font-size: 15px;
+    -fx-text-fill: #475569;
+}
+
+.btn-back {
+    -fx-background-color: transparent;
+    -fx-text-fill: #64748B;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.btn-back:hover {
+    -fx-text-fill: #1E293B;
+}
+
+.btn-primary-action {
+    -fx-background-color: #4A90E2;
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-padding: 12px 25px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(74, 144, 226, 0.3), 10, 0, 0, 3);
+}
+
+.btn-primary-action:hover {
+    -fx-background-color: #357ABD;
+}
+
+/* --- ULTRA MODERN DETAIL VIEW --- */
+.ultra-modern-card {
+    -fx-background-color: white;
+    -fx-background-radius: 24px;
+    -fx-effect: dropshadow(gaussian, rgba(44, 95, 138, 0.15), 30, 0, 0, 10);
+}
+
+.btn-back-ultra {
+    -fx-background-color: transparent;
+    -fx-text-fill: #7A8C9A;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 8 15;
+    -fx-background-radius: 20px;
+    -fx-border-color: #D6E8F7;
+    -fx-border-radius: 20px;
+}
+.btn-back-ultra:hover {
+    -fx-background-color: #D6E8F7;
+    -fx-text-fill: #1A3A52;
+    -fx-border-color: #2C5F8A;
+}
+
+.badge-category-ultra {
+    -fx-background-color: linear-gradient(to right, #2C5F8A, #1A3A52);
+    -fx-text-fill: white;
+    -fx-padding: 6 18;
+    -fx-background-radius: 20px;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-effect: dropshadow(gaussian, rgba(44, 95, 138, 0.3), 10, 0, 0, 4);
+}
+
+.title-ultra {
+    -fx-font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -fx-font-size: 32px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #1A3A52;
+}
+
+.info-label-ultra {
+    -fx-font-size: 14px;
+    -fx-text-fill: #7A8C9A;
+    -fx-font-weight: 600;
+}
+
+.desc-ultra {
+    -fx-font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -fx-font-size: 16px;
+    -fx-text-fill: #2C3E50;
+    -fx-line-spacing: 10px;
+}
+
+.btn-glow-ultra {
+    -fx-background-color: linear-gradient(to right, #2C5F8A, #1E4568);
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 50px;
+    -fx-padding: 16px 40px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(44, 95, 138, 0.45), 20, 0, 0, 8);
+}
+.btn-glow-ultra:hover {
+    -fx-background-color: linear-gradient(to right, #1E4568, #112F47);
+    -fx-translate-y: -2px;
 }

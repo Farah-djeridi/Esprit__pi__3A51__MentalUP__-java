@@ -5,6 +5,7 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
@@ -15,7 +16,7 @@
 
     <!-- SIDEBAR -->
     <left>
-        <VBox prefWidth="240" prefHeight="700" styleClass="admin-sidebar">
+        <VBox prefWidth="240" prefHeight="700" styleClass="modern-sidebar">
             <HBox alignment="CENTER_LEFT" spacing="10"
                   style="-fx-padding: 22 16 18 16; -fx-border-color: transparent transparent rgba(255,255,255,0.1) transparent; -fx-border-width: 0 0 1 0;">
                 <ImageView fx:id="logoImage" fitWidth="40" fitHeight="40" preserveRatio="true"/>
@@ -89,75 +90,176 @@
                     <Label text="Gérer les catégories et les ressources"
                            style="-fx-text-fill: #7A8C9A; -fx-font-size: 13px;"/>
                 </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="📥 Exporter en PDF" onAction="#exportToPDF"
+                        style="-fx-background-color: #3498DB; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15; -fx-background-radius: 5; -fx-cursor: hand;"/>
             </HBox>
 
             <TabPane style="-fx-background-color: transparent;" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
                 <!-- ONGLET RESSOURCES -->
                 <Tab text="Ressources">
-                    <HBox spacing="20" style="-fx-padding: 20;">
-                        <!-- Formulaire -->
-                        <VBox spacing="10" prefWidth="300" styleClass="form-card">
-                            <Label text="Détails de la ressource" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
-                            <TextField fx:id="resTitre" promptText="Titre" styleClass="modern-text-field"/>
-                            <TextArea fx:id="resDescription" promptText="Description" prefRowCount="3" styleClass="modern-text-field"/>
-                            <ComboBox fx:id="resType" promptText="Type" prefWidth="300" styleClass="modern-text-field"/>
-                            <TextField fx:id="resLien" promptText="Lien URL" styleClass="modern-text-field"/>
-                            <TextField fx:id="resImage" promptText="Image URL" styleClass="modern-text-field"/>
-                            <ComboBox fx:id="resCategorie" promptText="Catégorie" prefWidth="300" styleClass="modern-text-field"/>
+                    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" stylesheets="@css/ressources.css">
+                        <VBox spacing="20" style="-fx-padding: 20;">
                             
-                            <HBox spacing="10" style="-fx-padding: 10 0 0 0;">
-                                <Button text="Ajouter" onAction="#addRessource" styleClass="admin-btn-primary" HBox.hgrow="ALWAYS" maxWidth="Infinity" prefHeight="35"/>
-                                <Button text="Modifier" onAction="#updateRessource" styleClass="admin-btn-warning" HBox.hgrow="ALWAYS" maxWidth="Infinity" prefHeight="35"/>
+                            <!-- Stats Cards -->
+                            <HBox spacing="20">
+                                <!-- Card 1 -->
+                                <HBox styleClass="dashboard-card" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT" spacing="15">
+                                    <VBox styleClass="stat-icon-bg" alignment="CENTER"><Label text="📚" style="-fx-font-size: 24px;"/></VBox>
+                                    <VBox alignment="CENTER_LEFT">
+                                        <Label text="Total Ressources" styleClass="stat-title"/>
+                                        <Label fx:id="statTotalRes" text="0" styleClass="stat-value"/>
+                                    </VBox>
+                                </HBox>
+                                <!-- Card 2 -->
+                                <HBox styleClass="dashboard-card" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT" spacing="15">
+                                    <VBox styleClass="stat-icon-bg" alignment="CENTER"><Label text="👁" style="-fx-font-size: 24px;"/></VBox>
+                                    <VBox alignment="CENTER_LEFT">
+                                        <Label text="Total Vues" styleClass="stat-title"/>
+                                        <Label fx:id="statTotalVues" text="0" styleClass="stat-value"/>
+                                    </VBox>
+                                </HBox>
+                                <!-- Card 3 -->
+                                <HBox styleClass="dashboard-card" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT" spacing="15">
+                                    <VBox styleClass="stat-icon-bg" alignment="CENTER"><Label text="⭐" style="-fx-font-size: 24px;"/></VBox>
+                                    <VBox alignment="CENTER_LEFT">
+                                        <Label text="Catégorie Populaire" styleClass="stat-title"/>
+                                        <Label fx:id="statPopCat" text="-" styleClass="stat-value" style="-fx-font-size: 16px;"/>
+                                    </VBox>
+                                </HBox>
+                                <!-- Card 4 -->
+                                <HBox styleClass="dashboard-card" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT" spacing="15">
+                                    <VBox styleClass="stat-icon-bg" alignment="CENTER"><Label text="🔥" style="-fx-font-size: 24px;"/></VBox>
+                                    <VBox alignment="CENTER_LEFT">
+                                        <Label text="Plus Consultée" styleClass="stat-title"/>
+                                        <Label fx:id="statTopRes" text="-" styleClass="stat-value" style="-fx-font-size: 16px;"/>
+                                    </VBox>
+                                </HBox>
                             </HBox>
-                            <Button text="Supprimer" onAction="#deleteRessource" styleClass="admin-btn-danger" maxWidth="Infinity" prefHeight="35"/>
-                            <Button text="Vider" onAction="#clearResForm" styleClass="admin-btn-secondary" maxWidth="Infinity" prefHeight="35"/>
+
+                            <!-- IA Stats Cards -->
+                            <HBox spacing="20">
+                                <!-- Card Safe -->
+                                <HBox styleClass="dashboard-card" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT" spacing="15">
+                                    <VBox styleClass="stat-icon-bg" style="-fx-background-color: #D1FAE5;" alignment="CENTER"><Label text="✅" style="-fx-font-size: 24px;"/></VBox>
+                                    <VBox alignment="CENTER_LEFT">
+                                        <Label text="Ressources SAFE" styleClass="stat-title"/>
+                                        <Label fx:id="statSafe" text="0" styleClass="stat-value" style="-fx-text-fill: #065F46;"/>
+                                    </VBox>
+                                </HBox>
+                                <!-- Card Warning -->
+                                <HBox styleClass="dashboard-card" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT" spacing="15">
+                                    <VBox styleClass="stat-icon-bg" style="-fx-background-color: #FEF3C7;" alignment="CENTER"><Label text="⚠️" style="-fx-font-size: 24px;"/></VBox>
+                                    <VBox alignment="CENTER_LEFT">
+                                        <Label text="Ressources WARNING" styleClass="stat-title"/>
+                                        <Label fx:id="statWarning" text="0" styleClass="stat-value" style="-fx-text-fill: #92400E;"/>
+                                    </VBox>
+                                </HBox>
+                                <!-- Card Toxic -->
+                                <HBox styleClass="dashboard-card" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT" spacing="15">
+                                    <VBox styleClass="stat-icon-bg" style="-fx-background-color: #FEE2E2;" alignment="CENTER"><Label text="❌" style="-fx-font-size: 24px;"/></VBox>
+                                    <VBox alignment="CENTER_LEFT">
+                                        <Label text="Ressources TOXIC" styleClass="stat-title"/>
+                                        <Label fx:id="statToxic" text="0" styleClass="stat-value" style="-fx-text-fill: #991B1B;"/>
+                                    </VBox>
+                                </HBox>
+                            </HBox>
+
+                            <!-- Charts -->
+                            <HBox spacing="20" prefHeight="280">
+                                <VBox styleClass="modern-chart" HBox.hgrow="ALWAYS" prefWidth="400">
+                                    <Label text="Vues par Ressource" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #1E293B;"/>
+                                    <BarChart fx:id="viewsChart" VBox.vgrow="ALWAYS" legendVisible="false" animated="true">
+                                        <xAxis><CategoryAxis fx:id="xAxisViews" label="Ressources" tickLabelRotation="-45"/></xAxis>
+                                        <yAxis><NumberAxis fx:id="yAxisViews" label="Vues"/></yAxis>
+                                    </BarChart>
+                                </VBox>
+                                <VBox styleClass="modern-chart" HBox.hgrow="ALWAYS" prefWidth="400">
+                                    <Label text="Ressources par Catégorie" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #1E293B;"/>
+                                    <PieChart fx:id="categoryChart" VBox.vgrow="ALWAYS" animated="true" labelsVisible="true"/>
+                                </VBox>
+                            </HBox>
+
+                            <!-- Bottom Section: Form & Table -->
+                            <HBox spacing="20">
+                                <!-- Formulaire -->
+                                <VBox spacing="10" prefWidth="280" styleClass="dashboard-card">
+                                    <Label text="Détails de la ressource" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1E293B;"/>
+                                    <TextField fx:id="resTitre" promptText="Titre" styleClass="modern-text-field"/>
+                                    <TextArea fx:id="resDescription" promptText="Description" prefRowCount="3" styleClass="modern-text-field"/>
+                                    <ComboBox fx:id="resType" promptText="Type" prefWidth="280" styleClass="modern-text-field"/>
+                                    <TextField fx:id="resLien" promptText="Lien URL" styleClass="modern-text-field"/>
+                                    <TextField fx:id="resImage" promptText="Image URL" styleClass="modern-text-field"/>
+                                    <ComboBox fx:id="resCategorie" promptText="Catégorie" prefWidth="280" styleClass="modern-text-field"/>
+                                    
+                                    <HBox spacing="10" style="-fx-padding: 10 0 0 0;">
+                                        <Button text="Ajouter" onAction="#addRessource" styleClass="admin-btn-primary" HBox.hgrow="ALWAYS" maxWidth="Infinity" prefHeight="35"/>
+                                        <Button text="Modifier" onAction="#updateRessource" styleClass="admin-btn-warning" HBox.hgrow="ALWAYS" maxWidth="Infinity" prefHeight="35"/>
+                                    </HBox>
+                                    <Button text="Vider" onAction="#clearResForm" styleClass="admin-btn-secondary" maxWidth="Infinity" prefHeight="35"/>
+                                    <!-- "Supprimer" button removed from form as it will be in the table actions -->
+                                </VBox>
+                                
+                                <!-- Table -->
+                                <VBox spacing="10" HBox.hgrow="ALWAYS" styleClass="dashboard-card">
+                                    <HBox alignment="CENTER_LEFT" spacing="10">
+                                        <Label text="Liste des Ressources" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1E293B;"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <TextField fx:id="searchResField" promptText="Rechercher..." styleClass="modern-text-field" prefWidth="200"/>
+                                    </HBox>
+                                    <TableView fx:id="tableRessources" VBox.vgrow="ALWAYS" prefHeight="300">
+                                        <columns>
+                                            <TableColumn fx:id="colResImage" text="Image" prefWidth="70"/>
+                                            <TableColumn fx:id="colResTitre" text="Titre" prefWidth="140"/>
+                                            <TableColumn fx:id="colResType" text="Type" prefWidth="80"/>
+                                            <TableColumn fx:id="colResCat" text="Catégorie" prefWidth="120"/>
+                                            <TableColumn fx:id="colResVues" text="Vues" prefWidth="60"/>
+                                            <TableColumn fx:id="colResIA" text="Analyse IA" prefWidth="120"/>
+                                            <TableColumn fx:id="colResActions" text="Actions" prefWidth="160"/>
+                                        </columns>
+                                    </TableView>
+                                </VBox>
+                            </HBox>
                         </VBox>
-                        
-                        <!-- Table -->
-                        <VBox spacing="10" HBox.hgrow="ALWAYS" styleClass="form-card">
-                            <TextField fx:id="searchResField" promptText="Rechercher..." styleClass="modern-text-field"/>
-                            <TableView fx:id="tableRessources" VBox.vgrow="ALWAYS">
-                                <columns>
-                                    <TableColumn fx:id="colResId" text="ID" prefWidth="50"/>
-                                    <TableColumn fx:id="colResTitre" text="Titre" prefWidth="150"/>
-                                    <TableColumn fx:id="colResType" text="Type" prefWidth="100"/>
-                                    <TableColumn fx:id="colResCat" text="Catégorie" prefWidth="120"/>
-                                    <TableColumn fx:id="colResVues" text="Vues" prefWidth="60"/>
-                                </columns>
-                            </TableView>
-                        </VBox>
-                    </HBox>
+                    </ScrollPane>
                 </Tab>
 
                 <!-- ONGLET CATEGORIES -->
                 <Tab text="Catégories">
-                    <HBox spacing="20" style="-fx-padding: 20;">
-                        <!-- Formulaire -->
-                        <VBox spacing="10" prefWidth="300" styleClass="form-card">
-                            <Label text="Détails de la catégorie" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
-                            <TextField fx:id="catNom" promptText="Nom" styleClass="modern-text-field"/>
-                            <TextArea fx:id="catDescription" promptText="Description" prefRowCount="3" styleClass="modern-text-field"/>
-                            
-                            <HBox spacing="10" style="-fx-padding: 10 0 0 0;">
-                                <Button text="Ajouter" onAction="#addCategorie" styleClass="admin-btn-primary" HBox.hgrow="ALWAYS" maxWidth="Infinity" prefHeight="35"/>
-                                <Button text="Modifier" onAction="#updateCategorie" styleClass="admin-btn-warning" HBox.hgrow="ALWAYS" maxWidth="Infinity" prefHeight="35"/>
+                    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" stylesheets="@css/ressources.css">
+                        <VBox spacing="20" style="-fx-padding: 20;">
+                            <HBox spacing="20">
+                                <!-- Formulaire -->
+                                <VBox spacing="10" prefWidth="300" styleClass="dashboard-card">
+                                    <Label text="Détails de la catégorie" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1E293B;"/>
+                                    <TextField fx:id="catNom" promptText="Nom" styleClass="modern-text-field"/>
+                                    <TextArea fx:id="catDescription" promptText="Description" prefRowCount="3" styleClass="modern-text-field"/>
+                                    
+                                    <HBox spacing="10" style="-fx-padding: 10 0 0 0;">
+                                        <Button text="Ajouter" onAction="#addCategorie" styleClass="admin-btn-primary" HBox.hgrow="ALWAYS" maxWidth="Infinity" prefHeight="35"/>
+                                        <Button text="Modifier" onAction="#updateCategorie" styleClass="admin-btn-warning" HBox.hgrow="ALWAYS" maxWidth="Infinity" prefHeight="35"/>
+                                    </HBox>
+                                    <Button text="Vider" onAction="#clearCatForm" styleClass="admin-btn-secondary" maxWidth="Infinity" prefHeight="35"/>
+                                </VBox>
+                                
+                                <!-- Table -->
+                                <VBox spacing="10" HBox.hgrow="ALWAYS" styleClass="dashboard-card">
+                                    <HBox alignment="CENTER_LEFT" spacing="10">
+                                        <Label text="Liste des Catégories" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1E293B;"/>
+                                    </HBox>
+                                    <TableView fx:id="tableCategories" VBox.vgrow="ALWAYS" prefHeight="300">
+                                        <columns>
+                                            <TableColumn fx:id="colCatId" text="ID" prefWidth="50"/>
+                                            <TableColumn fx:id="colCatNom" text="Nom" prefWidth="150"/>
+                                            <TableColumn fx:id="colCatDesc" text="Description" prefWidth="200"/>
+                                            <TableColumn fx:id="colCatDate" text="Date de création" prefWidth="120"/>
+                                            <TableColumn fx:id="colCatActions" text="Actions" prefWidth="120"/>
+                                        </columns>
+                                    </TableView>
+                                </VBox>
                             </HBox>
-                            <Button text="Supprimer" onAction="#deleteCategorie" styleClass="admin-btn-danger" maxWidth="Infinity" prefHeight="35"/>
-                            <Button text="Vider" onAction="#clearCatForm" styleClass="admin-btn-secondary" maxWidth="Infinity" prefHeight="35"/>
                         </VBox>
-                        
-                        <!-- Table -->
-                        <VBox spacing="10" HBox.hgrow="ALWAYS" styleClass="form-card">
-                            <TableView fx:id="tableCategories" VBox.vgrow="ALWAYS">
-                                <columns>
-                                    <TableColumn fx:id="colCatId" text="ID" prefWidth="50"/>
-                                    <TableColumn fx:id="colCatNom" text="Nom" prefWidth="200"/>
-                                    <TableColumn fx:id="colCatDesc" text="Description" prefWidth="300"/>
-                                    <TableColumn fx:id="colCatDate" text="Date de création" prefWidth="150"/>
-                                </columns>
-                            </TableView>
-                        </VBox>
-                    </HBox>
+                    </ScrollPane>
                 </Tab>
             </TabPane>
 

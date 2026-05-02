@@ -15,6 +15,10 @@ public class Ressource {
     
     // Virtual attribute for display purposes
     private String categorieNom;
+    
+    // AI Moderation attributes
+    private String moderationStatus = "SAFE";
+    private double moderationScore = 0.0;
 
     public Ressource() {
     }
@@ -120,6 +124,22 @@ public class Ressource {
 
     public void setCategorieNom(String categorieNom) {
         this.categorieNom = categorieNom;
+    }
+
+    public String getModerationStatus() {
+        return moderationStatus;
+    }
+
+    public void setModerationStatus(String moderationStatus) {
+        this.moderationStatus = moderationStatus;
+    }
+
+    public double getModerationScore() {
+        return moderationScore;
+    }
+
+    public void setModerationScore(double moderationScore) {
+        this.moderationScore = moderationScore;
     }
 
     @Override

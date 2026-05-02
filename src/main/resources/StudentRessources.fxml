@@ -7,12 +7,13 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.image.ImageView?>
 
-<BorderPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="Controllor.ControllerStudentRessources"
-            prefWidth="1024" prefHeight="650"
-            styleClass="student-bg"
-            stylesheets="@css/ressources.css">
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="Controllor.ControllerStudentRessources"
+           prefWidth="1024" prefHeight="650"
+           stylesheets="@css/ressources.css">
+
+    <BorderPane styleClass="student-bg">
 
     <!-- SIDEBAR -->
     <left>
@@ -169,4 +170,38 @@
         </VBox>
     </center>
 
-</BorderPane>
+    </BorderPane>
+
+    <!-- FLOATING CHATBOT UI -->
+    <AnchorPane pickOnBounds="false">
+        <!-- Chat Window -->
+        <VBox fx:id="chatWindow" visible="false"
+              AnchorPane.bottomAnchor="80" AnchorPane.rightAnchor="30"
+              prefWidth="320" prefHeight="450"
+              style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 15, 0, 0, 5); -fx-border-color: #2C5F8A; -fx-border-radius: 15; -fx-border-width: 1;">
+            
+            <!-- Header -->
+            <HBox alignment="CENTER_LEFT" style="-fx-background-color: #2C5F8A; -fx-padding: 12; -fx-background-radius: 14 14 0 0;">
+                <Label text="🤖 Assistant Pédagogique" style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="✕" onAction="#toggleChat" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"/>
+            </HBox>
+
+            <!-- Messages Area -->
+            <ScrollPane fx:id="chatScrollPane" fitToWidth="true" vbarPolicy="AS_NEEDED" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-padding: 10;" VBox.vgrow="ALWAYS">
+                <VBox fx:id="chatMessages" spacing="10" style="-fx-background-color: transparent;"/>
+            </ScrollPane>
+
+            <!-- Input Area -->
+            <HBox spacing="10" style="-fx-padding: 10; -fx-border-color: #EEEEEE transparent transparent transparent; -fx-background-color: #FAFAFA; -fx-background-radius: 0 0 14 14;">
+                <TextField fx:id="chatInput" promptText="Posez votre question..." HBox.hgrow="ALWAYS" style="-fx-background-radius: 20; -fx-padding: 8 12;"/>
+                <Button fx:id="sendChatBtn" text="Envoyer" onAction="#sendMessage" style="-fx-background-color: #2C5F8A; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 15; -fx-cursor: hand;"/>
+            </HBox>
+        </VBox>
+
+        <!-- Floating Button -->
+        <Button fx:id="floatingChatBtn" text="💬" onAction="#toggleChat"
+                AnchorPane.bottomAnchor="20" AnchorPane.rightAnchor="30"
+                style="-fx-background-color: #2C5F8A; -fx-text-fill: white; -fx-font-size: 24px; -fx-background-radius: 50; -fx-min-width: 50; -fx-min-height: 50; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 4);"/>
+    </AnchorPane>
+</StackPane>

@@ -7,7 +7,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="controllers.ControllerHome"
+            fx:controller="Controllor.ControllerHome"
             prefWidth="1500" prefHeight="920"
             style="-fx-background-color: linear-gradient(to bottom right, #F4F8FF, #E8F0FE);">
 

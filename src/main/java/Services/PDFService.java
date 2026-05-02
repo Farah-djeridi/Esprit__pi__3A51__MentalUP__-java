@@ -20,8 +20,10 @@ import java.util.Map;
 
 public class PDFService {
 
-    private static final Color PRIMARY_COLOR = new Color(44, 95, 138);
-    private static final Color SECONDARY_COLOR = new Color(90, 108, 125);
+    private static final Color PRIMARY_COLOR = new Color(26, 115, 232); // Modern Blue
+    private static final Color HEADER_BG = new Color(241, 243, 244);   // Light Gray
+    private static final Color TEXT_COLOR = new Color(32, 33, 36);      // Dark Gray
+    private static final Color ACCENT_COLOR = new Color(44, 95, 138);
     private static final DateTimeFormatter dtFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     static {
@@ -30,55 +32,62 @@ public class PDFService {
     }
 
     private void drawHeader(PDDocument document, PDPageContentStream contentStream, String title) throws IOException {
+        // Draw a light blue top bar
+        contentStream.setNonStrokingColor(PRIMARY_COLOR);
+        contentStream.addRect(0, 820, 600, 22);
+        contentStream.fill();
+
         // Logo
-        try (InputStream is = getClass().getResourceAsStream("/ressources/images/logo.png")) {
+        try (InputStream is = getClass().getResourceAsStream("/Images/logo.png")) { // Updated path
             if (is != null) {
                 byte[] imageBytes = is.readAllBytes();
                 PDImageXObject logo = PDImageXObject.createFromByteArray(document, imageBytes, "logo");
-                contentStream.drawImage(logo, 50, 765, 60, 60);
+                contentStream.drawImage(logo, 50, 755, 50, 50);
             }
         } catch (Exception e) {
             System.err.println("Could not load logo for PDF: " + e.getMessage());
         }
 
-       
+        // Title and App Name
         contentStream.setNonStrokingColor(PRIMARY_COLOR);
-        contentStream.addRect(120, 770, 430, 50);
-        contentStream.fill();
-
-       
-        contentStream.setNonStrokingColor(Color.WHITE);
         contentStream.beginText();
-        contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 18);
-        contentStream.newLineAtOffset(140, 790);
-        contentStream.showText(title.toUpperCase());
+        contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 24);
+        contentStream.newLineAtOffset(110, 780);
+        contentStream.showText("MentalUP");
         contentStream.endText();
 
-      
-        contentStream.setStrokingColor(PRIMARY_COLOR);
+        contentStream.setNonStrokingColor(TEXT_COLOR);
+        contentStream.beginText();
+        contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
+        contentStream.newLineAtOffset(110, 765);
+        contentStream.showText(title);
+        contentStream.endText();
+
+        // Horizontal Line
+        contentStream.setStrokingColor(new Color(218, 220, 224));
         contentStream.setLineWidth(1f);
-        contentStream.moveTo(50, 750);
-        contentStream.lineTo(550, 750);
+        contentStream.moveTo(50, 740);
+        contentStream.lineTo(550, 740);
         contentStream.stroke();
     }
 
-    private void drawFooter(PDPageContentStream contentStream) throws IOException {
-        contentStream.setStrokingColor(new Color(200, 200, 200));
+    private void drawFooter(PDPageContentStream contentStream, int pageNum) throws IOException {
+        contentStream.setStrokingColor(new Color(218, 220, 224));
         contentStream.setLineWidth(0.5f);
         contentStream.moveTo(50, 50);
         contentStream.lineTo(550, 50);
         contentStream.stroke();
 
-        contentStream.setNonStrokingColor(SECONDARY_COLOR);
+        contentStream.setNonStrokingColor(new Color(128, 128, 128));
         contentStream.beginText();
         contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 8);
         contentStream.newLineAtOffset(50, 40);
-        contentStream.showText("Généré par MentalUp le " + LocalDateTime.now().format(dtFormatter));
+        contentStream.showText("Document confidentiel - Généré par MentalUp le " + LocalDateTime.now().format(dtFormatter));
         contentStream.endText();
         
         contentStream.beginText();
-        contentStream.newLineAtOffset(500, 40);
-        contentStream.showText("Page 1/1");
+        contentStream.newLineAtOffset(520, 40);
+        contentStream.showText("Page " + pageNum);
         contentStream.endText();
     }
 
@@ -88,108 +97,234 @@ public class PDFService {
             document.addPage(page);
 
             try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
-                drawHeader(document, contentStream, "Dossier Médical Patient");
+                drawHeader(document, contentStream, "DOSSIER MÉDICAL DU PATIENT");
 
-               
-                contentStream.setNonStrokingColor(PRIMARY_COLOR);
-                contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 12);
-                contentStream.newLineAtOffset(50, 720);
-                contentStream.showText("IDENTITÉ DU PATIENT");
-                contentStream.endText();
-
-                contentStream.setNonStrokingColor(Color.BLACK);
-                contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
-                contentStream.newLineAtOffset(50, 705);
-                contentStream.showText("Nom : " + (dossier.getPatientNom() != null ? dossier.getPatientNom() : "ID #" + dossier.getPatientId()));
-                contentStream.newLineAtOffset(0, -15);
-                contentStream.showText("Date de création : " + dossier.getDateCreation().toString());
-                contentStream.newLineAtOffset(0, -15);
-                contentStream.showText("Niveau de risque : " + dossier.getNiveauRisque());
-                contentStream.endText();
-
-                
-                contentStream.setNonStrokingColor(PRIMARY_COLOR);
-                contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 12);
-                contentStream.newLineAtOffset(50, 650);
-                contentStream.showText("NOTES CLINIQUES");
-                contentStream.endText();
-
-                contentStream.setNonStrokingColor(Color.BLACK);
-                String notes = dossier.getNotesGenerales();
-                if (notes != null) {
-                    contentStream.beginText();
-                    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
-                    contentStream.newLineAtOffset(50, 635);
-                    // Wrap simple
-                    int start = 0;
-                    int y = 635;
-                    while (start < notes.length() && y > 100) {
-                        int end = Math.min(start + 90, notes.length());
-                        contentStream.showText(notes.substring(start, end));
-                        contentStream.newLineAtOffset(0, -12);
-                        start = end;
-                        y -= 12;
-                    }
-                    contentStream.endText();
-                }
-
-               
-                int yPosition = 480;
-                contentStream.setNonStrokingColor(PRIMARY_COLOR);
-                contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 12);
-                contentStream.newLineAtOffset(50, yPosition);
-                contentText(contentStream, "HISTORIQUE DES RENDEZ-VOUS");
-                contentStream.endText();
-                yPosition -= 20;
-
-
-                contentStream.setNonStrokingColor(new Color(240, 244, 248));
-                contentStream.addRect(50, yPosition - 5, 500, 20);
+                // Info Section Box
+                contentStream.setNonStrokingColor(HEADER_BG);
+                contentStream.addRect(50, 640, 500, 85);
                 contentStream.fill();
 
                 contentStream.setNonStrokingColor(PRIMARY_COLOR);
                 contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 9);
-                contentStream.newLineAtOffset(60, yPosition);
-                contentStream.showText("DATE");
-                contentStream.newLineAtOffset(100, 0);
-                contentStream.showText("TYPE");
-                contentStream.newLineAtOffset(150, 0);
-                contentStream.showText("STATUT");
-                contentStream.newLineAtOffset(100, 0);
-                contentStream.showText("LIEU");
+                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 11);
+                contentStream.newLineAtOffset(65, 710);
+                contentStream.showText("INFORMATIONS GÉNÉRALES");
                 contentStream.endText();
 
-                yPosition -= 20;
-                contentStream.setNonStrokingColor(Color.BLACK);
+                contentStream.setNonStrokingColor(TEXT_COLOR);
+                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
+                
+                contentStream.beginText();
+                contentStream.newLineAtOffset(65, 690);
+                contentStream.showText("Patient : " + (dossier.getPatientNom() != null ? dossier.getPatientNom() : "ID #" + dossier.getPatientId()));
+                contentStream.newLineAtOffset(0, -18);
+                contentStream.showText("Ouvert le : " + dossier.getDateCreation().toString());
+                contentStream.newLineAtOffset(0, -18);
+                contentStream.showText("Niveau de Risque : ");
+                contentStream.endText();
+
+                // Risque Badge
+                String risque = dossier.getNiveauRisque() != null ? dossier.getNiveauRisque().toUpperCase() : "NORMAL";
+                Color risqueColor = new Color(52, 168, 83); // Green
+                if (risque.contains("HAUT") || risque.contains("ÉLEVÉ")) risqueColor = new Color(217, 48, 37); // Red
+                else if (risque.contains("MOYEN")) risqueColor = new Color(251, 188, 4); // Yellow/Orange
+                
+                contentStream.setNonStrokingColor(risqueColor);
+                contentStream.beginText();
+                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 10);
+                contentStream.newLineAtOffset(150, 654);
+                contentStream.showText(risque);
+                contentStream.endText();
+
+                // Notes Section
+                contentStream.setNonStrokingColor(PRIMARY_COLOR);
+                contentStream.beginText();
+                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 11);
+                contentStream.newLineAtOffset(50, 615);
+                contentStream.showText("NOTES CLINIQUES ET OBSERVATIONS");
+                contentStream.endText();
+
+                contentStream.setNonStrokingColor(TEXT_COLOR);
+                String notes = dossier.getNotesGenerales();
+                if (notes != null) {
+                    contentStream.beginText();
+                    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
+                    contentStream.newLineAtOffset(50, 600);
+                    
+                    String[] words = notes.split(" ");
+                    StringBuilder line = new StringBuilder();
+                    int y = 600;
+                    for (String word : words) {
+                        if (line.length() + word.length() > 95) {
+                            contentStream.showText(line.toString());
+                            contentStream.newLineAtOffset(0, -14);
+                            y -= 14;
+                            line = new StringBuilder();
+                        }
+                        line.append(word).append(" ");
+                        if (y < 450) break; // Limit for now
+                    }
+                    contentStream.showText(line.toString());
+                    contentStream.endText();
+                }
+
+                // AI Summary Section if exists
+                if (dossier.getAiSummary() != null && !dossier.getAiSummary().isEmpty()) {
+                    contentStream.setNonStrokingColor(new Color(232, 240, 254));
+                    contentStream.addRect(50, 420, 500, 60);
+                    contentStream.fill();
+                    
+                    contentStream.setNonStrokingColor(new Color(25, 103, 210));
+                    contentStream.beginText();
+                    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 10);
+                    contentStream.newLineAtOffset(60, 465);
+                    contentStream.showText("RÉSUMÉ IA (ANALYSE AUTOMATIQUE)");
+                    contentStream.endText();
+                    
+                    contentStream.setNonStrokingColor(TEXT_COLOR);
+                    contentStream.beginText();
+                    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_OBLIQUE), 9);
+                    contentStream.newLineAtOffset(60, 445);
+                    String summary = dossier.getAiSummary();
+                    contentStream.showText(summary.length() > 100 ? summary.substring(0, 97) + "..." : summary);
+                    contentStream.endText();
+                }
+
+                // Table Header
+                int yTable = 380;
+                contentStream.setNonStrokingColor(PRIMARY_COLOR);
+                contentStream.beginText();
+                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 11);
+                contentStream.newLineAtOffset(50, yTable);
+                contentStream.showText("HISTORIQUE DES SÉANCES");
+                contentStream.endText();
+                yTable -= 20;
+
+                // Column Headers
+                contentStream.setNonStrokingColor(PRIMARY_COLOR);
+                contentStream.addRect(50, yTable - 5, 500, 22);
+                contentStream.fill();
+
+                contentStream.setNonStrokingColor(Color.WHITE);
+                contentStream.beginText();
+                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 9);
+                contentStream.newLineAtOffset(60, yTable);
+                contentStream.showText("DATE");
+                contentStream.newLineAtOffset(90, 0);
+                contentStream.showText("TYPE");
+                contentStream.newLineAtOffset(130, 0);
+                contentStream.showText("STATUT");
+                contentStream.newLineAtOffset(100, 0);
+                contentStream.showText("LIEU / MODE");
+                contentStream.endText();
+
+                yTable -= 22;
+                boolean zebra = false;
                 for (RendezVous r : history) {
-                    if (yPosition < 80) break;
+                    if (yTable < 80) break;
+                    
+                    if (zebra) {
+                        contentStream.setNonStrokingColor(new Color(248, 249, 250));
+                        contentStream.addRect(50, yTable - 5, 500, 20);
+                        contentStream.fill();
+                    }
+                    
+                    contentStream.setNonStrokingColor(TEXT_COLOR);
                     contentStream.beginText();
                     contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 9);
-                    contentStream.newLineAtOffset(60, yPosition);
-                    contentStream.showText(r.getDate().toString());
-                    contentStream.newLineAtOffset(100, 0);
-                    contentStream.showText(r.getTypeRdv());
-                    contentStream.newLineAtOffset(150, 0);
-                    contentStream.showText(r.getStatut());
+                    contentStream.newLineAtOffset(60, yTable);
+                    contentStream.showText(r.getDate() != null ? r.getDate().toString() : "N/A");
+                    contentStream.newLineAtOffset(90, 0);
+                    contentStream.showText(r.getTypeRdv() != null ? r.getTypeRdv() : "N/A");
+                    contentStream.newLineAtOffset(130, 0);
+                    contentStream.showText(r.getStatut() != null ? r.getStatut().toUpperCase() : "N/A");
                     contentStream.newLineAtOffset(100, 0);
                     contentStream.showText(r.getLieu() != null ? r.getLieu() : "N/A");
                     contentStream.endText();
-                    yPosition -= 15;
+                    
+                    yTable -= 20;
+                    zebra = !zebra;
                 }
 
-                drawFooter(contentStream);
+                drawFooter(contentStream, 1);
             }
             document.save(outputPath);
         }
     }
 
-    private void contentText(PDPageContentStream stream, String text) throws IOException {
-        stream.showText(text);
+    public void generatePlanningPDF(List<RendezVous> rdvs, String period, String outputPath) throws IOException {
+        try (PDDocument document = new PDDocument()) {
+            PDPage page = new PDPage(PDRectangle.A4);
+            document.addPage(page);
+
+            try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
+                drawHeader(document, contentStream, "PLANNING DES RENDEZ-VOUS");
+
+                contentStream.setNonStrokingColor(ACCENT_COLOR);
+                contentStream.beginText();
+                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 12);
+                contentStream.newLineAtOffset(50, 715);
+                contentStream.showText("Période : " + period);
+                contentStream.endText();
+
+                int yPosition = 680;
+                
+                // Table Header
+                contentStream.setNonStrokingColor(PRIMARY_COLOR);
+                contentStream.addRect(50, yPosition - 5, 500, 22);
+                contentStream.fill();
+
+                contentStream.setNonStrokingColor(Color.WHITE);
+                contentStream.beginText();
+                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 9);
+                contentStream.newLineAtOffset(60, yPosition);
+                contentStream.showText("DATE");
+                contentStream.newLineAtOffset(80, 0);
+                contentStream.showText("HEURE");
+                contentStream.newLineAtOffset(70, 0);
+                contentStream.showText("PATIENT");
+                contentStream.newLineAtOffset(140, 0);
+                contentStream.showText("STATUT");
+                contentStream.newLineAtOffset(90, 0);
+                contentStream.showText("MODE");
+                contentStream.endText();
+
+                yPosition -= 22;
+                boolean zebra = false;
+                contentStream.setNonStrokingColor(TEXT_COLOR);
+                
+                for (RendezVous r : rdvs) {
+                    if (yPosition < 80) break;
+                    
+                    if (zebra) {
+                        contentStream.setNonStrokingColor(new Color(248, 249, 250));
+                        contentStream.addRect(50, yPosition - 5, 500, 20);
+                        contentStream.fill();
+                    }
+                    
+                    contentStream.setNonStrokingColor(TEXT_COLOR);
+                    contentStream.beginText();
+                    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 9);
+                    contentStream.newLineAtOffset(60, yPosition);
+                    contentStream.showText(r.getDate() != null ? r.getDate().toString() : "N/A");
+                    contentStream.newLineAtOffset(80, 0);
+                    contentStream.showText(r.getHeureDebut() != null ? r.getHeureDebut().toString().substring(0,5) : "N/A");
+                    contentStream.newLineAtOffset(70, 0);
+                    contentStream.showText(r.getEtudiantId() != null ? "Patient #" + r.getEtudiantId() : "Libre");
+                    contentStream.newLineAtOffset(140, 0);
+                    contentStream.showText(r.getStatut());
+                    contentStream.newLineAtOffset(90, 0);
+                    contentStream.showText(r.getLieu() != null ? r.getLieu() : "N/A");
+                    contentStream.endText();
+                    
+                    yPosition -= 20;
+                    zebra = !zebra;
+                }
+
+                drawFooter(contentStream, 1);
+            }
+            document.save(outputPath);
+        }
     }
 
     public void generateGlobalStatsPDF(Map<String, Object> stats, String outputPath) throws IOException {
@@ -198,11 +333,17 @@ public class PDFService {
             document.addPage(page);
 
             try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
-                drawHeader(document, contentStream, "Rapport Statistique Global");
+                drawHeader(document, contentStream, "RAPPORT STATISTIQUE GLOBAL");
 
                 int y = 700;
-                addStatLine(contentStream, "Nombre total de patients :", stats.get("totalPatients").toString(), y);
-                y -= 40;
+                
+                // Summary Box
+                contentStream.setNonStrokingColor(HEADER_BG);
+                contentStream.addRect(50, y - 50, 500, 60);
+                contentStream.fill();
+                
+                addStatLine(contentStream, "Nombre total de patients :", stats.get("totalPatients").toString(), y - 15);
+                y -= 80;
 
                 contentStream.setNonStrokingColor(PRIMARY_COLOR);
                 contentStream.beginText();
@@ -210,25 +351,33 @@ public class PDFService {
                 contentStream.newLineAtOffset(50, y);
                 contentStream.showText("Volume d'activité par mois");
                 contentStream.endText();
-                y -= 20;
+                y -= 25;
 
                 Map<String, Integer> rdvPerMonth = (Map<String, Integer>) stats.get("rdvPerMonth");
                 if (rdvPerMonth != null) {
-                    contentStream.setNonStrokingColor(Color.BLACK);
+                    boolean zebra = false;
                     for (Map.Entry<String, Integer> entry : rdvPerMonth.entrySet()) {
+                        if (zebra) {
+                            contentStream.setNonStrokingColor(new Color(248, 249, 250));
+                            contentStream.addRect(70, y - 5, 460, 18);
+                            contentStream.fill();
+                        }
+                        
+                        contentStream.setNonStrokingColor(TEXT_COLOR);
                         contentStream.beginText();
                         contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
-                        contentStream.newLineAtOffset(70, y);
+                        contentStream.newLineAtOffset(80, y);
                         contentStream.showText(entry.getKey() + " : " + entry.getValue() + " rendez-vous");
                         contentStream.endText();
-                        y -= 15;
+                        y -= 18;
+                        zebra = !zebra;
                     }
                 }
 
-                y -= 20;
+                y -= 30;
                 addStatLine(contentStream, "Taux d'annulation global :", stats.get("cancellationRate").toString() + "%", y);
                 
-                drawFooter(contentStream);
+                drawFooter(contentStream, 1);
             }
             document.save(outputPath);
         }
@@ -238,76 +387,15 @@ public class PDFService {
         stream.setNonStrokingColor(PRIMARY_COLOR);
         stream.beginText();
         stream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 11);
-        stream.newLineAtOffset(50, y);
+        stream.newLineAtOffset(65, y);
         stream.showText(label);
         stream.endText();
 
-        stream.setNonStrokingColor(Color.BLACK);
+        stream.setNonStrokingColor(TEXT_COLOR);
         stream.beginText();
-        stream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 11);
-        stream.newLineAtOffset(250, y);
+        stream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 11);
+        stream.newLineAtOffset(300, y);
         stream.showText(value);
         stream.endText();
-    }
-
-    public void generatePlanningPDF(List<RendezVous> rdvs, String period, String outputPath) throws IOException {
-        try (PDDocument document = new PDDocument()) {
-            PDPage page = new PDPage(PDRectangle.A4);
-            document.addPage(page);
-
-            try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
-                drawHeader(document, contentStream, "Planning des Rendez-vous");
-
-                contentStream.setNonStrokingColor(SECONDARY_COLOR);
-                contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
-                contentStream.newLineAtOffset(50, 725);
-                contentStream.showText("Période sélectionnée : " + period);
-                contentStream.endText();
-
-                int yPosition = 690;
-                contentStream.setNonStrokingColor(new Color(240, 244, 248));
-                contentStream.addRect(50, yPosition - 5, 500, 20);
-                contentStream.fill();
-
-                contentStream.setNonStrokingColor(PRIMARY_COLOR);
-                contentStream.beginText();
-                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 9);
-                contentStream.newLineAtOffset(60, yPosition);
-                contentStream.showText("DATE");
-                contentStream.newLineAtOffset(80, 0);
-                contentStream.showText("HEURE");
-                contentStream.newLineAtOffset(80, 0);
-                contentStream.showText("PATIENT");
-                contentStream.newLineAtOffset(150, 0);
-                contentStream.showText("STATUT");
-                contentStream.newLineAtOffset(100, 0);
-                contentStream.showText("MODE");
-                contentStream.endText();
-
-                yPosition -= 20;
-                contentStream.setNonStrokingColor(Color.BLACK);
-                for (RendezVous r : rdvs) {
-                    if (yPosition < 80) break;
-                    contentStream.beginText();
-                    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 9);
-                    contentStream.newLineAtOffset(60, yPosition);
-                    contentStream.showText(r.getDate() != null ? r.getDate().toString() : "N/A");
-                    contentStream.newLineAtOffset(80, 0);
-                    contentStream.showText(r.getHeureDebut() != null ? r.getHeureDebut().toString().substring(0,5) : "N/A");
-                    contentStream.newLineAtOffset(80, 0);
-                    contentStream.showText(r.getEtudiantId() != null ? "ID #" + r.getEtudiantId() : "Libre");
-                    contentStream.newLineAtOffset(150, 0);
-                    contentStream.showText(r.getStatut());
-                    contentStream.newLineAtOffset(100, 0);
-                    contentStream.showText(r.getLieu() != null ? r.getLieu() : "N/A");
-                    contentStream.endText();
-                    yPosition -= 15;
-                }
-
-                drawFooter(contentStream);
-            }
-            document.save(outputPath);
-        }
     }
 }

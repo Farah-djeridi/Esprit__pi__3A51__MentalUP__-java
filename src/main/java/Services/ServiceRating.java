@@ -28,6 +28,7 @@ public class ServiceRating {
     }
 
     public double getAverageForPsy(int psyId) {
+        if (cnx == null) return 0.0;
         String query = "SELECT AVG(note) as average FROM rating WHERE psychologue_id = ?";
         try (PreparedStatement ps = cnx.prepareStatement(query)) {
             ps.setInt(1, psyId);

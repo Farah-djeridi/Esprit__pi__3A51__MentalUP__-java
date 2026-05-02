@@ -102,6 +102,7 @@ public class ServiceRendezVous {
 
     public List<RendezVous> getByPsychologueId(int psychologueId) {
         List<RendezVous> list = new ArrayList<>();
+        if (conn == null) return list;
         String sql = "SELECT * FROM rendez_vous WHERE psychologue_id = ? AND date IS NOT NULL AND date != '0000-00-00' ORDER BY date, heure_debut";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, psychologueId);
@@ -249,6 +250,7 @@ public class ServiceRendezVous {
 
     public List<RendezVous> getRdvAujourdhui(int etudiantId) {
         List<RendezVous> list = new ArrayList<>();
+        if (conn == null) return list;
         String sql = "SELECT * FROM rendez_vous WHERE etudiant_id = ? AND date IS NOT NULL AND date != '0000-00-00' AND date = CURDATE() ORDER BY heure_debut";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, etudiantId);
@@ -264,6 +266,7 @@ public class ServiceRendezVous {
 
     public List<RendezVous> getRdvAvenir(int etudiantId) {
         List<RendezVous> list = new ArrayList<>();
+        if (conn == null) return list;
         String sql = "SELECT * FROM rendez_vous WHERE etudiant_id = ? AND date IS NOT NULL AND date != '0000-00-00' AND date > CURDATE() ORDER BY date, heure_debut";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, etudiantId);
@@ -394,6 +397,7 @@ public class ServiceRendezVous {
     }
 
     public RendezVous getById(int id) {
+        if (conn == null) return null;
         String sql = "SELECT * FROM rendez_vous WHERE id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);

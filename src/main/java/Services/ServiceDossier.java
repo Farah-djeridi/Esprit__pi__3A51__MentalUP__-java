@@ -90,6 +90,7 @@ public class ServiceDossier implements IService<Dossier> {
     @Override
     public List<Dossier> getAll() {
         List<Dossier> dossiers = new ArrayList<>();
+        if (cnx == null) return dossiers;
         String query =
                 "SELECT d.*, u.nom, u.prenom " +
                         "FROM dossier_patient d " +

@@ -109,6 +109,10 @@ public class ControllerHome {
         psyListContainer.getChildren().clear();
         
         Connection conn = MyDataBase.getInstance().getCnx();
+        if (conn == null) {
+            System.err.println("Erreur: Impossible de se connecter à la base de données. Vérifiez que MySQL est démarré.");
+            return;
+        }
         try (Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery("SELECT id, prenom, nom FROM user WHERE role = 'psychologue' LIMIT 3")) {
             

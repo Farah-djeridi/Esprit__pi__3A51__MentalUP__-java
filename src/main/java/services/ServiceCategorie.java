@@ -99,4 +99,24 @@ public class ServiceCategorie implements IService<Categorie> {
         }
         return null;
     }
+    @Override
+    public Categorie find(int id) {
+        String query = "SELECT * FROM categorie WHERE id = ?";
+        try {
+            PreparedStatement pst = cnx.prepareStatement(query);
+            pst.setInt(1, id);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                Categorie c = new Categorie();
+                c.setId(rs.getInt("id"));
+                c.setNom(rs.getString("nom"));
+                c.setDescription(rs.getString("description"));
+                c.setDateCreation(rs.getTimestamp("date_creation"));
+                return c;
+            }
+        } catch (SQLException e) {
+            System.out.println("Erreur find categorie: " + e.getMessage());
+        }
+        return null;
+    }
 }

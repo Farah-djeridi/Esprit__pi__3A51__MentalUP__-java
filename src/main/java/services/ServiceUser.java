@@ -275,4 +275,21 @@ public class ServiceUser implements IService<User> {
         return true;
     }
 
+    @Override
+    public User find(int id) {
+        try {
+            String query = "SELECT * FROM `user` WHERE `id`=?";
+            PreparedStatement pstm = cnx.prepareStatement(query);
+            pstm.setInt(1, id);
+            ResultSet rs = pstm.executeQuery();
+
+            if (rs.next()) {
+                return map(rs);
+            }
+        } catch (SQLException e) {
+            System.out.println("Erreur find: " + e.getMessage());
+        }
+        return null;
+    }
+
 }

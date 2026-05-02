@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 public class ControllerStudentRessources {
 
     @FXML private ImageView logoImage;
-    @FXML private Label avatarInitials, labelUserName, badgeRdv;
+    @FXML private Label avatarInitials, labelUserName, badgeRdv, labelUserRole;
     @FXML private Button menuButton, notifButton;
     @FXML private TextField searchField;
     @FXML private ComboBox<Categorie> categoryFilter;
@@ -61,6 +61,8 @@ public class ControllerStudentRessources {
         User user = SessionManager.getInstance().getCurrentUser();
         if (user != null) {
             labelUserName.setText(user.getPrenom() + " " + user.getNom());
+            if (labelUserRole != null) labelUserRole.setText(user.getRole() != null ? user.getRole() : "Étudiant");
+            
             String initials = "";
             if (user.getPrenom() != null && !user.getPrenom().isEmpty())
                 initials += user.getPrenom().charAt(0);
@@ -274,7 +276,7 @@ public class ControllerStudentRessources {
 
     @FXML void onNavHomeClicked(MouseEvent event)      { loadPage("/home.fxml", event); }
     @FXML void onNavSuiviClicked(MouseEvent event)     { System.out.println("Suivi"); }
-    @FXML void onNavRdvClicked(MouseEvent event)       { System.out.println("RDV"); }
+    @FXML void onNavRdvClicked(MouseEvent event)       { loadPage("/RendezVous_Etudiant.fxml", event); }
     @FXML void onNavBlogClicked(MouseEvent event)      { loadPage("/forum.fxml", event); }
     @FXML void onNavActivitesClicked(MouseEvent event) { System.out.println("Activités"); }
 

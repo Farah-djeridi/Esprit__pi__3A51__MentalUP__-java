@@ -62,8 +62,8 @@ public class EmailService {
             return false;
         }
         try {
-            boolean useSSL  = true;
-            String  port    = "465";
+            boolean useSSL  = false;
+            String  port    = "587";
 
             Properties props = new Properties();
             props.put("mail.smtp.host", "smtp.gmail.com");

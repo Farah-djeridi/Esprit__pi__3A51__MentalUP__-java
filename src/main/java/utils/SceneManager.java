@@ -47,7 +47,7 @@ public class SceneManager {
                 switchTo("HomeAdmin.fxml", "Administration — MentalUp");
                 break;
             case "psychologue":
-                switchTo("homepsy.fxml", "Espace Psychologue — MentalUp");
+                switchTo("DashboardPsyVue.fxml", "Espace Psychologue — MentalUp");
                 break;
             default: // etudiant
                 switchTo("home.fxml", "Accueil — MentalUp");

@@ -168,4 +168,44 @@ public class ServiceRessource implements IService<Ressource> {
         }
         return ressources;
     }
+    @Override
+    public Ressource find(int id) {
+        String query = "SELECT r.*, c.nom as categorie_nom FROM ressource r LEFT JOIN categorie c ON r.categorie_id = c.id WHERE r.id = ?";
+
+        try {
+            PreparedStatement pst = cnx.prepareStatement(query);
+            pst.setInt(1, id);
+            ResultSet rs = pst.executeQuery();
+
+            if (rs.next()) {
+                Ressource r = new Ressource();
+                r.setId(rs.getInt("id"));
+                r.setTitre(rs.getString("titre"));
+                r.setDescription(rs.getString("description"));
+                r.setType(rs.getString("type"));
+                r.setLien(rs.getString("lien"));
+                r.setImage(rs.getString("image"));
+                r.setDatePublication(rs.getTimestamp("date_publication"));
+                r.setNbVues(rs.getInt("nb_vues"));
+                r.setCategorieId(rs.getInt("categorie_id"));
+                r.setCategorieNom(rs.getString("categorie_nom"));
+
+                try {
+                    String modStatus = rs.getString("moderation_status");
+                    r.setModerationStatus(modStatus != null ? modStatus : "SAFE");
+                    r.setModerationScore(rs.getDouble("moderation_score"));
+                } catch (SQLException ex) {
+                    r.setModerationStatus("SAFE");
+                    r.setModerationScore(0.0);
+                }
+
+                return r;
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Erreur find: " + e.getMessage());
+        }
+
+        return null;
+    }
 }

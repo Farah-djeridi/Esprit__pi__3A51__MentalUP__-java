@@ -1,26 +1,40 @@
-# ============================================================
-# GITIGNORE — MentalUp JavaFX Project
-# ============================================================
-
-# Fichier de configuration avec les cles API (NE PAS COMMITTER)
-src/main/resources/config.properties
-
-# Build Maven
 target/
-*.class
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
 
-# IntelliJ IDEA
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/usage.statistics.xml
-.idea/dictionaries
-.idea/shelf
-.idea/httpRequests
+### IntelliJ IDEA ###
+.idea/modules.xml
+.idea/jarRepositories.xml
+.idea/compiler.xml
+.idea/libraries/
+*.iws
 *.iml
+*.ipr
 
-# OS
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+src/main/resources/groq.properties
+src/main/resources/config.properties
+### Mac OS ###
 .DS_Store
 Thumbs.db
-
-# Logs
-*.log

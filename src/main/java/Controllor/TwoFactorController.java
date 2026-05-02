@@ -121,16 +121,7 @@ public class TwoFactorController {
         if (entered.equals(expectedCode)) {
             // ✅ Code correct → arrêter le timer et rediriger
             if (timer != null) timer.stop();
-
-            User user = SessionManager.getInstance().getCurrentUser();
-            String role = user.getRole() != null ? user.getRole().toLowerCase() : "";
-
-            if (role.equals("psychologue"))
-                SceneManager.switchTo("HomePsy.fxml", "Dashboard Psychologue");
-            else if (role.equals("admin"))
-                SceneManager.switchTo("HomeAdmin.fxml", "Dashboard Admin");
-            else
-                SceneManager.switchTo("Home.fxml", "Dashboard Étudiant");
+            SceneManager.goToHome();
         } else {
             // ❌ Code incorrect
             error("Code incorrect. Vérifiez votre email.");

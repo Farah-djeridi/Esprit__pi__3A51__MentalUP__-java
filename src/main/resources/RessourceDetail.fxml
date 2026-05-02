@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane fx:id="rootPane" xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="Controllor.ControllerRessourceDetail"
+           prefWidth="1024" prefHeight="700"
+           style="-fx-background-color: #F5F7FA;"
+           stylesheets="@css/ressources.css">
+
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;">
+            <VBox alignment="TOP_CENTER" spacing="0">
+                
+                <!-- Hero Section (Banner at top) -->
+                <StackPane fx:id="heroContainer" prefHeight="350" style="-fx-background-color: #1A3A52;">
+                    <ImageView fx:id="detailImage" fitWidth="1024" fitHeight="350" preserveRatio="false" opacity="0.6"/>
+                    <Region style="-fx-background-color: linear-gradient(to top, #F5F7FA 0%, transparent 100%);"/>
+                </StackPane>
+
+                <!-- Foreground Content (Overlapping Card) -->
+                <VBox fx:id="infoCard" maxWidth="800" spacing="30" styleClass="ultra-modern-card" style="-fx-padding: 50; -fx-translate-y: -100;">
+                    
+                    <!-- Header Actions -->
+                    <HBox alignment="CENTER_LEFT" spacing="20">
+                        <Button text="← Retour aux ressources" onAction="#goBack" styleClass="btn-back-ultra"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="detailCategory" text="Catégorie" styleClass="badge-category-ultra"/>
+                    </HBox>
+
+                    <VBox spacing="15">
+                        <Label fx:id="detailTitle" text="Titre de la ressource" styleClass="title-ultra" wrapText="true"/>
+                        
+                        <HBox spacing="25" alignment="CENTER_LEFT">
+                            <HBox alignment="CENTER_LEFT" spacing="8">
+                                <Label text="📅" style="-fx-font-size: 16px;"/>
+                                <Label fx:id="detailDate" text="Date inconnue" styleClass="info-label-ultra"/>
+                            </HBox>
+                            <HBox alignment="CENTER_LEFT" spacing="8">
+                                <Label text="👁" style="-fx-font-size: 16px; -fx-text-fill: #4A90E2;"/>
+                                <Label fx:id="detailViews" text="0 vues" styleClass="info-label-ultra"/>
+                            </HBox>
+                            <HBox alignment="CENTER_LEFT" spacing="8">
+                                <Label text="✍️" style="-fx-font-size: 16px;"/>
+                                <Label text="MentalUP" styleClass="info-label-ultra"/>
+                            </HBox>
+                        </HBox>
+                    </VBox>
+
+                    <Separator style="-fx-background-color: transparent; -fx-border-color: #E2E8F0 transparent transparent transparent; -fx-border-width: 1 0 0 0;"/>
+
+                    <Label fx:id="detailDesc" text="Description..." styleClass="desc-ultra" wrapText="true" VBox.vgrow="ALWAYS"/>
+
+                    <Region VBox.vgrow="ALWAYS" minHeight="40"/>
+
+                    <HBox alignment="CENTER">
+                        <Button fx:id="openLinkBtn" text="🚀  Ouvrir la Ressource" onAction="#openLink" styleClass="btn-glow-ultra"/>
+                    </HBox>
+                    
+                </VBox>
+                
+                <!-- Bottom padding -->
+                <Region prefHeight="50"/>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

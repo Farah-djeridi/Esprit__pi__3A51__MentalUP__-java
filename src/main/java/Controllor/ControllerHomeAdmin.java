@@ -16,7 +16,7 @@ import utils.SessionManager;
 
 public class ControllerHomeAdmin {
 
-    @FXML private HBox navAccueil, navSuivi, navForum, navRdv, navActivites, navContenus, navDossiers, navUtilisateurs;
+    @FXML private HBox navAccueil, navSuivi, navForum, navRdv, navActivites, navContenus, navDossiers, navUtilisateurs, navRessources;
     @FXML private HBox navSuiviStats, navObjectifs, navSujets, navCommentaires;
     @FXML private VBox submenuSuivi, submenuForum;
     @FXML private Label arrowSuivi, arrowForum;
@@ -81,6 +81,7 @@ public class ControllerHomeAdmin {
     @FXML void onNavActivitesClicked(MouseEvent event){ setActiveNav(navActivites); }
     @FXML void onNavContenusClicked(MouseEvent event) { setActiveNav(navContenus); }
     @FXML void onNavDossiersClicked(MouseEvent event) { setActiveNav(navDossiers); }
+    @FXML void onNavRessourcesClicked(MouseEvent event) { SceneManager.switchTo("AdminRessources.fxml", "Gestion des Ressources"); }
     @FXML void onNavSuiviStatsClicked(MouseEvent event)  { System.out.println("Stats suivi"); }
     @FXML void onNavObjectifsClicked(MouseEvent event)   { System.out.println("Objectifs"); }
     @FXML void onNavSujetsClicked(MouseEvent event)      { System.out.println("Sujets"); }
@@ -122,7 +123,7 @@ public class ControllerHomeAdmin {
     @FXML private void onViewStats(ActionEvent event) { SceneManager.switchTo("StatsAdmin.fxml", "Statistiques"); }
 
     private void setActiveNav(HBox active) {
-        HBox[] all = {navAccueil, navSuivi, navForum, navRdv, navActivites, navContenus, navDossiers, navUtilisateurs};
+        HBox[] all = {navAccueil, navSuivi, navForum, navRdv, navActivites, navContenus, navDossiers, navUtilisateurs, navRessources};
         for (HBox n : all)
             if (n != null) n.setStyle("-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 14; -fx-cursor: hand;");
         if (active != null)

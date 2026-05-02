@@ -108,12 +108,12 @@ public class ControllerHome {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    @FXML void onNavHomeClicked(MouseEvent event)      { loadPage("/Home.fxml", event); }
+    @FXML void onNavHomeClicked(MouseEvent event)      { loadPage("/home.fxml", event); }
     @FXML void onNavSuiviClicked(MouseEvent event)     { System.out.println("Suivi"); }
     @FXML void onNavRdvClicked(MouseEvent event)       { System.out.println("RDV"); }
     @FXML void onNavBlogClicked(MouseEvent event)      { loadPage("/forum.fxml", event); }
     @FXML void onNavActivitesClicked(MouseEvent event) { System.out.println("Activités"); }
-    @FXML void onNavRessourcesClicked(MouseEvent event){ System.out.println("Ressources"); }
+    @FXML void onNavRessourcesClicked(MouseEvent event){ loadPage("/StudentRessources.fxml", event); }
 
     // Hover sidebar
     @FXML

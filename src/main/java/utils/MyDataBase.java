@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class MyDataBase {
 
     private static MyDataBase instance;
-    private final String URL      = AppConfig.get("db.url",      "jdbc:mysql://127.0.0.1:3306/projet3a51");
+    private final String URL      = AppConfig.get("db.url",      "jdbc:mysql://127.0.0.1:3306/projet3a5");
     private final String USERNAME = AppConfig.get("db.username",  "root");
     private final String PASSWORD = AppConfig.get("db.password",  "");
     private Connection cnx;

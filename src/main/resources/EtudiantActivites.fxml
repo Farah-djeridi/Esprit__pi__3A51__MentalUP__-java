@@ -107,7 +107,7 @@
                 <VBox spacing="25" style="-fx-padding: 30; -fx-background-color: #e8f4f8;">
 
                 <!-- Header avec titre et date -->
-                <VBox spacing="5">
+                <VBox fx:id="etudiantHeader" spacing="5">
                     <HBox alignment="CENTER_LEFT" spacing="15">
                         <Label text="Bonjour, Sophie 👋" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2d3748;"/>
                         <Region HBox.hgrow="ALWAYS"/>

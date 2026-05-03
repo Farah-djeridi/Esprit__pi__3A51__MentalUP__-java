@@ -64,7 +64,7 @@
 
     <!-- Main Content -->
     <center>
-        <VBox spacing="15" style="-fx-padding: 25; -fx-background-color: #f5f7fa;">
+        <VBox spacing="15" style="-fx-padding: 25; -fx-background-color: #F4F8FF;">
 
             <!-- Header -->
             <HBox alignment="CENTER_LEFT" spacing="12">
@@ -75,8 +75,6 @@
                 <Region HBox.hgrow="ALWAYS"/>
                 <Button fx:id="btnAjouter" text="＋ Ajouter une activité" onAction="#ouvrirPopupAjout"
                         style="-fx-background-color: #4a5568; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-cursor: hand; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 5, 0, 0, 2);"/>
-                <Button fx:id="btnVuePublique" text="👁 Vue Publique" onAction="#ouvrirVuePublique"
-                        style="-fx-background-color: #6b9fb5; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-cursor: hand; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);"/>
                 <Button text="🏆 Recommandations" onAction="#ouvrirRecommandations"
                         style="-fx-background-color: #9f7aea; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-cursor: hand; -fx-background-radius: 8;"/>
                 <Button text="📄 Export PDF" onAction="#exporterPDF"

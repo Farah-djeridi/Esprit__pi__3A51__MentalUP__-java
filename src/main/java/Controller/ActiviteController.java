@@ -34,7 +34,6 @@ public class ActiviteController implements Initializable {
     @FXML private FlowPane activitesFlow;
     @FXML private Label lblCount;
     @FXML private Button btnAjouter;
-    @FXML private Button btnVuePublique;
     @FXML private TextField searchField;
     @FXML private ComboBox<String> sortCombo;
 
@@ -786,19 +785,6 @@ public class ActiviteController implements Initializable {
     }
 
     // ─── Navigation ──────────────────────────────────────────────────────────
-
-    @FXML
-    private void ouvrirVuePublique() {
-        try {
-            Parent root = FXMLLoader.load(getClass().getResource("/EtudiantActivites.fxml"));
-            Stage stage = new Stage();
-            stage.setTitle("MentalUp - Espace Étudiant");
-            stage.setScene(new Scene(root, 1280, 850));
-            stage.show();
-        } catch (IOException e) {
-            alerte("Erreur", e.getMessage(), Alert.AlertType.ERROR);
-        }
-    }
 
     @FXML
     private void ouvrirReservations() {

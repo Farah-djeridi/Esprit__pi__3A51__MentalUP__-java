@@ -870,24 +870,76 @@ public class EtudiantActivitesController implements Initializable {
 
         btnAnnuler.setOnAction(e -> {
             if (resExistante != null) {
-                // Confirmer l'annulation
-                javafx.scene.control.Alert confirm = new javafx.scene.control.Alert(
-                        javafx.scene.control.Alert.AlertType.CONFIRMATION);
-                confirm.setTitle("Annuler la réservation");
-                confirm.setHeaderText("Annuler la réservation - Place " + resExistante.getPlace());
-                confirm.setContentText("Voulez-vous vraiment annuler votre réservation pour \"" + activite.getTitre() + "\" ?");
-                confirm.showAndWait().ifPresent(response -> {
-                    if (response == javafx.scene.control.ButtonType.OK) {
-                        try {
-                            serviceReservation.supprimerReservation(resExistante.getIdReservation());
-                            popup.close();
-                            afficherToast("Réservation annulée !", "#e53e3e", "🗑");
-                            chargerActivites();
-                        } catch (SQLException ex) {
-                            afficherToast("Erreur: " + ex.getMessage(), "#e53e3e", "❌");
-                        }
+                // Popup custom d'annulation
+                Stage confirmPopup = new Stage();
+                confirmPopup.initModality(Modality.APPLICATION_MODAL);
+                confirmPopup.initStyle(javafx.stage.StageStyle.UNDECORATED);
+
+                VBox root2 = new VBox(20);
+                root2.setAlignment(Pos.CENTER);
+                root2.setPadding(new Insets(30));
+                root2.setPrefWidth(400);
+                root2.setStyle("-fx-background-color: #1a1a2e; -fx-background-radius: 16; " +
+                               "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 20, 0, 0, 8);");
+
+                Label ico = new Label("🗑");
+                ico.setStyle("-fx-font-size: 40px;");
+
+                Label titre2 = new Label("Annuler la réservation");
+                titre2.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;");
+
+                Label msg2 = new Label("Voulez-vous vraiment annuler votre réservation\nPlace " +
+                        resExistante.getPlace() + " — " + activite.getTitre() + " ?");
+                msg2.setStyle("-fx-font-size: 13px; -fx-text-fill: #8892b0; -fx-text-alignment: center;");
+                msg2.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+
+                Button btnOui = new Button("🗑  Oui, annuler");
+                btnOui.setPrefWidth(150); btnOui.setPrefHeight(42);
+                btnOui.setStyle("-fx-background-color: #e53e3e; -fx-text-fill: white; " +
+                                "-fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand;");
+                btnOui.setOnMouseEntered(ev -> btnOui.setOpacity(0.85));
+                btnOui.setOnMouseExited(ev  -> btnOui.setOpacity(1.0));
+
+                Button btnNon = new Button("Garder");
+                btnNon.setPrefWidth(150); btnNon.setPrefHeight(42);
+                btnNon.setStyle("-fx-background-color: #2a3f5f; -fx-text-fill: #8892b0; " +
+                                "-fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand;");
+                btnNon.setOnAction(ev -> confirmPopup.close());
+
+                btnOui.setOnAction(ev -> {
+                    try {
+                        serviceReservation.supprimerReservation(resExistante.getIdReservation());
+                        confirmPopup.close();
+                        popup.close();
+                        afficherToast("Réservation annulée !", "#e53e3e", "🗑");
+                        chargerActivites();
+                    } catch (SQLException ex) {
+                        afficherToast("Erreur: " + ex.getMessage(), "#e53e3e", "❌");
                     }
                 });
+
+                HBox btns2 = new HBox(12, btnNon, btnOui);
+                btns2.setAlignment(Pos.CENTER);
+                root2.getChildren().addAll(ico, titre2, msg2, btns2);
+
+                // Animation
+                root2.setScaleX(0.8); root2.setScaleY(0.8); root2.setOpacity(0);
+                javafx.animation.ScaleTransition st2 = new javafx.animation.ScaleTransition(
+                        javafx.util.Duration.millis(200), root2);
+                st2.setToX(1); st2.setToY(1);
+                st2.setInterpolator(javafx.animation.Interpolator.EASE_OUT);
+                javafx.animation.FadeTransition ft2 = new javafx.animation.FadeTransition(
+                        javafx.util.Duration.millis(150), root2);
+                ft2.setToValue(1);
+                new javafx.animation.ParallelTransition(st2, ft2).play();
+
+                javafx.scene.Scene sc2 = new javafx.scene.Scene(root2);
+                sc2.setFill(javafx.scene.paint.Color.TRANSPARENT);
+                confirmPopup.setScene(sc2);
+                confirmPopup.show();
+                javafx.geometry.Rectangle2D screen = javafx.stage.Screen.getPrimary().getVisualBounds();
+                confirmPopup.setX(screen.getWidth() / 2 - 200);
+                confirmPopup.setY(screen.getHeight() / 2 - 120);
             } else {
                 popup.close();
             }

@@ -6,7 +6,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="Controller.ReservationAdminController"
-            style="-fx-background-color: #f5f7fa;">
+            style="-fx-background-color: #F4F8FF;">
 
     <!-- Sidebar Dark (même que GestionActivite) -->
     <left>
@@ -76,8 +76,8 @@
     <!-- Main Content -->
     <center>
         <ScrollPane fitToWidth="true"
-                    style="-fx-background: #f5f7fa; -fx-background-color: #f5f7fa;">
-        <VBox spacing="18" style="-fx-padding: 25; -fx-background-color: #f5f7fa;">
+                    style="-fx-background: #F4F8FF; -fx-background-color: #F4F8FF;">
+        <VBox spacing="18" style="-fx-padding: 25; -fx-background-color: #F4F8FF;">
 
             <!-- Header -->
             <HBox alignment="CENTER_LEFT" spacing="12">

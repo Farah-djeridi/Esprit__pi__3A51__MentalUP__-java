@@ -1,6 +1,6 @@
 package Controllor;
 
-import Models.Dossier;
+import models.Dossier;
 import services.ServiceDossier;
 import services.ServiceRendezVous;
 import javafx.fxml.FXML;

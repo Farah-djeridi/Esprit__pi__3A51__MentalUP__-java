@@ -3,75 +3,14 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
 
 <BorderPane xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="Controller.ReservationAdminController"
             style="-fx-background-color: #F4F8FF;">
 
     <!-- Sidebar Dark (même que GestionActivite) -->
-    <left>
-        <VBox style="-fx-background-color: #2d3748; -fx-pref-width: 260;">
-            <padding><Insets top="20" right="0" bottom="20" left="0"/></padding>
-
-            <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 20;">
-                <Label text="🧠" style="-fx-font-size: 32px;"/>
-                <VBox spacing="2">
-                    <Label text="MentalUp Admin" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;"/>
-                    <Label text="Espace d'administration" style="-fx-text-fill: #a0aec0; -fx-font-size: 11px;"/>
-                </VBox>
-            </HBox>
-
-            <Region style="-fx-background-color: #4a5568; -fx-pref-height: 1;">
-                <VBox.margin><Insets top="10" bottom="10"/></VBox.margin>
-            </Region>
-
-            <VBox spacing="2" style="-fx-padding: 10 15;">
-                <Button text="🏠  Accueil" alignment="CENTER_LEFT" maxWidth="Infinity"
-                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e0; -fx-font-size: 14px; -fx-padding: 12 15; -fx-background-radius: 8; -fx-cursor: hand;">
-                    <VBox.margin><Insets bottom="5"/></VBox.margin>
-                </Button>
-                <Button text="📊  Suivi Mental" alignment="CENTER_LEFT" maxWidth="Infinity"
-                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e0; -fx-font-size: 14px; -fx-padding: 12 15; -fx-background-radius: 8; -fx-cursor: hand;">
-                    <VBox.margin><Insets bottom="5"/></VBox.margin>
-                </Button>
-                <Button text="💬  Forum" alignment="CENTER_LEFT" maxWidth="Infinity"
-                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e0; -fx-font-size: 14px; -fx-padding: 12 15; -fx-background-radius: 8; -fx-cursor: hand;">
-                    <VBox.margin><Insets bottom="5"/></VBox.margin>
-                </Button>
-                <Button text="📅  Rendez-vous" alignment="CENTER_LEFT" maxWidth="Infinity"
-                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e0; -fx-font-size: 14px; -fx-padding: 12 15; -fx-background-radius: 8; -fx-cursor: hand;">
-                    <VBox.margin><Insets bottom="5"/></VBox.margin>
-                </Button>
-                <Button text="👥  Utilisateurs" alignment="CENTER_LEFT" maxWidth="Infinity"
-                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e0; -fx-font-size: 14px; -fx-padding: 12 15; -fx-background-radius: 8; -fx-cursor: hand;">
-                    <VBox.margin><Insets bottom="5"/></VBox.margin>
-                </Button>
-                <Button text="⚡  Activités" alignment="CENTER_LEFT" maxWidth="Infinity"
-                        onAction="#ouvrirActivites"
-                        style="-fx-background-color: transparent; -fx-text-fill: #cbd5e0; -fx-font-size: 14px; -fx-padding: 12 15; -fx-background-radius: 8; -fx-cursor: hand;">
-                    <VBox.margin><Insets bottom="5"/></VBox.margin>
-                </Button>
-                <!-- Réservations SÉLECTIONNÉ -->
-                <Button text="🎟  Réservations" alignment="CENTER_LEFT" maxWidth="Infinity"
-                        style="-fx-background-color: #4a5568; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 12 15; -fx-background-radius: 8; -fx-cursor: hand; -fx-font-weight: bold;">
-                    <VBox.margin><Insets bottom="5"/></VBox.margin>
-                </Button>
-            </VBox>
-
-            <Region VBox.vgrow="ALWAYS"/>
-
-            <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 15; -fx-background-color: #1a202c; -fx-background-radius: 10;">
-                <VBox.margin><Insets top="10" right="15" bottom="10" left="15"/></VBox.margin>
-                <Label text="👤" style="-fx-font-size: 24px; -fx-background-color: #4a5568; -fx-padding: 8; -fx-background-radius: 50%;"/>
-                <VBox spacing="2">
-                    <Label text="Admin MentalUp" style="-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;"/>
-                    <Label text="Super Administrateur" style="-fx-text-fill: #a0aec0; -fx-font-size: 10px;"/>
-                </VBox>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Label text="⋮" style="-fx-text-fill: #cbd5e0; -fx-font-size: 20px; -fx-cursor: hand;"/>
-            </HBox>
-        </VBox>
-    </left>
+        <left><VBox prefWidth="260" prefHeight="700" style="-fx-background-color: #2C3E50;"><HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 24 18 20 18; -fx-border-color: transparent transparent rgba(255,255,255,0.1) transparent; -fx-border-width: 0 0 1 0;"><StackPane><ImageView fx:id="logoImage" fitWidth="45" fitHeight="45" preserveRatio="true"/></StackPane><VBox spacing="2"><Label text="MentalUp Admin" style="-fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;"/><Label text="Espace d administration" style="-fx-text-fill: rgba(255,255,255,0.65); -fx-font-size: 11px;"/></VBox></HBox><VBox spacing="2" style="-fx-padding: 16 12 0 12;" VBox.vgrow="ALWAYS"><HBox alignment="CENTER_LEFT" spacing="12" fx:id="navAccueil" onMouseClicked="#onNavHomeClicked" onMouseEntered="#onNavHoverEnter" onMouseExited="#onNavHoverExit" style="-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 14; -fx-cursor: hand;"><Label text="Accueil" style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px; -fx-font-weight: 500;"/></HBox><VBox spacing="0"><HBox alignment="CENTER_LEFT" spacing="12" fx:id="navSuivi" onMouseClicked="#onNavSuiviClicked" onMouseEntered="#onNavHoverEnter" onMouseExited="#onNavHoverExit" style="-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 14; -fx-cursor: hand;"><Label text="Suivi Mental" style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px; -fx-font-weight: 500;"/><Region HBox.hgrow="ALWAYS"/><Label fx:id="arrowSuivi" text=">" style="-fx-text-fill: rgba(255,255,255,0.5); -fx-font-size: 11px;"/></HBox><VBox fx:id="submenuSuivi" spacing="2" style="-fx-padding: 4 0 6 28;"><HBox alignment="CENTER_LEFT" spacing="10" onMouseClicked="#onNavSuiviStatsClicked" onMouseEntered="#onSubmenuHoverEnter" onMouseExited="#onSubmenuHoverExit" style="-fx-background-radius: 6; -fx-padding: 8 12; -fx-cursor: hand;"><Label text="Liste des suivis" style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 13px;"/></HBox><HBox alignment="CENTER_LEFT" spacing="10" onMouseClicked="#onNavObjectifsClicked" onMouseEntered="#onSubmenuHoverEnter" onMouseExited="#onSubmenuHoverExit" style="-fx-background-radius: 6; -fx-padding: 8 12; -fx-cursor: hand;"><Label text="Objectifs" style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 13px;"/></HBox></VBox></VBox><VBox spacing="0"><HBox alignment="CENTER_LEFT" spacing="12" fx:id="navForum" onMouseClicked="#onNavForumClicked" onMouseEntered="#onNavHoverEnter" onMouseExited="#onNavHoverExit" style="-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 14; -fx-cursor: hand;"><Label text="Forum" style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px; -fx-font-weight: 500;"/><Region HBox.hgrow="ALWAYS"/><Label fx:id="arrowForum" text=">" style="-fx-text-fill: rgba(255,255,255,0.5); -fx-font-size: 11px;"/></HBox><VBox fx:id="submenuForum" spacing="2" style="-fx-padding: 4 0 6 28;"><HBox alignment="CENTER_LEFT" spacing="10" onMouseClicked="#onNavSujetsClicked" onMouseEntered="#onSubmenuHoverEnter" onMouseExited="#onSubmenuHoverExit" style="-fx-background-radius: 6; -fx-padding: 8 12; -fx-cursor: hand;"><Label text="Sujets" style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 13px;"/></HBox><HBox alignment="CENTER_LEFT" spacing="10" onMouseClicked="#onNavCommentairesClicked" onMouseEntered="#onSubmenuHoverEnter" onMouseExited="#onSubmenuHoverExit" style="-fx-background-radius: 6; -fx-padding: 8 12; -fx-cursor: hand;"><Label text="Commentaires" style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 13px;"/></HBox></VBox></VBox><HBox alignment="CENTER_LEFT" spacing="12" fx:id="navRdv" onMouseClicked="#onNavRdvClicked" onMouseEntered="#onNavHoverEnter" onMouseExited="#onNavHoverExit" style="-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 14; -fx-cursor: hand;"><Label text="Rendez-vous" style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px; -fx-font-weight: 500;"/></HBox><HBox alignment="CENTER_LEFT" spacing="12" fx:id="navUtilisateurs" onMouseClicked="#onNavUtilisateursClicked" onMouseEntered="#onNavHoverEnter" onMouseExited="#onNavHoverExit" style="-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 14; -fx-cursor: hand;"><Label text="Utilisateurs" style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px; -fx-font-weight: 500;"/></HBox><HBox alignment="CENTER_LEFT" spacing="12" fx:id="navDossiers" onMouseClicked="#onNavDossiersClicked" onMouseEntered="#onNavHoverEnter" onMouseExited="#onNavHoverExit" style="-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 14; -fx-cursor: hand;"><Label text="Dossiers medicaux" style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px; -fx-font-weight: 500;"/></HBox><HBox alignment="CENTER_LEFT" spacing="12" fx:id="navContenus" onMouseClicked="#onNavContenusClicked" onMouseEntered="#onNavHoverEnter" onMouseExited="#onNavHoverExit" style="-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 14; -fx-cursor: hand;"><Label text="Contenus" style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px; -fx-font-weight: 500;"/></HBox><HBox alignment="CENTER_LEFT" spacing="12" fx:id="navActivites" onMouseClicked="#onNavActivitesClicked" onMouseEntered="#onNavHoverEnter" onMouseExited="#onNavHoverExit" style="-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 14; -fx-cursor: hand;"><Label text="Activites" style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px; -fx-font-weight: 500;"/></HBox><HBox alignment="CENTER_LEFT" spacing="12" fx:id="navReservations" onMouseClicked="#onNavReservationsClicked" onMouseEntered="#onNavHoverEnter" onMouseExited="#onNavHoverExit" style="-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 14; -fx-cursor: hand;"><Label text="Reservations" style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px; -fx-font-weight: 500;"/></HBox></VBox><VBox spacing="6" style="-fx-padding: 16 14 20 14; -fx-border-color: rgba(255,255,255,0.08); -fx-border-width: 1 0 0 0;"><HBox alignment="CENTER_LEFT" spacing="10"><Label fx:id="avatarInitials" text="AD" style="-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;"/><VBox spacing="1"><Label fx:id="labelUserName" text="Admin" style="-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;"/><Label text="Super Administrateur" style="-fx-text-fill: rgba(255,255,255,0.55); -fx-font-size: 11px;"/></VBox><Region HBox.hgrow="ALWAYS"/><Button text="Quitter" onAction="#onLogout" style="-fx-background-color: rgba(255,255,255,0.1); -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 5 10; -fx-cursor: hand; -fx-font-size: 11px;"/></HBox></VBox></VBox></left>
 
     <!-- Main Content -->
     <center>

@@ -43,11 +43,11 @@ public class ControllerForum {
 
     @FXML private Label labelDate;
     @FXML private Label badgeRdv;
-    @FXML private Label labelUserName;
-    @FXML private Label avatarInitials;
+    private Label labelUserName;
+    private Label avatarInitials;
     @FXML private Label totalDiscussions;
 
-    @FXML private Button logoutButton;
+    private Button logoutButton;
 
     @FXML private TextField searchField;
     @FXML private ComboBox<String> orderCombo;
@@ -56,15 +56,15 @@ public class ControllerForum {
     @FXML private VBox emptyState;
     @FXML private HBox paginationBox;
 
-    @FXML private HBox navAccueil;
-    @FXML private HBox navSuivi;
-    @FXML private HBox navObjectif;
-    @FXML private HBox navForum;
-    @FXML private HBox navRendezVous;
-    @FXML private HBox navActivites;
-    @FXML private HBox navContenu;
+    private HBox navAccueil;
+    private HBox navSuivi;
+    private HBox navObjectif;
+    private HBox navForum;
+    private HBox navRendezVous;
+    private HBox navActivites;
+    private HBox navContenu;
 
-    @FXML private javafx.scene.image.ImageView logoImage;
+    private javafx.scene.image.ImageView logoImage;
 
     private ServiceSujet serviceSujet;
     private ServiceCommentaire serviceCommentaire;
@@ -108,17 +108,17 @@ public class ControllerForum {
         User currentUser = SessionManager.getInstance().getCurrentUser();
         if (currentUser != null) {
             this.currentUserId = currentUser.getId();
-            labelUserName.setText(currentUser.getPrenom() + " " + currentUser.getNom());
-            avatarInitials.setText(getInitials(currentUser.getPrenom() + " " + currentUser.getNom()));
+            if (labelUserName != null) labelUserName.setText(currentUser.getPrenom() + " " + currentUser.getNom());
+            if (avatarInitials != null) avatarInitials.setText(getInitials(currentUser.getPrenom() + " " + currentUser.getNom()));
         }
 
         try {
-            Image logo = new Image(getClass().getResourceAsStream("/images/logo.png"));
-            if (logo != null) {
+            if (logoImage != null) {
+                Image logo = new Image(getClass().getResourceAsStream("/images/logo.png"));
                 logoImage.setImage(logo);
             }
         } catch (Exception e) {
-            System.err.println("Logo non trouvé, utilisation du texte par défaut");
+            System.err.println("Logo non trouvé");
         }
 
         serviceSujet = new ServiceSujet();
@@ -133,7 +133,7 @@ public class ControllerForum {
         loadSujetsFromDatabase();
         setupSearchAndFilter();
 
-        badgeRdv.setText(String.valueOf(getRendezVousCount()));
+        if (badgeRdv != null) badgeRdv.setText(String.valueOf(getRendezVousCount()));
 
         orderCombo.getItems().addAll("Plus récents", "Plus populaires");
         orderCombo.setValue("Plus récents");

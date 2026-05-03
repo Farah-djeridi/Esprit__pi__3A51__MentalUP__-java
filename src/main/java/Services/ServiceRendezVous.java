@@ -1,6 +1,6 @@
 package services;
 
-import Models.RendezVous;
+import models.RendezVous;
 import utils.MyDataBase;
 
 import java.sql.*;

@@ -1,6 +1,6 @@
 package validators;
 
-import Models.Dossier;
+import models.Dossier;
 
 import java.sql.Date;
 import java.time.LocalDate;

@@ -83,11 +83,11 @@ public class ObjectifController {
     @FXML private CategoryAxis xAxisProgressionType;
     @FXML private NumberAxis yAxisProgressionType;
 
-    // Sidebar fields
-    @FXML private ImageView logoImage;
-    @FXML private HBox navAccueil, navSuivi, navObjectifs, navRdv, navForum, navActivites, navRessources;
+    // Sidebar fields (removed from FXML, kept as plain fields)
+    private ImageView logoImage;
+    private HBox navAccueil, navSuivi, navObjectifs, navRdv, navForum, navActivites, navRessources;
     @FXML private Label labelUserName, labelDate, avatarInitials;
-    @FXML private Button logoutButton;
+    private Button logoutButton;
 
     private final ServiceObjectif service = new ServiceObjectif();
     private Integer editingObjectifId = null;
@@ -119,6 +119,12 @@ public class ObjectifController {
         typeObjectifCombo.setValue("stress");
 
         activiteCombo.setItems(FXCollections.observableArrayList(service.getActivites()));
+        activiteCombo.setConverter(new javafx.util.StringConverter<models.Activite>() {
+            @Override public String toString(models.Activite a) {
+                return a == null ? "" : a.getTitre();
+            }
+            @Override public models.Activite fromString(String s) { return null; }
+        });
 
         searchStatutCombo.setItems(FXCollections.observableArrayList(
                 "", "en cours", "terminé", "annulé"

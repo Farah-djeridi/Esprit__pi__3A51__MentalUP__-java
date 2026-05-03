@@ -1,6 +1,6 @@
 package Controllor;
 
-import Models.RendezVous;
+import models.RendezVous;
 import services.ServiceRendezVous;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -25,7 +25,7 @@ import java.awt.Desktop;
 import java.net.URI;
 import java.util.Optional;
 import services.PDFService;
-import Models.Dossier;
+import models.Dossier;
 import services.ServiceDossier;
 import services.SmsService;
 public class RendezVousController {

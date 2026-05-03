@@ -1,4 +1,7 @@
 package Controllor;
+import javafx.scene.input.MouseEvent;
+import javafx.event.ActionEvent;
+import Controllor.AdminSidebarHelper;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -131,6 +134,7 @@ public class ControllerAdminSujet {
     }
 
     private void addHoverEffect(HBox navItem) {
+        if (navItem == null) return;
         navItem.setOnMouseEntered(e -> {
             if (!navItem.equals(navForum)) {
                 navItem.setStyle("-fx-background-color: rgba(255,255,255,0.08); -fx-background-radius: 10; -fx-padding: 10 14; -fx-cursor: hand;");
@@ -144,6 +148,7 @@ public class ControllerAdminSujet {
     }
 
     private void addSubmenuHoverEffect(HBox navItem) {
+        if (navItem == null) return;
         navItem.setOnMouseEntered(e -> {
             navItem.setStyle("-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 8; -fx-padding: 8 12; -fx-cursor: hand;");
         });
@@ -915,4 +920,19 @@ public class ControllerAdminSujet {
 
         alert.showAndWait();
     }
+
+    @FXML public void onNavHomeClicked(MouseEvent e)         { AdminSidebarHelper.goToAccueil(); }
+    @FXML public void onNavSuiviClicked(MouseEvent e)        { AdminSidebarHelper.goToSuiviMental(); }
+    @FXML public void onNavForumClicked(MouseEvent e)        { AdminSidebarHelper.goToForum(); }
+    @FXML public void onNavRdvClicked(MouseEvent e)          { AdminSidebarHelper.goToRendezVous(); }
+    @FXML public void onNavDossiersClicked(MouseEvent e)     { AdminSidebarHelper.goToDossiers(); }
+    @FXML public void onNavUtilisateursClicked(MouseEvent e) { AdminSidebarHelper.goToUtilisateurs(); }
+    @FXML public void onNavContenusClicked(MouseEvent e)     { AdminSidebarHelper.goToContenus(); }
+    @FXML public void onNavActivitesClicked(MouseEvent e)    { AdminSidebarHelper.goToActivites(); }
+    @FXML public void onNavReservationsClicked(MouseEvent e) { AdminSidebarHelper.goToReservations(); }
+    @FXML public void onNavHoverEnter(MouseEvent e)          { }
+    @FXML public void onNavHoverExit(MouseEvent e)           { }
+    @FXML public void onLogout(ActionEvent e)                { AdminSidebarHelper.logout(); }
+    @FXML public void onSubmenuHoverEnter(MouseEvent e)       { }
+    @FXML public void onSubmenuHoverExit(MouseEvent e)        { }
 }

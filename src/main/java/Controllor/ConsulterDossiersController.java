@@ -1,7 +1,7 @@
 package Controllor;
 
-import Models.Dossier;
-import Models.RendezVous;
+import models.Dossier;
+import models.RendezVous;
 import services.PDFService;
 import services.ServiceDossier;
 import javafx.scene.layout.StackPane;

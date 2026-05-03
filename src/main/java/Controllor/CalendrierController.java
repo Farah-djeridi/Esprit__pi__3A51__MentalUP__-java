@@ -1,6 +1,6 @@
 package Controllor;
 
-import Models.RendezVous;
+import models.RendezVous;
 import services.ServiceRendezVous;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

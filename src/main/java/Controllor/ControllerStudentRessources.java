@@ -33,9 +33,10 @@ import java.util.stream.Collectors;
 
 public class ControllerStudentRessources {
 
-    @FXML private ImageView logoImage;
-    @FXML private Label avatarInitials, labelUserName, badgeRdv, labelUserRole;
-    @FXML private Button menuButton, notifButton;
+    private ImageView logoImage;
+    private Label avatarInitials, labelUserName, badgeRdv, labelUserRole;
+    private Button menuButton;
+    @FXML private Button notifButton;
     @FXML private TextField searchField;
     @FXML private ComboBox<Categorie> categoryFilter;
     @FXML private FlowPane resourcesContainer;
@@ -60,20 +61,16 @@ public class ControllerStudentRessources {
         // User Info
         User user = SessionManager.getInstance().getCurrentUser();
         if (user != null) {
-            labelUserName.setText(user.getPrenom() + " " + user.getNom());
+            if (labelUserName != null) labelUserName.setText(user.getPrenom() + " " + user.getNom());
             if (labelUserRole != null) labelUserRole.setText(user.getRole() != null ? user.getRole() : "Étudiant");
-            
             String initials = "";
-            if (user.getPrenom() != null && !user.getPrenom().isEmpty())
-                initials += user.getPrenom().charAt(0);
-            if (user.getNom() != null && !user.getNom().isEmpty())
-                initials += user.getNom().charAt(0);
-            avatarInitials.setText(initials.toUpperCase());
+            if (user.getPrenom() != null && !user.getPrenom().isEmpty()) initials += user.getPrenom().charAt(0);
+            if (user.getNom()    != null && !user.getNom().isEmpty())    initials += user.getNom().charAt(0);
+            if (avatarInitials != null) avatarInitials.setText(initials.toUpperCase());
         }
 
-        try {
-            logoImage.setImage(new Image(getClass().getResourceAsStream("/Images/logo.png")));
-        } catch (Exception ignored) {}
+        try { if (logoImage != null) logoImage.setImage(new Image(getClass().getResourceAsStream("/Images/logo.png"))); }
+        catch (Exception ignored) {}
 
         setupMenu();
         loadCategories();

@@ -1,4 +1,7 @@
 package Controllor;
+import javafx.scene.input.MouseEvent;
+import javafx.event.ActionEvent;
+import Controllor.AdminSidebarHelper;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -33,7 +36,10 @@ public class ControllerAdminUsers {
     @FXML private Button    btnPrev;
     @FXML private Button    btnNext;
     @FXML private ImageView logoImage;
-    @FXML private ToggleButton toggleViewBtn;
+    @FXML private Button toggleViewBtn;
+    private boolean isListView = false;
+    @FXML private Label avatarInitials;
+    @FXML private Label labelUserName;
     // Stats 3D
     @FXML private Label statTotal;
     @FXML private Label statEtudiants;
@@ -163,6 +169,9 @@ public class ControllerAdminUsers {
     @FXML public void filterPsychologues() { currentFilter = "psychologue"; applyFilter(); }
     @FXML public void filterAdmins()       { currentFilter = "admin";       applyFilter(); }
     @FXML public void handleSearch()       { applyFilter(); }
+    @FXML public void onSearch()           { applyFilter(); }
+    @FXML public void goToTrash()          { showDeletedUsers(); }
+    @FXML public void onAddUser()          { handleAdd(); }
 
     @FXML public void prevPage() { if (currentPage > 0) { currentPage--; refreshCards(); } }
     @FXML public void nextPage() {
@@ -172,13 +181,9 @@ public class ControllerAdminUsers {
 
     @FXML
     public void toggleView() {
-        // Bascule entre vue cartes et vue liste (actuellement seule la vue cartes est implémentée)
+        isListView = !isListView;
         if (toggleViewBtn != null) {
-            if (toggleViewBtn.isSelected()) {
-                toggleViewBtn.setText("Vue Liste");
-            } else {
-                toggleViewBtn.setText("Vue Cartes");
-            }
+            toggleViewBtn.setText(isListView ? "Vue Cartes" : "Vue Liste");
         }
         refreshCards();
     }
@@ -240,4 +245,23 @@ public class ControllerAdminUsers {
         if (role == null) return "#E8F5FF";
         return switch (role.toLowerCase()) { case "psychologue" -> "#E8FFF0"; case "admin" -> "#FFF0F0"; default -> "#E8F5FF"; };
     }
+
+    @FXML public void onNavHomeClicked(MouseEvent e)         { AdminSidebarHelper.goToAccueil(); }
+    @FXML public void onNavSuiviClicked(MouseEvent e)        { AdminSidebarHelper.goToSuiviMental(); }
+    @FXML public void onNavForumClicked(MouseEvent e)        { AdminSidebarHelper.goToForum(); }
+    @FXML public void onNavRdvClicked(MouseEvent e)          { AdminSidebarHelper.goToRendezVous(); }
+    @FXML public void onNavDossiersClicked(MouseEvent e)     { AdminSidebarHelper.goToDossiers(); }
+    @FXML public void onNavUtilisateursClicked(MouseEvent e) { AdminSidebarHelper.goToUtilisateurs(); }
+    @FXML public void onNavContenusClicked(MouseEvent e)     { AdminSidebarHelper.goToContenus(); }
+    @FXML public void onNavActivitesClicked(MouseEvent e)    { AdminSidebarHelper.goToActivites(); }
+    @FXML public void onNavReservationsClicked(MouseEvent e) { AdminSidebarHelper.goToReservations(); }
+    @FXML public void onNavHoverEnter(MouseEvent e)          { }
+    @FXML public void onNavHoverExit(MouseEvent e)           { }
+    @FXML public void onLogout(ActionEvent e)                { AdminSidebarHelper.logout(); }
+    @FXML public void onNavSuiviStatsClicked(MouseEvent e)    { AdminSidebarHelper.goToSuiviMental(); }
+    @FXML public void onNavObjectifsClicked(MouseEvent e)     { AdminSidebarHelper.goToObjectifs(); }
+    @FXML public void onNavSujetsClicked(MouseEvent e)        { AdminSidebarHelper.goToForum(); }
+    @FXML public void onNavCommentairesClicked(MouseEvent e)  { AdminSidebarHelper.goToCommentaires(); }
+    @FXML public void onSubmenuHoverEnter(MouseEvent e)       { }
+    @FXML public void onSubmenuHoverExit(MouseEvent e)        { }
 }

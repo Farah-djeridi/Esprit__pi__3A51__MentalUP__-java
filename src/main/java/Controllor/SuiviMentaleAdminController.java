@@ -14,6 +14,7 @@ import services.SuiviMentaleAdminService;
 import javafx.event.ActionEvent;
 import javafx.scene.input.MouseEvent;
 import utils.SceneManager;
+import Controllor.AdminSidebarHelper;
 import utils.SessionManager;
 import java.sql.Date;
 import java.util.List;
@@ -42,6 +43,10 @@ public class SuiviMentaleAdminController {
     @FXML private NumberAxis yAxisScoreMental;
     @FXML private CategoryAxis xAxisSommeil;
     @FXML private NumberAxis yAxisSommeil;
+
+    @FXML private javafx.scene.image.ImageView logoImage;
+    @FXML private Label avatarInitials;
+    @FXML private Label labelUserName;
 
     private final SuiviMentaleAdminService service = new SuiviMentaleAdminService();
 
@@ -696,15 +701,25 @@ public class SuiviMentaleAdminController {
     private String safe(String value) {
         return value == null ? "" : value;
     }
-    @FXML private void onNavHomeClicked(MouseEvent event) { SceneManager.switchTo("HomeAdmin.fxml", "Tableau de Bord Admin"); }
-    @FXML private void onNavSuiviStatsClicked(MouseEvent event) { SceneManager.switchTo("AdminSuiviMental.fxml", "Suivis Mentaux - Admin"); }
-    @FXML private void onNavObjectifsClicked(MouseEvent event) { SceneManager.switchTo("AdminObjectif.fxml", "Objectifs - Admin"); }
-    @FXML private void onNavRdvClicked(MouseEvent event) { SceneManager.switchTo("AdminRdv.fxml", "Gestion des Rendez-vous"); }
-    @FXML private void onNavDossiersClicked(MouseEvent event) { SceneManager.switchTo("AdminDossiers.fxml", "Dossiers Médicaux"); }
-    @FXML private void onNavUtilisateursClicked(MouseEvent event) { SceneManager.switchTo("AdminUsers.fxml", "Gestion des Utilisateurs"); }
+    @FXML private void onNavHomeClicked(MouseEvent event)         { AdminSidebarHelper.goToAccueil(); }
+    @FXML private void onNavSuiviStatsClicked(MouseEvent event)   { AdminSidebarHelper.goToSuiviMental(); }
+    @FXML private void onNavObjectifsClicked(MouseEvent event)    { AdminSidebarHelper.goToObjectifs(); }
+    @FXML private void onNavSuiviClicked(MouseEvent event)        { AdminSidebarHelper.goToSuiviMental(); }
+    @FXML private void onNavForumClicked(MouseEvent event)        { AdminSidebarHelper.goToForum(); }
+    @FXML private void onNavRdvClicked(MouseEvent event)          { AdminSidebarHelper.goToRendezVous(); }
+    @FXML private void onNavDossiersClicked(MouseEvent event)     { AdminSidebarHelper.goToDossiers(); }
+    @FXML private void onNavUtilisateursClicked(MouseEvent event) { AdminSidebarHelper.goToUtilisateurs(); }
+    @FXML private void onNavContenusClicked(MouseEvent event)     { AdminSidebarHelper.goToContenus(); }
+    @FXML private void onNavActivitesClicked(MouseEvent event)    { AdminSidebarHelper.goToActivites(); }
+    @FXML private void onNavReservationsClicked(MouseEvent event) { AdminSidebarHelper.goToReservations(); }
+    @FXML private void onNavHoverEnter(MouseEvent event)          { }
+    @FXML private void onNavHoverExit(MouseEvent event)           { }
 
     @FXML private void onLogout(ActionEvent event) {
-        SessionManager.getInstance().logout();
-        SceneManager.goToLogin();
+        AdminSidebarHelper.logout();
     }
+    @FXML public void onNavSujetsClicked(MouseEvent e)        { AdminSidebarHelper.goToForum(); }
+    @FXML public void onNavCommentairesClicked(MouseEvent e)  { AdminSidebarHelper.goToCommentaires(); }
+    @FXML public void onSubmenuHoverEnter(MouseEvent e)       { }
+    @FXML public void onSubmenuHoverExit(MouseEvent e)        { }
 }

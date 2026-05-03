@@ -32,29 +32,35 @@
 
                 <!-- Nav liens -->
                 <HBox spacing="0" HBox.hgrow="ALWAYS" alignment="CENTER">
-                    <Button text="Tableau de bord"
+                    <Button text="Tableau de bord" onAction="#goToDashboard"
                             style="-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.85);
                                    -fx-font-size: 13px; -fx-padding: 22 14; -fx-cursor: hand;"/>
-                    <Button text="Suivi Mental"
+                    <Button text="Suivi Mental" onAction="#goToSuivi"
                             style="-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.85);
                                    -fx-font-size: 13px; -fx-padding: 22 14; -fx-cursor: hand;"/>
-                    <Button text="Objectif"
+                    <Button text="Objectif" onAction="#goToObjectif"
                             style="-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.85);
                                    -fx-font-size: 13px; -fx-padding: 22 14; -fx-cursor: hand;"/>
-                    <Button text="Forum"
+                    <Button text="Forum" onAction="#goToForum"
                             style="-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.85);
                                    -fx-font-size: 13px; -fx-padding: 22 14; -fx-cursor: hand;"/>
-                    <Button text="Rendez-vous"
+                    <Button text="Rendez-vous" onAction="#goToRdv"
                             style="-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.85);
                                    -fx-font-size: 13px; -fx-padding: 22 14; -fx-cursor: hand;"/>
-                    <Button text="Activités"
+                    <Button text="Activités" onAction="#goToActivites"
                             style="-fx-background-color: transparent; -fx-text-fill: rgba(255,255,255,0.85);
                                    -fx-font-size: 13px; -fx-padding: 22 14; -fx-cursor: hand;"/>
                 </HBox>
 
-                <!-- Nom user + menu -->
+                <!-- Nom user + avatar photo + menu -->
                 <HBox alignment="CENTER" spacing="10">
-                    <Circle radius="18" style="-fx-fill: rgba(255,255,255,0.2);"/>
+                    <StackPane>
+                        <Circle radius="18" style="-fx-fill: rgba(255,255,255,0.2);"/>
+                        <ImageView fx:id="navAvatarImage" fitWidth="36" fitHeight="36"
+                                   preserveRatio="false" visible="false" mouseTransparent="true"/>
+                        <Label fx:id="navAvatarInitials" text=""
+                               style="-fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    </StackPane>
                     <VBox spacing="1">
                         <Label fx:id="lblNavName" text=""
                                style="-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;"/>

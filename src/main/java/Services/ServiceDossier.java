@@ -1,7 +1,7 @@
 package services;
 
 import interfaces.IService;
-import Models.Dossier;
+import models.Dossier;
 import utils.MyDataBase;
 
 import java.sql.*;

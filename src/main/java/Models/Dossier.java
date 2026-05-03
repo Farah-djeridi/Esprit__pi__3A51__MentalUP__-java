@@ -1,4 +1,4 @@
-package Models;
+package models;
 
 import javafx.beans.property.*;
 import java.sql.Date;

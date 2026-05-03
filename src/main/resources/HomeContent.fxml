@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="Controllor.ControllerHomeContent"
+            fitToWidth="true"
+            style="-fx-background-color: #f0f4f8; -fx-background: #f0f4f8; -fx-border-color: transparent;">
+
+    <VBox spacing="20" style="-fx-padding: 24 28;">
+
+        <!-- Hero Banner -->
+        <HBox fx:id="bannerBox" spacing="20" alignment="CENTER_LEFT"
+              style="-fx-background-color: linear-gradient(to right, #1a3a5c, #2d6a9f); -fx-background-radius: 16; -fx-padding: 30 34;">
+            <VBox spacing="10" HBox.hgrow="ALWAYS">
+                <Label text="✦ Bienvenue sur MentalUp ✦"
+                       style="-fx-text-fill: rgba(255,255,255,0.75); -fx-font-size: 13px;"/>
+                <Label text="Prenez soin de votre santé mentale"
+                       style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;"/>
+                <Label text="Une plateforme dédiée à votre bien-être avec des outils de suivi,&#10;des ressources et une communauté bienveillante."
+                       style="-fx-text-fill: rgba(255,255,255,0.8); -fx-font-size: 13px; -fx-wrap-text: true;"/>
+                <Button text="Commencer l'aventure →"
+                        style="-fx-background-color: white; -fx-text-fill: #2d5a8e; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 10 22; -fx-cursor: hand; -fx-font-size: 13px;">
+                    <VBox.margin><Insets top="6"/></VBox.margin>
+                </Button>
+            </VBox>
+        </HBox>
+
+        <!-- 3 Quick-action cards -->
+        <HBox spacing="16">
+            <VBox fx:id="card1" spacing="10" HBox.hgrow="ALWAYS"
+                  style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 22; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
+                <Label text="📊" style="-fx-font-size: 26px;"/>
+                <Label text="Suivi émotionnel"
+                       style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #1a3a5c;"/>
+                <Label text="Enregistrez votre humeur quotidienne et visualisez votre progression."
+                       style="-fx-font-size: 11px; -fx-text-fill: #7a9cb8; -fx-wrap-text: true;" maxWidth="Infinity"/>
+                <Label text="Découvrir →" style="-fx-text-fill: #2d6a9f; -fx-font-size: 12px; -fx-cursor: hand;"/>
+            </VBox>
+            <VBox fx:id="card2" spacing="10" HBox.hgrow="ALWAYS"
+                  style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 22; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
+                <Label text="👥" style="-fx-font-size: 26px;"/>
+                <Label text="Accompagnement"
+                       style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #1a3a5c;"/>
+                <Label text="Professionnels à votre écoute et communauté bienveillante."
+                       style="-fx-font-size: 11px; -fx-text-fill: #7a9cb8; -fx-wrap-text: true;" maxWidth="Infinity"/>
+                <Label text="Découvrir →" style="-fx-text-fill: #2d6a9f; -fx-font-size: 12px; -fx-cursor: hand;"/>
+            </VBox>
+            <VBox fx:id="card3" spacing="10" HBox.hgrow="ALWAYS"
+                  style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 22; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);">
+                <Label text="📚" style="-fx-font-size: 26px;"/>
+                <Label text="Ressources"
+                       style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #1a3a5c;"/>
+                <Label text="Articles, méditations et outils pour votre bien-être."
+                       style="-fx-font-size: 11px; -fx-text-fill: #7a9cb8; -fx-wrap-text: true;" maxWidth="Infinity"/>
+                <Label text="Découvrir →" style="-fx-text-fill: #2d6a9f; -fx-font-size: 12px; -fx-cursor: hand;"/>
+            </VBox>
+        </HBox>
+
+        <!-- Pourquoi MentalUp -->
+        <VBox spacing="14"
+              style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 22; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
+            <Label text="Pourquoi choisir MentalUp ?"
+                   style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1a3a5c;"/>
+            <HBox spacing="0">
+                <VBox spacing="8" HBox.hgrow="ALWAYS" alignment="CENTER" style="-fx-padding: 14 8;">
+                    <Label text="🎯" style="-fx-font-size: 26px;"/>
+                    <Label text="100% Gratuit" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                    <Label text="Pour tous les étudiants" style="-fx-font-size: 11px; -fx-text-fill: #7a9cb8;"/>
+                </VBox>
+                <VBox spacing="8" HBox.hgrow="ALWAYS" alignment="CENTER" style="-fx-padding: 14 8;">
+                    <Label text="🔒" style="-fx-font-size: 26px;"/>
+                    <Label text="Confidentiel" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                    <Label text="Données protégées" style="-fx-font-size: 11px; -fx-text-fill: #7a9cb8;"/>
+                </VBox>
+                <VBox spacing="8" HBox.hgrow="ALWAYS" alignment="CENTER" style="-fx-padding: 14 8;">
+                    <Label text="⏰" style="-fx-font-size: 26px;"/>
+                    <Label text="Disponible 24/7" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                    <Label text="À tout moment" style="-fx-font-size: 11px; -fx-text-fill: #7a9cb8;"/>
+                </VBox>
+                <VBox spacing="8" HBox.hgrow="ALWAYS" alignment="CENTER" style="-fx-padding: 14 8;">
+                    <Label text="🤝" style="-fx-font-size: 26px;"/>
+                    <Label text="Communauté active" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                    <Label text="Entraide et partage" style="-fx-font-size: 11px; -fx-text-fill: #7a9cb8;"/>
+                </VBox>
+            </HBox>
+        </VBox>
+
+        <!-- Prochains RDV + Psychologues -->
+        <HBox spacing="16" alignment="TOP_LEFT">
+            <VBox fx:id="rdvHomeContainer" spacing="12" HBox.hgrow="ALWAYS"
+                  style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 22; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
+                <Label text="📅  Prochains rendez-vous"
+                       style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #1a3a5c;"/>
+                <Label text="Vous n'avez aucun rendez-vous de prévu."
+                       style="-fx-text-fill: #7a9cb8; -fx-font-size: 13px; -fx-font-style: italic;"/>
+            </VBox>
+            <VBox spacing="12" prefWidth="250"
+                  style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 22; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
+                <Label text="👨‍⚕️  Nos psychologues"
+                       style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #1a3a5c;"/>
+                <HBox fx:id="psyListContainer" spacing="10" alignment="TOP_LEFT"/>
+            </VBox>
+        </HBox>
+
+    </VBox>
+</ScrollPane>

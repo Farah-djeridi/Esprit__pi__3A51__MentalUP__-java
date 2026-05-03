@@ -1,6 +1,6 @@
 package validators;
 
-import Models.RendezVous;
+import models.RendezVous;
 
 import java.sql.Date;
 import java.sql.Time;

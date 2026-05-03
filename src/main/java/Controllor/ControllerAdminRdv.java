@@ -1,8 +1,9 @@
 package Controllor;
 
 
-import Models.RendezVous;
+import models.RendezVous;
 import services.ServiceRendezVous;
+import Controllor.AdminSidebarHelper;
 import javafx.animation.FadeTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -36,6 +37,8 @@ public class ControllerAdminRdv {
     @FXML private TextField searchField;
     @FXML private ComboBox<String> filtreStatut, filtreType, triOptions;
     @FXML private ImageView logoImage;
+    @FXML private Label avatarInitials;
+    @FXML private Label labelUserName;
 
     private final ServiceRendezVous service = new ServiceRendezVous();
     private List<RendezVous> tousLesRdv;
@@ -68,10 +71,10 @@ public class ControllerAdminRdv {
     }
 
     private void mettreAJourStats(List<RendezVous> list) {
-        long total     = list.size();
-        long libres    = list.stream().filter(r -> "libre".equalsIgnoreCase(r.getStatut()) || "disponible".equalsIgnoreCase(r.getStatut())).count();
-        long reserves  = list.stream().filter(r -> "réservé".equalsIgnoreCase(r.getStatut()) || "en attente".equalsIgnoreCase(r.getStatut())).count();
-        long confirmes = list.stream().filter(r -> "confirmé".equalsIgnoreCase(r.getStatut())).count();
+        long total      = list.size();
+        long libres     = list.stream().filter(r -> "libre".equalsIgnoreCase(r.getStatut()) || "disponible".equalsIgnoreCase(r.getStatut())).count();
+        long reserves   = list.stream().filter(r -> "réservé".equalsIgnoreCase(r.getStatut()) || "en attente".equalsIgnoreCase(r.getStatut())).count();
+        long confirmes  = list.stream().filter(r -> "confirmé".equalsIgnoreCase(r.getStatut())).count();
         long aujourdhui = list.stream().filter(r -> r.getDate() != null && r.getDate().toLocalDate().equals(LocalDate.now())).count();
 
         statTotal.setText(String.valueOf(total));
@@ -82,19 +85,19 @@ public class ControllerAdminRdv {
     }
 
     private void appliquerFiltresEtTri() {
-        String search  = searchField.getText() != null ? searchField.getText().toLowerCase().trim() : "";
-        String statut  = filtreStatut.getValue();
-        String type    = filtreType.getValue();
-        String tri     = triOptions.getValue();
+        String search = searchField.getText() != null ? searchField.getText().toLowerCase().trim() : "";
+        String statut = filtreStatut.getValue();
+        String type   = filtreType.getValue();
+        String tri    = triOptions.getValue();
 
         List<RendezVous> filtres = tousLesRdv.stream()
             .filter(r -> {
                 // Recherche texte
                 if (!search.isEmpty()) {
-                    String concat = (r.getTypeRdv()  != null ? r.getTypeRdv().toLowerCase()  : "") + " " +
-                                    (r.getStatut()   != null ? r.getStatut().toLowerCase()   : "") + " " +
-                                    (r.getDate()     != null ? r.getDate().toString()         : "") + " " +
-                                    (r.getLieu()     != null ? r.getLieu().toLowerCase()      : "");
+                    String concat = (r.getTypeRdv() != null ? r.getTypeRdv().toLowerCase() : "") + " " +
+                                    (r.getStatut()  != null ? r.getStatut().toLowerCase()  : "") + " " +
+                                    (r.getDate()    != null ? r.getDate().toString()        : "") + " " +
+                                    (r.getLieu()    != null ? r.getLieu().toLowerCase()     : "");
                     if (!concat.contains(search)) return false;
                 }
                 // Filtre statut
@@ -155,7 +158,6 @@ public class ControllerAdminRdv {
         barre.setPrefWidth(6);
         barre.setStyle("-fx-background-color: " + couleur + "; -fx-background-radius: 14 0 0 14;");
 
-
         HBox contenu = new HBox(16);
         contenu.setAlignment(Pos.CENTER_LEFT);
         contenu.setPadding(new Insets(16, 20, 16, 18));
@@ -164,25 +166,22 @@ public class ControllerAdminRdv {
         Label icone = new Label(getIconeType(r.getTypeRdv()));
         icone.setStyle("-fx-font-size: 26px;");
 
-
         VBox infos = new VBox(4);
         HBox.setHgrow(infos, Priority.ALWAYS);
 
-
         HBox ligne1 = new HBox(10);
         ligne1.setAlignment(Pos.CENTER_LEFT);
-        Label lblDate = new Label(formatDate(r.getDate()));
+        Label lblDate  = new Label(formatDate(r.getDate()));
         lblDate.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;");
         Label lblHeure = new Label("•  " + formatTime(r.getHeureDebut()) + " – " + formatTime(r.getHeureFin()));
         lblHeure.setStyle("-fx-font-size: 13px; -fx-text-fill: #5A6C7D; -fx-font-weight: 500;");
         ligne1.getChildren().addAll(lblDate, lblHeure);
 
-
         HBox ligne2 = new HBox(12);
         ligne2.setAlignment(Pos.CENTER_LEFT);
-        Label lblType = new Label(r.getTypeRdv() != null ? capitalize(r.getTypeRdv()) : "—");
+        Label lblType = new Label(r.getTypeRdv() != null ? capitalize(r.getTypeRdv()) : "–");
         lblType.setStyle("-fx-font-size: 12px; -fx-text-fill: #5A6C7D;");
-        Label lblPsy = new Label("Psy #" + r.getPsychologueId());
+        Label lblPsy  = new Label("Psy #" + r.getPsychologueId());
         lblPsy.setStyle("-fx-font-size: 12px; -fx-text-fill: #94A3B8;");
         if (r.getEtudiantId() != null) {
             Label lblEtu = new Label("Étudiant #" + r.getEtudiantId());
@@ -195,7 +194,7 @@ public class ControllerAdminRdv {
         infos.getChildren().addAll(ligne1, ligne2);
 
         // Badge statut
-        Label badge = new Label(r.getStatut() != null ? r.getStatut().toUpperCase() : "—");
+        Label badge = new Label(r.getStatut() != null ? r.getStatut().toUpperCase() : "–");
         badge.setStyle(
             "-fx-background-color: " + couleur + "22; -fx-text-fill: " + couleur + ";" +
             "-fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 4 12;"
@@ -204,9 +203,7 @@ public class ControllerAdminRdv {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        contenu.getChildren().addAll(icone, infos, spacer);
-
-        contenu.getChildren().add(badge);
+        contenu.getChildren().addAll(icone, infos, spacer, badge);
         card.getChildren().addAll(barre, contenu);
 
         // Hover
@@ -223,7 +220,6 @@ public class ControllerAdminRdv {
 
         return card;
     }
-
 
 
     @FXML
@@ -301,20 +297,19 @@ public class ControllerAdminRdv {
         cbStat.setValue("libre"); cbStat.setPrefWidth(240);
         cbStat.setStyle("-fx-background-radius: 8;"); grid.add(cbStat, 1, 4);
 
-      
+        // Type RDV
         grid.add(fl("Type RDV"), 0, 5);
         ComboBox<String> cbType = new ComboBox<>(); cbType.setId("typeRdv");
         cbType.getItems().addAll("consultation", "suivi", "urgence", "bilan");
         cbType.setValue("consultation"); cbType.setPrefWidth(240);
         cbType.setStyle("-fx-background-radius: 8;"); grid.add(cbType, 1, 5);
 
-       
+        // Psy ID
         grid.add(fl("Psy ID"), 0, 6);
         TextField tfPsy = ft("2"); tfPsy.setId("psyId"); grid.add(tfPsy, 1, 6);
 
-       
         if (existing != null) {
-            if (existing.getDate() != null) dp.setValue(existing.getDate().toLocalDate());
+            if (existing.getDate()       != null) dp.setValue(existing.getDate().toLocalDate());
             if (existing.getHeureDebut() != null) tfS.setText(existing.getHeureDebut().toString().substring(0, 5));
             if (existing.getHeureFin()   != null) tfE.setText(existing.getHeureFin().toString().substring(0, 5));
             if (existing.getStatut()     != null) cbStat.setValue(existing.getStatut());
@@ -344,12 +339,11 @@ public class ControllerAdminRdv {
                                         TextField tfPsy,
                                         int id) {
 
-        RendezVousValidator.ValidationResult result =
-                new RendezVousValidator.ValidationResult();
+        RendezVousValidator.ValidationResult result = new RendezVousValidator.ValidationResult();
 
         Time tDebut = RendezVousValidator.parseHeure(tfS.getText(), "Heure début", result);
-        Time tFin   = RendezVousValidator.parseHeure(tfE.getText(), "Heure fin", result);
-        int psyId   = RendezVousValidator.parseId(tfPsy.getText(), "Psy ID", result);
+        Time tFin   = RendezVousValidator.parseHeure(tfE.getText(), "Heure fin",   result);
+        int  psyId  = RendezVousValidator.parseId(tfPsy.getText(),  "Psy ID",      result);
 
         RendezVous r = new RendezVous();
         r.setId(id);
@@ -366,7 +360,7 @@ public class ControllerAdminRdv {
 
         if (!full.isValide()) {
             new Alert(Alert.AlertType.WARNING,
-                    "⚠ Erreurs de saisie :\n\n" + full.getMessageComplet()
+                    "⚠  Erreurs de saisie :\n\n" + full.getMessageComplet()
             ).showAndWait();
             return null;
         }
@@ -375,9 +369,9 @@ public class ControllerAdminRdv {
     }
 
 
-    @FXML private void onSearch(KeyEvent e)        { appliquerFiltresEtTri(); }
-    @FXML private void onFiltreChange(ActionEvent e){ appliquerFiltresEtTri(); }
-    @FXML private void onTriChange(ActionEvent e)  { appliquerFiltresEtTri(); }
+    @FXML private void onSearch(KeyEvent e)         { appliquerFiltresEtTri(); }
+    @FXML private void onFiltreChange(ActionEvent e) { appliquerFiltresEtTri(); }
+    @FXML private void onTriChange(ActionEvent e)    { appliquerFiltresEtTri(); }
 
     @FXML
     private void onFilterTotal(MouseEvent e) {
@@ -438,9 +432,10 @@ public class ControllerAdminRdv {
         } catch (Exception ex) { ex.printStackTrace(); }
     }
 
-    @FXML private void onNavHomeClicked(MouseEvent e)    { loadPage("/HomeAdmin.fxml", e); }
-    @FXML private void onNavDossiersClicked(MouseEvent e){ loadPage("/AdminDossiers.fxml", e); }
-    @FXML private void onLogout(ActionEvent e)           { loadPage("/HomeAdmin.fxml", e); }
+    @FXML private void onNavHomeClicked(MouseEvent e)     { AdminSidebarHelper.goToAccueil(); }
+    @FXML private void onNavDossiersClicked(MouseEvent e) { AdminSidebarHelper.goToDossiers(); }
+    @FXML private void onNavRdvClicked(MouseEvent e)      { AdminSidebarHelper.goToRendezVous(); }
+    @FXML private void onLogout(ActionEvent e)            { AdminSidebarHelper.logout(); }
 
     @FXML private void onNavHoverEnter(MouseEvent event) {
         ((HBox) event.getSource()).setStyle(
@@ -453,33 +448,40 @@ public class ControllerAdminRdv {
         );
     }
 
+    @FXML public void onNavSuiviClicked(MouseEvent e)        { AdminSidebarHelper.goToSuiviMental(); }
+    @FXML public void onNavForumClicked(MouseEvent e)        { AdminSidebarHelper.goToForum(); }
+    @FXML public void onNavUtilisateursClicked(MouseEvent e) { AdminSidebarHelper.goToUtilisateurs(); }
+    @FXML public void onNavContenusClicked(MouseEvent e)     { AdminSidebarHelper.goToContenus(); }
+    @FXML public void onNavActivitesClicked(MouseEvent e)    { AdminSidebarHelper.goToActivites(); }
+    @FXML public void onNavReservationsClicked(MouseEvent e) { AdminSidebarHelper.goToReservations(); }
+
 
     private String getCouleurStatut(String s) {
         if (s == null) return "#95A5A6";
         return switch (s.toLowerCase()) {
-            case "libre", "disponible" -> "#27AE60";
-            case "confirmé"            -> "#2980B9";
-            case "réservé", "en attente" -> "#E67E22";
-            case "annulé"              -> "#95A5A6";
-            default                    -> "#95A5A6";
+            case "libre", "disponible"       -> "#27AE60";
+            case "confirmé"                  -> "#2980B9";
+            case "réservé", "en attente"     -> "#E67E22";
+            case "annulé"                    -> "#95A5A6";
+            default                          -> "#95A5A6";
         };
     }
 
     private String getIconeType(String t) {
         if (t == null) return "📋";
         return switch (t.toLowerCase()) {
-            case "urgence"      -> "🚨";
-            case "suivi"        -> "📈";
-            case "bilan"        -> "📊";
-            default             -> "🏥";
+            case "urgence" -> "🚨";
+            case "suivi"   -> "📈";
+            case "bilan"   -> "📊";
+            default        -> "🏥";
         };
     }
 
     private String formatDate(Date date) {
-        if (date == null) return "—";
+        if (date == null) return "–";
         LocalDate ld = date.toLocalDate();
-        String[] mois = {"jan.","fév.","mar.","avr.","mai","juin","juil.","août","sep.","oct.","nov.","déc."};
-        return ld.getDayOfMonth() + " " + mois[ld.getMonthValue()-1] + " " + ld.getYear();
+        String[] mois = {"jan.", "fév.", "mar.", "avr.", "mai", "juin", "juil.", "août", "sep.", "oct.", "nov.", "déc."};
+        return ld.getDayOfMonth() + " " + mois[ld.getMonthValue() - 1] + " " + ld.getYear();
     }
 
     private String formatTime(Time t) {
@@ -489,7 +491,7 @@ public class ControllerAdminRdv {
 
     private String capitalize(String s) {
         if (s == null || s.isEmpty()) return s;
-        return s.substring(0,1).toUpperCase() + s.substring(1);
+        return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
 
     private Label fl(String text) {
@@ -504,4 +506,11 @@ public class ControllerAdminRdv {
                     "-fx-border-color: #D0D9E0; -fx-background-color: white;");
         return tf;
     }
+
+    @FXML public void onNavSuiviStatsClicked(MouseEvent e)   { AdminSidebarHelper.goToSuiviMental(); }
+    @FXML public void onNavObjectifsClicked(MouseEvent e)    { AdminSidebarHelper.goToObjectifs(); }
+    @FXML public void onNavSujetsClicked(MouseEvent e)       { AdminSidebarHelper.goToForum(); }
+    @FXML public void onNavCommentairesClicked(MouseEvent e) { AdminSidebarHelper.goToCommentaires(); }
+    @FXML public void onSubmenuHoverEnter(MouseEvent e)      { }
+    @FXML public void onSubmenuHoverExit(MouseEvent e)       { }
 }

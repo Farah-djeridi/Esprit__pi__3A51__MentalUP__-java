@@ -1,5 +1,6 @@
 package Controllor;
 
+import Controllor.AdminSidebarHelper;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -21,6 +22,8 @@ public class ControllerStatsAdmin {
     @FXML private WebView  webView;
     @FXML private Label    lblStatsInfo;
     @FXML private ImageView logoImage;
+    @FXML private Label avatarInitials;
+    @FXML private Label labelUserName;
 
     private final ServiceUser service = new ServiceUser();
 
@@ -242,16 +245,35 @@ public class ControllerStatsAdmin {
     }
 
     // Navigation
-    @FXML public void goToDashboard() { SceneManager.switchTo("HomeAdmin.fxml", "Dashboard Admin"); }
-    @FXML public void goToUsers()     { SceneManager.switchTo("AdminUsers.fxml", "Gestion des Utilisateurs"); }
-    @FXML public void handleLogout()  { SessionManager.getInstance().logout(); SceneManager.goToLogin(); }
+    @FXML public void goToDashboard() { AdminSidebarHelper.goToAccueil(); }
+    @FXML public void goToUsers()     { AdminSidebarHelper.goToUtilisateurs(); }
+    @FXML public void handleLogout()  { AdminSidebarHelper.logout(); }
 
-    @FXML public void onHoverEnter(MouseEvent e) {
+    @FXML public void onNavHomeClicked(javafx.scene.input.MouseEvent e)         { AdminSidebarHelper.goToAccueil(); }
+    @FXML public void onNavSuiviClicked(javafx.scene.input.MouseEvent e)        { AdminSidebarHelper.goToSuiviMental(); }
+    @FXML public void onNavForumClicked(javafx.scene.input.MouseEvent e)        { AdminSidebarHelper.goToForum(); }
+    @FXML public void onNavRdvClicked(javafx.scene.input.MouseEvent e)          { AdminSidebarHelper.goToRendezVous(); }
+    @FXML public void onNavUtilisateursClicked(javafx.scene.input.MouseEvent e) { AdminSidebarHelper.goToUtilisateurs(); }
+    @FXML public void onNavDossiersClicked(javafx.scene.input.MouseEvent e)     { AdminSidebarHelper.goToDossiers(); }
+    @FXML public void onNavContenusClicked(javafx.scene.input.MouseEvent e)     { AdminSidebarHelper.goToContenus(); }
+    @FXML public void onNavActivitesClicked(javafx.scene.input.MouseEvent e)    { AdminSidebarHelper.goToActivites(); }
+    @FXML public void onNavReservationsClicked(javafx.scene.input.MouseEvent e) { AdminSidebarHelper.goToReservations(); }
+    @FXML public void onNavHoverEnter(javafx.scene.input.MouseEvent e)          { }
+    @FXML public void onNavHoverExit(javafx.scene.input.MouseEvent e)           { }
+    @FXML public void onLogout(javafx.event.ActionEvent e)                      { AdminSidebarHelper.logout(); }
+
+    @FXML public void onHoverEnter(javafx.scene.input.MouseEvent e) {
         HBox h = (HBox) e.getSource();
         h.setStyle("-fx-background-color: rgba(52,73,94,0.5); -fx-background-radius: 8; -fx-padding: 10 12; -fx-cursor: hand;");
     }
-    @FXML public void onHoverExit(MouseEvent e) {
+    @FXML public void onHoverExit(javafx.scene.input.MouseEvent e) {
         HBox h = (HBox) e.getSource();
         h.setStyle("-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 12; -fx-cursor: hand;");
     }
+    @FXML public void onNavSuiviStatsClicked(MouseEvent e)    { AdminSidebarHelper.goToSuiviMental(); }
+    @FXML public void onNavObjectifsClicked(MouseEvent e)     { AdminSidebarHelper.goToObjectifs(); }
+    @FXML public void onNavSujetsClicked(MouseEvent e)        { AdminSidebarHelper.goToForum(); }
+    @FXML public void onNavCommentairesClicked(MouseEvent e)  { AdminSidebarHelper.goToCommentaires(); }
+    @FXML public void onSubmenuHoverEnter(MouseEvent e)       { }
+    @FXML public void onSubmenuHoverExit(MouseEvent e)        { }
 }

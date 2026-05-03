@@ -21,6 +21,19 @@ public class SceneManager {
         try {
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/" + fxmlFile));
             Parent root = loader.load();
+            if (primaryStage == null) {
+                // Fallback: find any visible stage
+                for (javafx.stage.Window w : javafx.stage.Window.getWindows()) {
+                    if (w instanceof Stage && w.isShowing()) {
+                        primaryStage = (Stage) w;
+                        break;
+                    }
+                }
+            }
+            if (primaryStage == null) {
+                System.err.println("SceneManager: primaryStage is null, cannot switch to " + fxmlFile);
+                return;
+            }
             primaryStage.setScene(new Scene(root));
             primaryStage.setTitle(title);
             primaryStage.show();

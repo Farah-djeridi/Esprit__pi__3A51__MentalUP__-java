@@ -1,7 +1,8 @@
 package Controllor;
 
-import Models.Dossier;
+import models.Dossier;
 import services.ServiceDossier;
+import Controllor.AdminSidebarHelper;
 import javafx.animation.FadeTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -35,6 +36,8 @@ public class ControllerAdminDossiers {
     @FXML private TextField searchField;
     @FXML private ComboBox<String> filtreRisque, triOptions;
     @FXML private ImageView logoImage;
+    @FXML private Label avatarInitials;
+    @FXML private Label labelUserName;
 
     private final ServiceDossier service = new ServiceDossier();
     private List<Dossier> tousLesDossiers;
@@ -392,20 +395,18 @@ public class ControllerAdminDossiers {
         } catch (Exception ex) { ex.printStackTrace(); }
     }
 
-    @FXML private void onNavHomeClicked(MouseEvent e)  { loadPage("/HomeAdmin.fxml", e); }
-    @FXML private void onNavRdvClicked(MouseEvent e)   { loadPage("/AdminRdv.fxml", e); }
-    @FXML private void onLogout(ActionEvent e)         { loadPage("/HomeAdmin.fxml", e); }
-
-    @FXML private void onNavHoverEnter(MouseEvent event) {
-        ((HBox) event.getSource()).setStyle(
-            "-fx-background-color: rgba(52,73,94,0.5); -fx-background-radius: 8; -fx-padding: 10 14; -fx-cursor: hand;"
-        );
-    }
-    @FXML private void onNavHoverExit(MouseEvent event) {
-        ((HBox) event.getSource()).setStyle(
-            "-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 14; -fx-cursor: hand;"
-        );
-    }
+    @FXML public void onNavHomeClicked(MouseEvent e)         { AdminSidebarHelper.goToAccueil(); }
+    @FXML public void onNavSuiviClicked(MouseEvent e)        { AdminSidebarHelper.goToSuiviMental(); }
+    @FXML public void onNavForumClicked(MouseEvent e)        { AdminSidebarHelper.goToForum(); }
+    @FXML public void onNavRdvClicked(MouseEvent e)          { AdminSidebarHelper.goToRendezVous(); }
+    @FXML public void onNavDossiersClicked(MouseEvent e)     { AdminSidebarHelper.goToDossiers(); }
+    @FXML public void onNavUtilisateursClicked(MouseEvent e) { AdminSidebarHelper.goToUtilisateurs(); }
+    @FXML public void onNavContenusClicked(MouseEvent e)     { AdminSidebarHelper.goToContenus(); }
+    @FXML public void onNavActivitesClicked(MouseEvent e)    { AdminSidebarHelper.goToActivites(); }
+    @FXML public void onNavReservationsClicked(MouseEvent e) { AdminSidebarHelper.goToReservations(); }
+    @FXML public void onNavHoverEnter(MouseEvent e)          { }
+    @FXML public void onNavHoverExit(MouseEvent e)           { }
+    @FXML public void onLogout(ActionEvent e)                { AdminSidebarHelper.logout(); }
 
 
     private String getCouleurRisque(String r) {
@@ -447,4 +448,10 @@ public class ControllerAdminDossiers {
                     "-fx-border-color: #D0D9E0; -fx-background-color: white;");
         return tf;
     }
+    @FXML public void onNavSuiviStatsClicked(MouseEvent e)    { AdminSidebarHelper.goToSuiviMental(); }
+    @FXML public void onNavObjectifsClicked(MouseEvent e)     { AdminSidebarHelper.goToObjectifs(); }
+    @FXML public void onNavSujetsClicked(MouseEvent e)        { AdminSidebarHelper.goToForum(); }
+    @FXML public void onNavCommentairesClicked(MouseEvent e)  { AdminSidebarHelper.goToCommentaires(); }
+    @FXML public void onSubmenuHoverEnter(MouseEvent e)       { }
+    @FXML public void onSubmenuHoverExit(MouseEvent e)        { }
 }

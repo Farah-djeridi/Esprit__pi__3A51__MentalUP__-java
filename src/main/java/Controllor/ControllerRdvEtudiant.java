@@ -1,9 +1,9 @@
 package Controllor;
 
-import Models.RendezVous;
+import models.RendezVous;
 import services.ServiceRendezVous;
-import Models.Rating;
-import Services.ServiceRating;
+import models.Rating;
+import services.ServiceRating;
 import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
 import javafx.event.ActionEvent;
@@ -35,9 +35,10 @@ public class ControllerRdvEtudiant {
     @FXML private VBox rdvAujContainer;
     @FXML private VBox rdvAvenirContainer;
     @FXML private VBox rdvAnciensContainer;
-    @FXML private Label labelUserName, avatarInitials, badgeRdv, labelUserRole;
-    @FXML private Button notifButton, logoutButton;
-    @FXML private ImageView logoImage;
+    private Label labelUserName, avatarInitials, badgeRdv, labelUserRole;
+    @FXML private Button notifButton;
+    private Button logoutButton;
+    private ImageView logoImage;
 
     private final ServiceRendezVous serviceRdv = new ServiceRendezVous();
     private final ServiceRating serviceRating = new ServiceRating();
@@ -52,18 +53,16 @@ public class ControllerRdvEtudiant {
         models.User user = SessionManager.getInstance().getCurrentUser();
         if (user != null) {
             etudiantId = user.getId();
-            labelUserName.setText(user.getPrenom() + " " + user.getNom());
+            if (labelUserName != null) labelUserName.setText(user.getPrenom() + " " + user.getNom());
             if (labelUserRole != null) labelUserRole.setText(user.getRole() != null ? user.getRole() : "Étudiant");
-            
             String initials = "";
-            if (user.getPrenom() != null && !user.getPrenom().isEmpty())
-                initials += user.getPrenom().charAt(0);
-            if (user.getNom() != null && !user.getNom().isEmpty())
-                initials += user.getNom().charAt(0);
-            avatarInitials.setText(initials.toUpperCase());
+            if (user.getPrenom() != null && !user.getPrenom().isEmpty()) initials += user.getPrenom().charAt(0);
+            if (user.getNom()    != null && !user.getNom().isEmpty())    initials += user.getNom().charAt(0);
+            if (avatarInitials != null) avatarInitials.setText(initials.toUpperCase());
         }
 
-        logoImage.setImage(new Image(getClass().getResourceAsStream("/Images/logo.png")));
+        try { if (logoImage != null) logoImage.setImage(new Image(getClass().getResourceAsStream("/Images/logo.png"))); }
+        catch (Exception ignored) {}
         chargerPsychologues();
         chargerRdvAujourdhui();
         chargerRdvAvenir();

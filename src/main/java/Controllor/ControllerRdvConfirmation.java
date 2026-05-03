@@ -1,6 +1,6 @@
 package Controllor;
 
-import Models.RendezVous;
+import models.RendezVous;
 import services.ServiceRendezVous;
 import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;

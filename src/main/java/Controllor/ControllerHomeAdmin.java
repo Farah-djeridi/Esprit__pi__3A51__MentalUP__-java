@@ -17,8 +17,8 @@ import javafx.scene.chart.PieChart;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
-import Models.RendezVous;
-import Models.Dossier;
+import models.RendezVous;
+import models.Dossier;
 import services.PDFService;
 import services.ServiceRendezVous;
 import services.ServiceDossier;
@@ -35,7 +35,7 @@ import java.time.format.DateTimeFormatter;
 
 public class ControllerHomeAdmin {
 
-    @FXML private HBox navAccueil, navSuivi, navForum, navRdv, navActivites, navContenus, navDossiers, navUtilisateurs, navRessources;
+    @FXML private HBox navAccueil, navSuivi, navForum, navRdv, navActivites, navContenus, navDossiers, navUtilisateurs, navRessources, navReservations;
     @FXML private HBox navSuiviStats, navObjectifs, navSujets, navCommentaires;
     @FXML private VBox submenuSuivi, submenuForum;
     @FXML private Label arrowSuivi, arrowForum;
@@ -183,7 +183,8 @@ public class ControllerHomeAdmin {
     // Navigation
     @FXML public void onNavHomeClicked(MouseEvent event)     { setActiveNav(navAccueil); }
     @FXML public void onNavRdvClicked(MouseEvent event)      { SceneManager.switchTo("AdminRdv.fxml", "Gestion des Rendez-vous"); }
-    @FXML public void onNavActivitesClicked(MouseEvent event){ setActiveNav(navActivites); }
+    @FXML public void onNavActivitesClicked(MouseEvent event){ SceneManager.switchTo("GestionActivite.fxml", "Gestion des Activités"); }
+    @FXML public void onNavReservationsClicked(MouseEvent event){ SceneManager.switchTo("GestionReservations.fxml", "Gestion des Réservations"); }
     @FXML public void onNavContenusClicked(MouseEvent event) { SceneManager.switchTo("AdminRessources.fxml", "Gestion des Ressources"); }
     @FXML public void onNavDossiersClicked(MouseEvent event) { SceneManager.switchTo("AdminDossiers.fxml", "Gestion des Dossiers"); }
     @FXML public void onNavUtilisateursClicked(MouseEvent event) { SceneManager.switchTo("AdminUsers.fxml", "Gestion des Utilisateurs"); }

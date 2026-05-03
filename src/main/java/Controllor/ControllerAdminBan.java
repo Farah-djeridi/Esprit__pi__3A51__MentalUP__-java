@@ -1,4 +1,7 @@
 package Controllor;
+import javafx.scene.input.MouseEvent;
+import javafx.event.ActionEvent;
+import Controllor.AdminSidebarHelper;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -661,4 +664,19 @@ public class ControllerAdminBan {
 
         alert.showAndWait();
     }
+
+    @FXML public void onNavHomeClicked(MouseEvent e)         { AdminSidebarHelper.goToAccueil(); }
+    @FXML public void onNavSuiviClicked(MouseEvent e)        { AdminSidebarHelper.goToSuiviMental(); }
+    @FXML public void onNavForumClicked(MouseEvent e)        { AdminSidebarHelper.goToForum(); }
+    @FXML public void onNavRdvClicked(MouseEvent e)          { AdminSidebarHelper.goToRendezVous(); }
+    @FXML public void onNavDossiersClicked(MouseEvent e)     { AdminSidebarHelper.goToDossiers(); }
+    @FXML public void onNavUtilisateursClicked(MouseEvent e) { AdminSidebarHelper.goToUtilisateurs(); }
+    @FXML public void onNavContenusClicked(MouseEvent e)     { AdminSidebarHelper.goToContenus(); }
+    @FXML public void onNavActivitesClicked(MouseEvent e)    { AdminSidebarHelper.goToActivites(); }
+    @FXML public void onNavReservationsClicked(MouseEvent e) { AdminSidebarHelper.goToReservations(); }
+    @FXML public void onNavHoverEnter(MouseEvent e)          { }
+    @FXML public void onNavHoverExit(MouseEvent e)           { }
+    @FXML public void onLogout(ActionEvent e)                { AdminSidebarHelper.logout(); }
+    @FXML public void onSubmenuHoverEnter(MouseEvent e)       { }
+    @FXML public void onSubmenuHoverExit(MouseEvent e)        { }
 }

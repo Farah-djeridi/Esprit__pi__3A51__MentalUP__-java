@@ -35,6 +35,8 @@ public class EtudiantActivitesController implements Initializable {
 
     @FXML private GridPane activitesGrid;
     @FXML private TextField searchField;
+    @FXML private javafx.scene.control.Label lblWelcome;
+    @FXML private javafx.scene.control.Label lblDate;
 
     private ServiceActivite serviceActivite;
     private ServiceReservation serviceReservation;
@@ -46,6 +48,17 @@ public class EtudiantActivitesController implements Initializable {
         serviceActivite    = new ServiceActivite();
         serviceReservation = new ServiceReservation();
         serviceNotation    = new ServiceNotation();
+
+        // Set welcome message from session
+        models.User user = utils.SessionManager.getInstance().getCurrentUser();
+        if (user != null && lblWelcome != null) {
+            lblWelcome.setText("Bonjour, " + user.getPrenom() + " 👋");
+        }
+        if (lblDate != null) {
+            lblDate.setText(java.time.LocalDate.now()
+                .format(java.time.format.DateTimeFormatter.ofPattern("EEEE d MMMM yyyy", java.util.Locale.FRENCH)));
+        }
+
         corrigerCoordonnees();
         chargerActivites();
 

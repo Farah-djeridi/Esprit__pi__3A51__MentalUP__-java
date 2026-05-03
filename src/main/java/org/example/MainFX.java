@@ -22,7 +22,7 @@ public class MainFX extends Application {
 
             stage.setTitle("MentalUp - Dashboard Psychologue");
             stage.setScene(scene);
-            stage.setResizable(false);
+            stage.setResizable(true);
             stage.show();
 
         } catch (Exception e) {

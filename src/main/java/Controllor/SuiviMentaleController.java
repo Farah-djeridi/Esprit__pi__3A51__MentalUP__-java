@@ -122,11 +122,11 @@ public class SuiviMentaleController {
     @FXML private CategoryAxis xAxisEvolution;
     @FXML private NumberAxis yAxisEvolution;
 
-    // Sidebar fields
-    @FXML private ImageView logoImage;
-    @FXML private HBox navAccueil, navSuivi, navObjectifs, navRdv, navForum, navActivites, navRessources;
+    // Sidebar fields (removed from FXML, kept as plain fields)
+    private ImageView logoImage;
+    private HBox navAccueil, navSuivi, navObjectifs, navRdv, navForum, navActivites, navRessources;
     @FXML private Label labelUserName, labelDate, avatarInitials;
-    @FXML private Button logoutButton;
+    private Button logoutButton;
     private final WellbeingTipService wellbeingTipService = new WellbeingTipService();
     private final ServiceSuiviMentale suiviService = new ServiceSuiviMentale();
     private final ServiceObjectif objectifService = new ServiceObjectif();

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="Controllor.ControllerHome"
+            prefWidth="1100" prefHeight="700"
+            style="-fx-background-color: #f0f4f8;">
+
+    <!-- ═══════════════════════════════════════════════════════════ SIDEBAR (fixed) -->
+    <left>
+        <VBox prefWidth="200" minWidth="200" maxWidth="200"
+              style="-fx-background-color: linear-gradient(to bottom, #1a3a5c, #2d5a8e);">
+
+            <!-- Logo -->
+            <VBox alignment="CENTER" spacing="6" style="-fx-padding: 22 12 14 12;">
+                <ImageView fx:id="logoImage" fitWidth="52" fitHeight="52" preserveRatio="true"/>
+                <Label text="MentalUp"
+                       style="-fx-text-fill: white; -fx-font-size: 17px; -fx-font-weight: bold;"/>
+                <Label text="Bien-être étudiant"
+                       style="-fx-text-fill: rgba(255,255,255,0.6); -fx-font-size: 10px;"/>
+            </VBox>
+
+            <Region style="-fx-background-color: rgba(255,255,255,0.15); -fx-pref-height: 1; -fx-min-height: 1;"/>
+
+            <!-- Nav items -->
+            <VBox spacing="2" style="-fx-padding: 12 10;" VBox.vgrow="ALWAYS">
+
+                <HBox fx:id="navAccueil" spacing="10" alignment="CENTER_LEFT"
+                      style="-fx-background-color: rgba(255,255,255,0.18); -fx-background-radius: 8; -fx-padding: 10 12; -fx-cursor: hand;"
+                      onMouseClicked="#onNavHomeClicked"
+                      onMouseEntered="#onNavHoverEnter" onMouseExited="#onNavHoverExit">
+                    <Label text="🏠" style="-fx-font-size: 14px;"/>
+                    <Label text="Accueil" style="-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                </HBox>
+
+                <HBox fx:id="navSuivi" spacing="10" alignment="CENTER_LEFT"
+                      style="-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 12; -fx-cursor: hand;"
+                      onMouseClicked="#onNavSuiviClicked"
+                      onMouseEntered="#onNavHoverEnter" onMouseExited="#onNavHoverExit">
+                    <Label text="📊" style="-fx-font-size: 14px;"/>
+                    <Label text="Suivi Mental" style="-fx-text-fill: rgba(255,255,255,0.88); -fx-font-size: 13px;"/>
+                </HBox>
+
+                <HBox fx:id="navObjectifs" spacing="10" alignment="CENTER_LEFT"
+                      style="-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 12; -fx-cursor: hand;"
+                      onMouseClicked="#onNavObjectifsClicked"
+                      onMouseEntered="#onNavHoverEnter" onMouseExited="#onNavHoverExit">
+                    <Label text="🎯" style="-fx-font-size: 14px;"/>
+                    <Label text="Objectifs" style="-fx-text-fill: rgba(255,255,255,0.88); -fx-font-size: 13px;"/>
+                </HBox>
+
+                <HBox fx:id="navRdv" spacing="10" alignment="CENTER_LEFT"
+                      style="-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 12; -fx-cursor: hand;"
+                      onMouseClicked="#onNavRdvClicked"
+                      onMouseEntered="#onNavHoverEnter" onMouseExited="#onNavHoverExit">
+                    <Label text="📅" style="-fx-font-size: 14px;"/>
+                    <Label text="Rendez-vous" style="-fx-text-fill: rgba(255,255,255,0.88); -fx-font-size: 13px;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="badgeRdv" text="0"
+                           style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 1 5; -fx-font-size: 10px;"
+                           visible="false"/>
+                </HBox>
+
+                <HBox fx:id="navForum" spacing="10" alignment="CENTER_LEFT"
+                      style="-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 12; -fx-cursor: hand;"
+                      onMouseClicked="#onNavForumClicked"
+                      onMouseEntered="#onNavHoverEnter" onMouseExited="#onNavHoverExit">
+                    <Label text="💬" style="-fx-font-size: 14px;"/>
+                    <Label text="Forum" style="-fx-text-fill: rgba(255,255,255,0.88); -fx-font-size: 13px;"/>
+                </HBox>
+
+                <HBox fx:id="navActivites" spacing="10" alignment="CENTER_LEFT"
+                      style="-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 12; -fx-cursor: hand;"
+                      onMouseClicked="#onNavActivitesClicked"
+                      onMouseEntered="#onNavHoverEnter" onMouseExited="#onNavHoverExit">
+                    <Label text="⚡" style="-fx-font-size: 14px;"/>
+                    <Label text="Activités" style="-fx-text-fill: rgba(255,255,255,0.88); -fx-font-size: 13px;"/>
+                </HBox>
+
+                <HBox fx:id="navRessources" spacing="10" alignment="CENTER_LEFT"
+                      style="-fx-background-color: transparent; -fx-background-radius: 8; -fx-padding: 10 12; -fx-cursor: hand;"
+                      onMouseClicked="#onNavRessourcesClicked"
+                      onMouseEntered="#onNavHoverEnter" onMouseExited="#onNavHoverExit">
+                    <Label text="📚" style="-fx-font-size: 14px;"/>
+                    <Label text="Ressources" style="-fx-text-fill: rgba(255,255,255,0.88); -fx-font-size: 13px;"/>
+                </HBox>
+
+            </VBox>
+
+            <!-- User info at bottom -->
+            <Region style="-fx-background-color: rgba(255,255,255,0.15); -fx-pref-height: 1; -fx-min-height: 1;"/>
+            <HBox spacing="8" alignment="CENTER_LEFT" style="-fx-padding: 10 12 14 12;">
+                <StackPane>
+                    <Circle fx:id="avatarCircle" radius="20" style="-fx-fill: #3d7ab5;"/>
+                    <Label fx:id="avatarInitials" text="ET"
+                           style="-fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <ImageView fx:id="avatarImage" fitWidth="40" fitHeight="40" preserveRatio="false"
+                               visible="false" mouseTransparent="true"/>
+                </StackPane>
+                <VBox spacing="1" HBox.hgrow="ALWAYS">
+                    <Label fx:id="labelUserName" text="Étudiant"
+                           style="-fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                    <Label fx:id="labelUserRole" text="étudiant"
+                           style="-fx-text-fill: rgba(255,255,255,0.6); -fx-font-size: 10px;"/>
+                </VBox>
+                <Button fx:id="logoutButton" text="⏻" onAction="#onLogout"
+                        style="-fx-background-color: rgba(255,255,255,0.12); -fx-text-fill: rgba(255,255,255,0.8); -fx-background-radius: 50; -fx-pref-width: 28; -fx-pref-height: 28; -fx-cursor: hand; -fx-font-size: 13px;"/>
+            </HBox>
+        </VBox>
+    </left>
+
+    <!-- ═══════════════════════════════════════════════════════════ MAIN CONTENT -->
+    <center>
+        <VBox spacing="0">
+
+            <!-- Top bar (always visible) -->
+            <HBox alignment="CENTER_LEFT" spacing="14"
+                  style="-fx-background-color: white; -fx-padding: 12 24; -fx-border-color: transparent transparent #e2e8f0 transparent; -fx-border-width: 0 0 1 0;">
+                <VBox spacing="1">
+                    <Label fx:id="labelWelcome" text="Bonjour 👋"
+                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1a3a5c;"/>
+                    <Label fx:id="labelDate" text=""
+                           style="-fx-font-size: 11px; -fx-text-fill: #7a9cb8;"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <StackPane>
+                    <Button fx:id="notifButton" text="🔔" onAction="#onNotifications"
+                            style="-fx-background-color: #f0f6ff; -fx-background-radius: 50; -fx-pref-width: 38; -fx-pref-height: 38; -fx-cursor: hand; -fx-font-size: 15px;"/>
+                    <Label fx:id="notifBadgeLabel" text="0"
+                           style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 1 5; -fx-font-size: 9px;"
+                           StackPane.alignment="TOP_RIGHT" visible="false"/>
+                </StackPane>
+                <Button fx:id="menuButton" text="⋮" onAction="#onMenuClicked"
+                        style="-fx-background-color: #f0f6ff; -fx-background-radius: 50; -fx-pref-width: 38; -fx-pref-height: 38; -fx-cursor: hand; -fx-font-size: 17px;"/>
+            </HBox>
+
+            <!-- Notification panel -->
+            <VBox fx:id="notifPanel" spacing="10"
+                  style="-fx-background-color: white; -fx-padding: 14; -fx-border-color: #e2e8f0; -fx-border-width: 0 0 1 0;"
+                  visible="false" managed="false">
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label text="🔔 Notifications"
+                           style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #1a3a5c;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <ComboBox fx:id="notifFilterCombo" onAction="#onNotifFilterChanged"
+                              style="-fx-font-size: 12px;" prefWidth="150"/>
+                    <Button fx:id="clearAllNotifButton" text="Tout effacer"
+                            onAction="#onClearAllNotifications"
+                            style="-fx-background-color: #fff0f0; -fx-text-fill: #e74c3c; -fx-background-radius: 6; -fx-padding: 4 10; -fx-cursor: hand; -fx-font-size: 11px;"/>
+                </HBox>
+                <ListView fx:id="notifListView" prefHeight="180"
+                          style="-fx-background-color: transparent; -fx-border-color: transparent;"/>
+            </VBox>
+
+            <!-- ═══ CONTENT PANE — swapped by nav clicks ═══ -->
+            <StackPane fx:id="contentPane" VBox.vgrow="ALWAYS"
+                       style="-fx-background-color: #f0f4f8;"/>
+
+        </VBox>
+    </center>
+
+</BorderPane>

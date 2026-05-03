@@ -34,6 +34,9 @@ public class ReservationAdminController implements Initializable {
     @FXML private VBox chartDonutContainer;
     @FXML private GridPane calendarGrid;
     @FXML private Label lblMoisAnnee;
+    @FXML private javafx.scene.image.ImageView logoImage;
+    @FXML private Label avatarInitials;
+    @FXML private Label labelUserName;
 
     private ServiceReservation serviceReservation;
     private ServiceActivite    serviceActivite;
@@ -823,15 +826,27 @@ public class ReservationAdminController implements Initializable {
 
     @FXML
     private void ouvrirActivites() {
-        try {
-            Parent root = FXMLLoader.load(getClass().getResource("/GestionActivite.fxml"));
-            Stage stage = (Stage) reservationsVBox.getScene().getWindow();
-            stage.setScene(new Scene(root, 1200, 800));
-            stage.setTitle("Gestion des Activités - MentalUp");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Controllor.AdminSidebarHelper.goToActivites();
     }
+
+    @FXML public void onNavHomeClicked(javafx.scene.input.MouseEvent e)         { Controllor.AdminSidebarHelper.goToAccueil(); }
+    @FXML public void onNavSuiviClicked(javafx.scene.input.MouseEvent e)        { Controllor.AdminSidebarHelper.goToSuiviMental(); }
+    @FXML public void onNavForumClicked(javafx.scene.input.MouseEvent e)        { Controllor.AdminSidebarHelper.goToForum(); }
+    @FXML public void onNavRdvClicked(javafx.scene.input.MouseEvent e)          { Controllor.AdminSidebarHelper.goToRendezVous(); }
+    @FXML public void onNavUtilisateursClicked(javafx.scene.input.MouseEvent e) { Controllor.AdminSidebarHelper.goToUtilisateurs(); }
+    @FXML public void onNavDossiersClicked(javafx.scene.input.MouseEvent e)     { Controllor.AdminSidebarHelper.goToDossiers(); }
+    @FXML public void onNavContenusClicked(javafx.scene.input.MouseEvent e)     { Controllor.AdminSidebarHelper.goToContenus(); }
+    @FXML public void onNavActivitesClicked(javafx.scene.input.MouseEvent e)    { Controllor.AdminSidebarHelper.goToActivites(); }
+    @FXML public void onNavReservationsClicked(javafx.scene.input.MouseEvent e) { Controllor.AdminSidebarHelper.goToReservations(); }
+    @FXML public void onNavHoverEnter(javafx.scene.input.MouseEvent e)          { }
+    @FXML public void onNavHoverExit(javafx.scene.input.MouseEvent e)           { }
+    @FXML public void onNavSujetsClicked(javafx.scene.input.MouseEvent e)       { Controllor.AdminSidebarHelper.goToForum(); }
+    @FXML public void onNavCommentairesClicked(javafx.scene.input.MouseEvent e) { Controllor.AdminSidebarHelper.goToCommentaires(); }
+    @FXML public void onNavSuiviStatsClicked(javafx.scene.input.MouseEvent e)   { Controllor.AdminSidebarHelper.goToSuiviMental(); }
+    @FXML public void onNavObjectifsClicked(javafx.scene.input.MouseEvent e)    { Controllor.AdminSidebarHelper.goToObjectifs(); }
+    @FXML public void onSubmenuHoverEnter(javafx.scene.input.MouseEvent e)      { }
+    @FXML public void onSubmenuHoverExit(javafx.scene.input.MouseEvent e)       { }
+    @FXML public void onLogout(javafx.event.ActionEvent e)                      { Controllor.AdminSidebarHelper.logout(); }
 
     // ─── Popup Modification ──────────────────────────────────────────────────
 

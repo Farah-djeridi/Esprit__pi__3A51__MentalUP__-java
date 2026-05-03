@@ -1,6 +1,6 @@
-package Services;
+package services;
 
-import Models.Rating;
+import models.Rating;
 import utils.MyDataBase;
 
 import java.sql.*;
@@ -36,8 +36,8 @@ public class ServiceRating {
             if (rs.next()) {
                 return rs.getDouble("average");
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            // Table may not exist yet — return 0 silently
         }
         return 0.0;
     }

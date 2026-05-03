@@ -218,6 +218,21 @@
                            style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px; -fx-font-weight: 500;"/>
                 </HBox>
 
+                <!-- Réservations -->
+                <HBox alignment="CENTER_LEFT" spacing="12"
+                      fx:id="navReservations"
+                      onMouseClicked="#onNavReservationsClicked"
+                      onMouseEntered="#onNavHoverEnter"
+                      onMouseExited="#onNavHoverExit"
+                      style="-fx-background-color: transparent;
+                             -fx-background-radius: 8;
+                             -fx-padding: 10 14;
+                             -fx-cursor: hand;">
+                    <Label text="📋" style="-fx-font-size: 16px; -fx-text-fill: rgba(255,255,255,0.85);"/>
+                    <Label text="Réservations"
+                           style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14px; -fx-font-weight: 500;"/>
+                </HBox>
+
             </VBox>
 
             <!-- Profil administrateur -->
@@ -235,7 +250,7 @@
                                style="-fx-text-fill: rgba(255,255,255,0.55); -fx-font-size: 11px; -fx-font-weight: 500;"/>
                     </VBox>
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Button fx:id="logoutButton" text="⏻" onAction="#onLogout"
+                    <Button fx:id="logoutButton" text="Quitter" onAction="#onLogout"
                             style="-fx-background-color: rgba(255,255,255,0.1);
                                    -fx-text-fill: white;
                                    -fx-background-radius: 6;

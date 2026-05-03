@@ -260,6 +260,8 @@ public class LoginController {
             TwoFactorController ctrl = loader.getController();
             ctrl.setExpectedCode(code);
             Stage stage = (Stage) txtEmail.getScene().getWindow();
+            // Register this stage as the primary stage so SceneManager.goToHome() works
+            SceneManager.setPrimaryStage(stage);
             stage.setScene(new Scene(root));
             stage.setTitle("Verification — MentalUp");
         } catch (Exception e) {

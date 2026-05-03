@@ -31,16 +31,28 @@ public class ProfileController {
     @FXML private Label         lblNavName;
     @FXML private Label         lblNavRole;
     @FXML private Label         avatarInitials;
+    @FXML private Label         navAvatarInitials;
     @FXML private ImageView     avatarImage;
+    @FXML private ImageView     navAvatarImage;
     @FXML private ImageView     logoImage;
     @FXML private Button        menuButton;
     @FXML private StackPane     cameraOverlay;
 
     private final ServiceUser service = new ServiceUser();
     private ContextMenu contextMenu;
+    private Thread generationThread;
+    private volatile boolean controllerActive = true;
+    // Static ref to deactivate previous instance when a new one is created
+    private static ProfileController currentInstance;
 
     @FXML
     public void initialize() {
+        // Always clear any stale message from a previous session
+        lblMessage.setText("");
+        // Deactivate any previous instance so its pending callbacks are ignored
+        if (currentInstance != null) currentInstance.controllerActive = false;
+        currentInstance = this;
+
         // Logo
         try {
             logoImage.setImage(new Image(getClass().getResourceAsStream("/Images/logo.png")));
@@ -76,6 +88,7 @@ public class ProfileController {
 
         // Charger avatar s'il existe deja
         loadAvatarFromPath(user.getAvatarFilename());
+        loadNavAvatarFromPath(user.getAvatarFilename(), initials.toUpperCase());
 
         // Menu contextuel
         contextMenu = new ContextMenu();
@@ -143,6 +156,7 @@ public class ProfileController {
             if (user != null) {
                 user.setAvatarFilename(file.getAbsolutePath());
                 service.update(user);
+                loadNavAvatarFromPath(file.getAbsolutePath(), "");
             }
         }
     }
@@ -211,6 +225,35 @@ public class ProfileController {
         }
     }
 
+    /** Loads avatar into the top-right nav circle */
+    private void loadNavAvatarFromPath(String path, String initials) {
+        if (navAvatarInitials != null) navAvatarInitials.setText(initials);
+        if (path == null || path.isEmpty()) return;
+        try {
+            java.io.File f = new java.io.File(path);
+            if (!f.exists()) return;
+            javafx.scene.image.Image img = new javafx.scene.image.Image(f.toURI().toString());
+            if (navAvatarImage != null) {
+                navAvatarImage.setImage(img);
+                javafx.scene.shape.Circle clip = new javafx.scene.shape.Circle(18, 18, 18);
+                navAvatarImage.setClip(clip);
+                navAvatarImage.setVisible(true);
+                if (navAvatarInitials != null) navAvatarInitials.setVisible(false);
+            }
+        } catch (Exception e) {
+            System.err.println("Nav avatar load error: " + e.getMessage());
+        }
+    }
+
+    // ─── Navigation ──────────────────────────────────────────────────────────
+
+    @FXML public void goToDashboard(javafx.event.ActionEvent e) { SceneManager.goToHome(); }
+    @FXML public void goToSuivi(javafx.event.ActionEvent e)     { SceneManager.switchTo("suivi_mentale.fxml", "Suivi Mental"); }
+    @FXML public void goToObjectif(javafx.event.ActionEvent e)  { SceneManager.switchTo("objvue.fxml", "Objectifs"); }
+    @FXML public void goToForum(javafx.event.ActionEvent e)     { SceneManager.switchTo("forum.fxml", "Forum"); }
+    @FXML public void goToRdv(javafx.event.ActionEvent e)       { SceneManager.switchTo("RendezVous_Etudiant.fxml", "Rendez-vous"); }
+    @FXML public void goToActivites(javafx.event.ActionEvent e) { SceneManager.switchTo("EtudiantActivites.fxml", "Activités"); }
+
     @FXML
     public void handleLogout() {
         SessionManager.getInstance().logout();
@@ -227,24 +270,32 @@ public class ProfileController {
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(prompt -> {
             if (!prompt.trim().isEmpty()) {
-                msg("Generation en cours (30-60 sec)...", true);
-
+                msg("Generation en cours...", true);
                 String finalPrompt = prompt.trim();
-                Thread t = new Thread(() -> {
+                controllerActive = true;
+
+                generationThread = new Thread(() -> {
+                    // Try HuggingFace first, fall back to DiceBear
                     String filePath = AvatarService.generateAvatarFromPrompt(finalPrompt);
 
+                    if (filePath == null) {
+                        // Fallback: DiceBear cartoon avatar (no token needed)
+                        filePath = generateDiceBearAvatar(finalPrompt);
+                    }
+
+                    final String finalPath = filePath;
                     javafx.application.Platform.runLater(() -> {
-                        if (filePath != null) {
+                        if (!controllerActive) return; // controller was replaced, ignore
+                        if (finalPath != null) {
                             try {
-                                File imageFile = new File(filePath);
+                                File imageFile = new File(finalPath);
                                 if (imageFile.exists()) {
                                     avatarImage.setImage(new Image(imageFile.toURI().toString()));
                                     applyCircleClip();
                                     avatarInitials.setVisible(false);
-
                                     User user = SessionManager.getInstance().getCurrentUser();
                                     if (user != null) {
-                                        user.setAvatarFilename(filePath);
+                                        user.setAvatarFilename(finalPath);
                                         service.update(user);
                                     }
                                     msg("Avatar genere avec succes !", true);
@@ -252,18 +303,51 @@ public class ProfileController {
                                     msg("Fichier image non trouve.", false);
                                 }
                             } catch (Exception e) {
-                                e.printStackTrace();
-                                msg("Erreur chargement image: " + e.getMessage(), false);
+                                msg("Erreur: " + e.getMessage(), false);
                             }
                         } else {
-                            msg("Generation echouee. Verifiez votre token Hugging Face.", false);
+                            msg("Generation echouee. Verifiez votre connexion.", false);
                         }
                     });
                 });
-                t.setDaemon(true);
-                t.start();
+                generationThread.setDaemon(true);
+                generationThread.start();
             }
         });
+    }
+
+    /**
+     * Generates a cartoon avatar using DiceBear API (free, no token needed).
+     * Uses the "adventurer" style which produces colorful cartoon faces.
+     */
+    private String generateDiceBearAvatar(String seed) {
+        try {
+            // Encode seed for URL
+            String encodedSeed = java.net.URLEncoder.encode(seed, java.nio.charset.StandardCharsets.UTF_8);
+            String url = "https://api.dicebear.com/7.x/adventurer/png?seed=" + encodedSeed + "&size=200";
+
+            java.net.HttpURLConnection conn = (java.net.HttpURLConnection) new java.net.URL(url).openConnection();
+            conn.setRequestMethod("GET");
+            conn.setConnectTimeout(10000);
+            conn.setReadTimeout(10000);
+            conn.setRequestProperty("User-Agent", "MentalUpApp/1.0");
+
+            if (conn.getResponseCode() != 200) return null;
+
+            // Save to temp file
+            java.io.File tempFile = java.io.File.createTempFile("avatar_", ".png");
+            try (java.io.InputStream in = conn.getInputStream();
+                 java.io.FileOutputStream out = new java.io.FileOutputStream(tempFile)) {
+                byte[] buf = new byte[4096];
+                int n;
+                while ((n = in.read(buf)) != -1) out.write(buf, 0, n);
+            }
+            conn.disconnect();
+            return tempFile.getAbsolutePath();
+        } catch (Exception e) {
+            System.err.println("DiceBear fallback failed: " + e.getMessage());
+            return null;
+        }
     }
 
     private void msg(String text, boolean success) {

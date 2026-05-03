@@ -22,8 +22,8 @@ import javafx.collections.ObservableList;
 import services.ServiceRendezVous;
 import services.ServiceDossier;
 import services.PDFService;
-import Models.Dossier;
-import Models.RendezVous;
+import models.Dossier;
+import models.RendezVous;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
